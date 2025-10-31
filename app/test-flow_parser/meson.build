@@ -2,4 +2,4 @@
 
 sources = files('main.c')
 
-deps += ['flow_parser']
+deps += ['ethdev']

@@ -16,7 +16,6 @@
 #include <cmdline_parse_string.h>
 #include <cmdline_parse_num.h>
 #include <rte_flow.h>
-#include <rte_flow_parser.h>
 
 #include "testpmd.h"
 

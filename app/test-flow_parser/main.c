@@ -9,7 +9,6 @@
 
 #include <rte_eal.h>
 #include <rte_flow.h>
-#include <rte_flow_parser.h>
 #include <rte_ip.h>
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))

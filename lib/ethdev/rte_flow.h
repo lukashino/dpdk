@@ -7126,6 +7126,244 @@ rte_flow_template_table_resize_complete(uint16_t port_id,
 					struct rte_flow_template_table *table,
 					struct rte_flow_error *error);
 
+/**
+ * @warning
+ * @b EXPERIMENTAL: this API may change without prior notice.
+ *
+ * Default limit for pattern items produced by the flow parser helpers.
+ */
+#define RTE_FLOW_PARSER_DEFAULT_PATTERN_ITEMS 32U
+
+/**
+ * @warning
+ * @b EXPERIMENTAL: this API may change without prior notice.
+ *
+ * Default limit for actions produced by the flow parser helpers.
+ */
+#define RTE_FLOW_PARSER_DEFAULT_ACTIONS 32U
+
+/**
+ * @warning
+ * @b EXPERIMENTAL: this API may change without prior notice.
+ *
+ * Opaque parser context for converting textual flow descriptions to
+ * ``struct rte_flow`` objects. The context lifetime is managed through
+ * rte_flow_parser_create() and rte_flow_parser_destroy().
+ */
+struct rte_flow_parser;
+
+/**
+ * @warning
+ * @b EXPERIMENTAL: this API may change without prior notice.
+ *
+ * Parser configuration attributes controlling memory consumption and
+ * allocation policy.
+ */
+struct rte_flow_parse_attr {
+	uint32_t max_pattern_items; /**< Maximum pattern items to allocate. */
+	uint32_t max_actions; /**< Maximum actions to allocate. */
+	uint32_t socket_id; /**< Preferred NUMA socket for allocations. */
+};
+
+/**
+ * @warning
+ * @b EXPERIMENTAL: this API may change without prior notice.
+ *
+ * Result container produced by rte_flow parser helpers.
+ */
+struct rte_flow_parse_result {
+	struct rte_flow_attr attr; /**< Parsed rule attributes. */
+	struct rte_flow_item *pattern; /**< Pattern array terminated by END. */
+	uint32_t pattern_count; /**< Number of valid pattern entries. */
+	struct rte_flow_action *actions; /**< Actions array terminated by END. */
+	uint32_t actions_count; /**< Number of valid action entries. */
+	uint16_t port_id; /**< Port identifier extracted from command. */
+};
+
+/**
+ * @warning
+ * @b EXPERIMENTAL: this API may change without prior notice.
+ *
+ * Create a flow parser context.
+ *
+ * @param attr
+ *   Optional attributes controlling capacity and allocation policy.
+ * @param error
+ *   Flow error for detailed diagnostics when creation fails.
+ *
+ * @return
+ *   A valid parser pointer on success, NULL otherwise with error populated.
+ */
+__rte_experimental
+struct rte_flow_parser *
+rte_flow_parser_create(const struct rte_flow_parse_attr *attr,
+	    struct rte_flow_error *error);
+
+/**
+ * @warning
+ * @b EXPERIMENTAL: this API may change without prior notice.
+ *
+ * Reset an existing parser context. Presently a no-op kept for API symmetry.
+ *
+ * @param parser
+ *   Parser instance obtained from rte_flow_parser_create().
+ * @param error
+ *   Flow error for detailed diagnostics.
+ *
+ * @return
+ *   0 on success, negative errno-style value otherwise.
+ */
+__rte_experimental
+int
+rte_flow_parser_reset(struct rte_flow_parser *parser,
+	struct rte_flow_error *error);
+
+/**
+ * @warning
+ * @b EXPERIMENTAL: this API may change without prior notice.
+ *
+ * Parse a ``flow create`` command string into rte_flow structures.
+ *
+ * @param parser
+ *   Parser instance obtained from rte_flow_parser_create().
+ * @param input
+ *   Null-terminated command string.
+ * @param result
+ *   Output structure receiving parsed attributes, pattern and actions.
+ * @param error
+ *   Optional flow error populated on failure.
+ *
+ * @return
+ *   0 on success, negative errno-style value otherwise.
+ */
+__rte_experimental
+int
+rte_flow_parser_rule(struct rte_flow_parser *parser,
+	const char *input,
+	struct rte_flow_parse_result *result,
+	struct rte_flow_error *error);
+
+/**
+ * @warning
+ * @b EXPERIMENTAL: this API may change without prior notice.
+ *
+ * Parse only the pattern portion of a flow command.
+ *
+ * @param parser
+ *   Parser instance obtained from rte_flow_parser_create().
+ * @param pattern_str
+ *   Null-terminated string describing the pattern.
+ * @param[out] pattern_out
+ *   Receives the allocated pattern array (must be freed with
+ *   rte_flow_parser_pattern_free()).
+ * @param[out] pattern_count
+ *   Receives the number of entries in @p pattern_out when non-NULL.
+ * @param error
+ *   Optional flow error populated on failure.
+ *
+ * @return
+ *   0 on success, negative errno-style value otherwise.
+ */
+__rte_experimental
+int
+rte_flow_parser_pattern(struct rte_flow_parser *parser,
+	const char *pattern_str,
+	struct rte_flow_item **pattern_out,
+	uint32_t *pattern_count,
+	struct rte_flow_error *error);
+
+/**
+ * @warning
+ * @b EXPERIMENTAL: this API may change without prior notice.
+ *
+ * Parse only the actions portion of a flow command.
+ *
+ * @param parser
+ *   Parser instance obtained from rte_flow_parser_create().
+ * @param actions_str
+ *   Null-terminated string describing the actions.
+ * @param[out] actions_out
+ *   Receives the allocated actions array (must be freed with
+ *   rte_flow_parser_actions_free()).
+ * @param[out] actions_count
+ *   Receives the number of entries in @p actions_out when non-NULL.
+ * @param error
+ *   Optional flow error populated on failure.
+ *
+ * @return
+ *   0 on success, negative errno-style value otherwise.
+ */
+__rte_experimental
+int
+rte_flow_parser_actions(struct rte_flow_parser *parser,
+	const char *actions_str,
+	struct rte_flow_action **actions_out,
+	uint32_t *actions_count,
+	struct rte_flow_error *error);
+
+/**
+ * @warning
+ * @b EXPERIMENTAL: this API may change without prior notice.
+ *
+ * Destroy a parser context created by rte_flow_parser_create().
+ *
+ * @param parser
+ *   Parser instance to destroy. NULL is permitted.
+ */
+__rte_experimental
+void
+rte_flow_parser_destroy(struct rte_flow_parser *parser);
+
+/**
+ * @warning
+ * @b EXPERIMENTAL: this API may change without prior notice.
+ *
+ * Free a pattern array produced by the parser helpers.
+ *
+ * @param parser
+ *   Parser instance that produced the pattern (unused, may be NULL).
+ * @param pattern
+ *   Pattern array allocated by rte_flow_parser_pattern() or
+ *   rte_flow_parser_rule().
+ */
+__rte_experimental
+void
+rte_flow_parser_pattern_free(struct rte_flow_parser *parser,
+	struct rte_flow_item *pattern);
+
+/**
+ * @warning
+ * @b EXPERIMENTAL: this API may change without prior notice.
+ *
+ * Free an actions array produced by the parser helpers.
+ *
+ * @param parser
+ *   Parser instance that produced the actions (unused, may be NULL).
+ * @param actions
+ *   Actions array allocated by rte_flow_parser_actions() or
+ *   rte_flow_parser_rule().
+ */
+__rte_experimental
+void
+rte_flow_parser_actions_free(struct rte_flow_parser *parser,
+	struct rte_flow_action *actions);
+
+/**
+ * @warning
+ * @b EXPERIMENTAL: this API may change without prior notice.
+ *
+ * Release all allocations referenced by a parse result.
+ *
+ * @param parser
+ *   Parser instance that produced the result (unused, may be NULL).
+ * @param result
+ *   Result structure to clean (may be NULL).
+ */
+__rte_experimental
+void
+rte_flow_parse_result_free(struct rte_flow_parser *parser,
+	struct rte_flow_parse_result *result);
+
 #ifdef __cplusplus
 }
 #endif
