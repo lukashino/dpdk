@@ -10,11 +10,13 @@
 #include <string.h>
 
 #include <rte_common.h>
+#include <rte_errno.h>
 #include <rte_ethdev.h>
 #include <cmdline_parse.h>
 #include <cmdline_parse_string.h>
 #include <cmdline_parse_num.h>
 #include <rte_flow.h>
+#include <rte_flow_parser.h>
 
 #include "testpmd.h"
 
@@ -126,42 +128,68 @@ enum flex_link_type {
 static int
 flex_link_item_parse(const char *src, struct rte_flow_item *item)
 {
-#define  FLEX_PARSE_DATA_SIZE 1024
+	char pattern_str[256];
+	struct rte_flow_parser *parser;
+	struct rte_flow_item *pattern = NULL;
+	uint32_t pattern_count = 0;
+	struct rte_flow_error error;
+	const struct rte_flow_item *parsed;
+	void *spec_buf = (void *)(uintptr_t)item->spec;
+	void *mask_buf = (void *)(uintptr_t)item->mask;
+	void *last_buf = (void *)(uintptr_t)item->last;
+	int len;
+	int ret = 0;
 
-	int ret;
-	uint8_t *ptr, data[FLEX_PARSE_DATA_SIZE] = {0,};
-	char flow_rule[256];
-	struct rte_flow_attr *attr;
-	struct rte_flow_item *pattern;
-	struct rte_flow_action *actions;
+	len = snprintf(pattern_str, sizeof(pattern_str),
+		      "pattern %s / end", src);
+	if (len < 0 || len >= (int)sizeof(pattern_str))
+		return -ENOSPC;
 
-	sprintf(flow_rule,
-		"flow create 0 pattern %s / end actions drop / end", src);
-	src = flow_rule;
-	ret = flow_parse(src, (void *)data, sizeof(data),
-			 &attr, &pattern, &actions);
-	if (ret)
-		return ret;
-	item->type = pattern->type;
-	if (pattern->spec) {
-		ptr = (void *)(uintptr_t)item->spec;
-		memcpy(ptr, pattern->spec, FLEX_MAX_FLOW_PATTERN_LENGTH);
+	parser = rte_flow_parser_create(NULL, &error);
+	if (!parser)
+		return -rte_errno;
+
+	ret = rte_flow_parser_pattern(parser, pattern_str, &pattern,
+					  &pattern_count, &error);
+	if (ret) {
+		printf("flex parser: failed to parse pattern \"%s\": %s\n",
+		       src, error.message ? error.message : "unknown error");
+		goto out_destroy;
+	}
+	if (!pattern_count) {
+		ret = -EINVAL;
+		goto out_cleanup;
+	}
+
+	parsed = &pattern[0];
+	item->type = parsed->type;
+	if (parsed->spec && spec_buf) {
+		memcpy(spec_buf, parsed->spec,
+		       FLEX_MAX_FLOW_PATTERN_LENGTH);
+		item->spec = spec_buf;
 	} else {
 		item->spec = NULL;
 	}
-	if (pattern->mask) {
-		ptr = (void *)(uintptr_t)item->mask;
-		memcpy(ptr, pattern->mask, FLEX_MAX_FLOW_PATTERN_LENGTH);
+	if (parsed->mask && mask_buf) {
+		memcpy(mask_buf, parsed->mask,
+		       FLEX_MAX_FLOW_PATTERN_LENGTH);
+		item->mask = mask_buf;
 	} else {
 		item->mask = NULL;
 	}
-	if (pattern->last) {
-		ptr = (void *)(uintptr_t)item->last;
-		memcpy(ptr, pattern->last, FLEX_MAX_FLOW_PATTERN_LENGTH);
+	if (parsed->last && last_buf) {
+		memcpy(last_buf, parsed->last,
+		       FLEX_MAX_FLOW_PATTERN_LENGTH);
+		item->last = last_buf;
 	} else {
 		item->last = NULL;
 	}
-	return 0;
+
+out_cleanup:
+	rte_flow_parser_pattern_free(parser, pattern);
+out_destroy:
+	rte_flow_parser_destroy(parser);
+	return ret;
 }
 
 static int

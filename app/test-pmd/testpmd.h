@@ -1280,10 +1280,6 @@ void flex_item_create(portid_t port_id, uint16_t flex_id, const char *filename);
 void flex_item_destroy(portid_t port_id, uint16_t flex_id);
 void port_flex_item_flush(portid_t port_id);
 
-extern int flow_parse(const char *src, void *result, unsigned int size,
-		      struct rte_flow_attr **attr,
-		      struct rte_flow_item **pattern,
-		      struct rte_flow_action **actions);
 int setup_hairpin_queues(portid_t pi, portid_t p_pi, uint16_t cnt_pi);
 int hairpin_bind(uint16_t cfg_pi, portid_t *pl, portid_t *peer_pl);
 void hairpin_map_usage(void);
