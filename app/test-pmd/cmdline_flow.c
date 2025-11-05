@@ -21,6 +21,8 @@
 #include <cmdline_parse_string.h>
 #include <cmdline_parse_num.h>
 #include <rte_flow.h>
+
+#include <rte_flow_cmd_parser_priv.h>
 #include <rte_hexdump.h>
 #include <rte_vxlan.h>
 #include <rte_gre.h>
@@ -29,768 +31,6 @@
 #include <rte_geneve.h>
 
 #include "testpmd.h"
-
-/** Parser token indices. */
-enum index {
-	/* Special tokens. */
-	ZERO = 0,
-	END,
-	START_SET,
-	END_SET,
-
-	/* Common tokens. */
-	COMMON_INTEGER,
-	COMMON_UNSIGNED,
-	COMMON_PREFIX,
-	COMMON_BOOLEAN,
-	COMMON_STRING,
-	COMMON_HEX,
-	COMMON_FILE_PATH,
-	COMMON_MAC_ADDR,
-	COMMON_IPV4_ADDR,
-	COMMON_IPV6_ADDR,
-	COMMON_RULE_ID,
-	COMMON_PORT_ID,
-	COMMON_GROUP_ID,
-	COMMON_PRIORITY_LEVEL,
-	COMMON_INDIRECT_ACTION_ID,
-	COMMON_PROFILE_ID,
-	COMMON_POLICY_ID,
-	COMMON_FLEX_HANDLE,
-	COMMON_FLEX_TOKEN,
-	COMMON_PATTERN_TEMPLATE_ID,
-	COMMON_ACTIONS_TEMPLATE_ID,
-	COMMON_TABLE_ID,
-	COMMON_QUEUE_ID,
-	COMMON_METER_COLOR_NAME,
-
-	/* TOP-level command. */
-	ADD,
-
-	/* Top-level command. */
-	SET,
-	/* Sub-leve commands. */
-	SET_RAW_ENCAP,
-	SET_RAW_DECAP,
-	SET_RAW_INDEX,
-	SET_SAMPLE_ACTIONS,
-	SET_SAMPLE_INDEX,
-	SET_IPV6_EXT_REMOVE,
-	SET_IPV6_EXT_PUSH,
-	SET_IPV6_EXT_INDEX,
-
-	/* Top-level command. */
-	FLOW,
-	/* Sub-level commands. */
-	INFO,
-	CONFIGURE,
-	PATTERN_TEMPLATE,
-	ACTIONS_TEMPLATE,
-	TABLE,
-	FLOW_GROUP,
-	INDIRECT_ACTION,
-	VALIDATE,
-	CREATE,
-	DESTROY,
-	UPDATE,
-	FLUSH,
-	DUMP,
-	QUERY,
-	LIST,
-	AGED,
-	ISOLATE,
-	TUNNEL,
-	FLEX,
-	QUEUE,
-	PUSH,
-	PULL,
-	HASH,
-
-	/* Flex arguments */
-	FLEX_ITEM_CREATE,
-	FLEX_ITEM_DESTROY,
-
-	/* Pattern template arguments. */
-	PATTERN_TEMPLATE_CREATE,
-	PATTERN_TEMPLATE_DESTROY,
-	PATTERN_TEMPLATE_CREATE_ID,
-	PATTERN_TEMPLATE_DESTROY_ID,
-	PATTERN_TEMPLATE_RELAXED_MATCHING,
-	PATTERN_TEMPLATE_INGRESS,
-	PATTERN_TEMPLATE_EGRESS,
-	PATTERN_TEMPLATE_TRANSFER,
-	PATTERN_TEMPLATE_SPEC,
-
-	/* Actions template arguments. */
-	ACTIONS_TEMPLATE_CREATE,
-	ACTIONS_TEMPLATE_DESTROY,
-	ACTIONS_TEMPLATE_CREATE_ID,
-	ACTIONS_TEMPLATE_DESTROY_ID,
-	ACTIONS_TEMPLATE_INGRESS,
-	ACTIONS_TEMPLATE_EGRESS,
-	ACTIONS_TEMPLATE_TRANSFER,
-	ACTIONS_TEMPLATE_SPEC,
-	ACTIONS_TEMPLATE_MASK,
-
-	/* Queue arguments. */
-	QUEUE_CREATE,
-	QUEUE_DESTROY,
-	QUEUE_FLOW_UPDATE_RESIZED,
-	QUEUE_UPDATE,
-	QUEUE_AGED,
-	QUEUE_INDIRECT_ACTION,
-
-	/* Queue create arguments. */
-	QUEUE_CREATE_POSTPONE,
-	QUEUE_TEMPLATE_TABLE,
-	QUEUE_PATTERN_TEMPLATE,
-	QUEUE_ACTIONS_TEMPLATE,
-	QUEUE_RULE_ID,
-
-	/* Queue destroy arguments. */
-	QUEUE_DESTROY_ID,
-	QUEUE_DESTROY_POSTPONE,
-
-	/* Queue update arguments. */
-	QUEUE_UPDATE_ID,
-
-	/* Queue indirect action arguments */
-	QUEUE_INDIRECT_ACTION_CREATE,
-	QUEUE_INDIRECT_ACTION_LIST_CREATE,
-	QUEUE_INDIRECT_ACTION_UPDATE,
-	QUEUE_INDIRECT_ACTION_DESTROY,
-	QUEUE_INDIRECT_ACTION_QUERY,
-	QUEUE_INDIRECT_ACTION_QUERY_UPDATE,
-
-	/* Queue indirect action create arguments */
-	QUEUE_INDIRECT_ACTION_CREATE_ID,
-	QUEUE_INDIRECT_ACTION_INGRESS,
-	QUEUE_INDIRECT_ACTION_EGRESS,
-	QUEUE_INDIRECT_ACTION_TRANSFER,
-	QUEUE_INDIRECT_ACTION_CREATE_POSTPONE,
-	QUEUE_INDIRECT_ACTION_SPEC,
-	QUEUE_INDIRECT_ACTION_LIST,
-
-	/* Queue indirect action update arguments */
-	QUEUE_INDIRECT_ACTION_UPDATE_POSTPONE,
-
-	/* Queue indirect action destroy arguments */
-	QUEUE_INDIRECT_ACTION_DESTROY_ID,
-	QUEUE_INDIRECT_ACTION_DESTROY_POSTPONE,
-
-	/* Queue indirect action query arguments */
-	QUEUE_INDIRECT_ACTION_QUERY_POSTPONE,
-
-	/* Queue indirect action query_update arguments */
-	QUEUE_INDIRECT_ACTION_QU_MODE,
-
-	/* Push arguments. */
-	PUSH_QUEUE,
-
-	/* Pull arguments. */
-	PULL_QUEUE,
-
-	/* Table arguments. */
-	TABLE_CREATE,
-	TABLE_DESTROY,
-	TABLE_RESIZE,
-	TABLE_RESIZE_COMPLETE,
-	TABLE_CREATE_ID,
-	TABLE_DESTROY_ID,
-	TABLE_RESIZE_ID,
-	TABLE_RESIZE_RULES_NUMBER,
-	TABLE_INSERTION_TYPE,
-	TABLE_INSERTION_TYPE_NAME,
-	TABLE_HASH_FUNC,
-	TABLE_HASH_FUNC_NAME,
-	TABLE_GROUP,
-	TABLE_PRIORITY,
-	TABLE_INGRESS,
-	TABLE_EGRESS,
-	TABLE_TRANSFER,
-	TABLE_TRANSFER_WIRE_ORIG,
-	TABLE_TRANSFER_VPORT_ORIG,
-	TABLE_RESIZABLE,
-	TABLE_RULES_NUMBER,
-	TABLE_PATTERN_TEMPLATE,
-	TABLE_ACTIONS_TEMPLATE,
-
-	/* Group arguments */
-	GROUP_ID,
-	GROUP_INGRESS,
-	GROUP_EGRESS,
-	GROUP_TRANSFER,
-	GROUP_SET_MISS_ACTIONS,
-
-	/* Hash calculation arguments. */
-	HASH_CALC_TABLE,
-	HASH_CALC_PATTERN_INDEX,
-	HASH_CALC_PATTERN,
-	HASH_CALC_ENCAP,
-	HASH_CALC_DEST,
-	ENCAP_HASH_FIELD_SRC_PORT,
-	ENCAP_HASH_FIELD_GRE_FLOW_ID,
-
-	/* Tunnel arguments. */
-	TUNNEL_CREATE,
-	TUNNEL_CREATE_TYPE,
-	TUNNEL_LIST,
-	TUNNEL_DESTROY,
-	TUNNEL_DESTROY_ID,
-
-	/* Destroy arguments. */
-	DESTROY_RULE,
-	DESTROY_IS_USER_ID,
-
-	/* Query arguments. */
-	QUERY_ACTION,
-	QUERY_IS_USER_ID,
-
-	/* List arguments. */
-	LIST_GROUP,
-
-	/* Destroy aged flow arguments. */
-	AGED_DESTROY,
-
-	/* Validate/create arguments. */
-	VC_GROUP,
-	VC_PRIORITY,
-	VC_INGRESS,
-	VC_EGRESS,
-	VC_TRANSFER,
-	VC_TUNNEL_SET,
-	VC_TUNNEL_MATCH,
-	VC_USER_ID,
-	VC_IS_USER_ID,
-
-	/* Dump arguments */
-	DUMP_ALL,
-	DUMP_ONE,
-	DUMP_IS_USER_ID,
-
-	/* Configure arguments */
-	CONFIG_QUEUES_NUMBER,
-	CONFIG_QUEUES_SIZE,
-	CONFIG_COUNTERS_NUMBER,
-	CONFIG_AGING_OBJECTS_NUMBER,
-	CONFIG_METERS_NUMBER,
-	CONFIG_CONN_TRACK_NUMBER,
-	CONFIG_QUOTAS_NUMBER,
-	CONFIG_FLAGS,
-	CONFIG_HOST_PORT,
-
-	/* Indirect action arguments */
-	INDIRECT_ACTION_CREATE,
-	INDIRECT_ACTION_LIST_CREATE,
-	INDIRECT_ACTION_FLOW_CONF_CREATE,
-	INDIRECT_ACTION_UPDATE,
-	INDIRECT_ACTION_DESTROY,
-	INDIRECT_ACTION_QUERY,
-	INDIRECT_ACTION_QUERY_UPDATE,
-
-	/* Indirect action create arguments */
-	INDIRECT_ACTION_CREATE_ID,
-	INDIRECT_ACTION_INGRESS,
-	INDIRECT_ACTION_EGRESS,
-	INDIRECT_ACTION_TRANSFER,
-	INDIRECT_ACTION_SPEC,
-	INDIRECT_ACTION_LIST,
-	INDIRECT_ACTION_FLOW_CONF,
-
-	/* Indirect action destroy arguments */
-	INDIRECT_ACTION_DESTROY_ID,
-
-	/* Indirect action query-and-update arguments */
-	INDIRECT_ACTION_QU_MODE,
-	INDIRECT_ACTION_QU_MODE_NAME,
-
-	/* Validate/create pattern. */
-	ITEM_PATTERN,
-	ITEM_PARAM_IS,
-	ITEM_PARAM_SPEC,
-	ITEM_PARAM_LAST,
-	ITEM_PARAM_MASK,
-	ITEM_PARAM_PREFIX,
-	ITEM_NEXT,
-	ITEM_END,
-	ITEM_VOID,
-	ITEM_INVERT,
-	ITEM_ANY,
-	ITEM_ANY_NUM,
-	ITEM_PORT_ID,
-	ITEM_PORT_ID_ID,
-	ITEM_MARK,
-	ITEM_MARK_ID,
-	ITEM_RAW,
-	ITEM_RAW_RELATIVE,
-	ITEM_RAW_SEARCH,
-	ITEM_RAW_OFFSET,
-	ITEM_RAW_LIMIT,
-	ITEM_RAW_PATTERN,
-	ITEM_RAW_PATTERN_HEX,
-	ITEM_ETH,
-	ITEM_ETH_DST,
-	ITEM_ETH_SRC,
-	ITEM_ETH_TYPE,
-	ITEM_ETH_HAS_VLAN,
-	ITEM_VLAN,
-	ITEM_VLAN_TCI,
-	ITEM_VLAN_PCP,
-	ITEM_VLAN_DEI,
-	ITEM_VLAN_VID,
-	ITEM_VLAN_INNER_TYPE,
-	ITEM_VLAN_HAS_MORE_VLAN,
-	ITEM_IPV4,
-	ITEM_IPV4_VER_IHL,
-	ITEM_IPV4_TOS,
-	ITEM_IPV4_LENGTH,
-	ITEM_IPV4_ID,
-	ITEM_IPV4_FRAGMENT_OFFSET,
-	ITEM_IPV4_TTL,
-	ITEM_IPV4_PROTO,
-	ITEM_IPV4_SRC,
-	ITEM_IPV4_DST,
-	ITEM_IPV6,
-	ITEM_IPV6_TC,
-	ITEM_IPV6_FLOW,
-	ITEM_IPV6_LEN,
-	ITEM_IPV6_PROTO,
-	ITEM_IPV6_HOP,
-	ITEM_IPV6_SRC,
-	ITEM_IPV6_DST,
-	ITEM_IPV6_HAS_FRAG_EXT,
-	ITEM_IPV6_ROUTING_EXT,
-	ITEM_IPV6_ROUTING_EXT_TYPE,
-	ITEM_IPV6_ROUTING_EXT_NEXT_HDR,
-	ITEM_IPV6_ROUTING_EXT_SEG_LEFT,
-	ITEM_ICMP,
-	ITEM_ICMP_TYPE,
-	ITEM_ICMP_CODE,
-	ITEM_ICMP_IDENT,
-	ITEM_ICMP_SEQ,
-	ITEM_UDP,
-	ITEM_UDP_SRC,
-	ITEM_UDP_DST,
-	ITEM_TCP,
-	ITEM_TCP_SRC,
-	ITEM_TCP_DST,
-	ITEM_TCP_FLAGS,
-	ITEM_SCTP,
-	ITEM_SCTP_SRC,
-	ITEM_SCTP_DST,
-	ITEM_SCTP_TAG,
-	ITEM_SCTP_CKSUM,
-	ITEM_VXLAN,
-	ITEM_VXLAN_VNI,
-	ITEM_VXLAN_FLAG_G,
-	ITEM_VXLAN_FLAG_VER,
-	ITEM_VXLAN_FLAG_I,
-	ITEM_VXLAN_FLAG_P,
-	ITEM_VXLAN_FLAG_B,
-	ITEM_VXLAN_FLAG_O,
-	ITEM_VXLAN_FLAG_D,
-	ITEM_VXLAN_FLAG_A,
-	ITEM_VXLAN_GBP_ID,
-	/* Used for "struct rte_vxlan_hdr", GPE Next protocol */
-	ITEM_VXLAN_GPE_PROTO,
-	ITEM_VXLAN_FIRST_RSVD,
-	ITEM_VXLAN_SECND_RSVD,
-	ITEM_VXLAN_THIRD_RSVD,
-	ITEM_VXLAN_LAST_RSVD,
-	ITEM_E_TAG,
-	ITEM_E_TAG_GRP_ECID_B,
-	ITEM_NVGRE,
-	ITEM_NVGRE_TNI,
-	ITEM_MPLS,
-	ITEM_MPLS_LABEL,
-	ITEM_MPLS_TC,
-	ITEM_MPLS_S,
-	ITEM_MPLS_TTL,
-	ITEM_GRE,
-	ITEM_GRE_PROTO,
-	ITEM_GRE_C_RSVD0_VER,
-	ITEM_GRE_C_BIT,
-	ITEM_GRE_K_BIT,
-	ITEM_GRE_S_BIT,
-	ITEM_FUZZY,
-	ITEM_FUZZY_THRESH,
-	ITEM_GTP,
-	ITEM_GTP_FLAGS,
-	ITEM_GTP_MSG_TYPE,
-	ITEM_GTP_TEID,
-	ITEM_GTPC,
-	ITEM_GTPU,
-	ITEM_GENEVE,
-	ITEM_GENEVE_VNI,
-	ITEM_GENEVE_PROTO,
-	ITEM_GENEVE_OPTLEN,
-	ITEM_VXLAN_GPE,
-	ITEM_VXLAN_GPE_VNI,
-	/* Used for "struct rte_vxlan_gpe_hdr", deprecated, prefer ITEM_VXLAN_GPE_PROTO */
-	ITEM_VXLAN_GPE_PROTO_IN_DEPRECATED_VXLAN_GPE_HDR,
-	ITEM_VXLAN_GPE_FLAGS,
-	ITEM_VXLAN_GPE_RSVD0,
-	ITEM_VXLAN_GPE_RSVD1,
-	ITEM_ARP_ETH_IPV4,
-	ITEM_ARP_ETH_IPV4_SHA,
-	ITEM_ARP_ETH_IPV4_SPA,
-	ITEM_ARP_ETH_IPV4_THA,
-	ITEM_ARP_ETH_IPV4_TPA,
-	ITEM_IPV6_EXT,
-	ITEM_IPV6_EXT_NEXT_HDR,
-	ITEM_IPV6_FRAG_EXT,
-	ITEM_IPV6_FRAG_EXT_NEXT_HDR,
-	ITEM_IPV6_FRAG_EXT_FRAG_DATA,
-	ITEM_IPV6_FRAG_EXT_ID,
-	ITEM_ICMP6,
-	ITEM_ICMP6_TYPE,
-	ITEM_ICMP6_CODE,
-	ITEM_ICMP6_ECHO_REQUEST,
-	ITEM_ICMP6_ECHO_REQUEST_ID,
-	ITEM_ICMP6_ECHO_REQUEST_SEQ,
-	ITEM_ICMP6_ECHO_REPLY,
-	ITEM_ICMP6_ECHO_REPLY_ID,
-	ITEM_ICMP6_ECHO_REPLY_SEQ,
-	ITEM_ICMP6_ND_NS,
-	ITEM_ICMP6_ND_NS_TARGET_ADDR,
-	ITEM_ICMP6_ND_NA,
-	ITEM_ICMP6_ND_NA_TARGET_ADDR,
-	ITEM_ICMP6_ND_OPT,
-	ITEM_ICMP6_ND_OPT_TYPE,
-	ITEM_ICMP6_ND_OPT_SLA_ETH,
-	ITEM_ICMP6_ND_OPT_SLA_ETH_SLA,
-	ITEM_ICMP6_ND_OPT_TLA_ETH,
-	ITEM_ICMP6_ND_OPT_TLA_ETH_TLA,
-	ITEM_META,
-	ITEM_META_DATA,
-	ITEM_RANDOM,
-	ITEM_RANDOM_VALUE,
-	ITEM_GRE_KEY,
-	ITEM_GRE_KEY_VALUE,
-	ITEM_GRE_OPTION,
-	ITEM_GRE_OPTION_CHECKSUM,
-	ITEM_GRE_OPTION_KEY,
-	ITEM_GRE_OPTION_SEQUENCE,
-	ITEM_GTP_PSC,
-	ITEM_GTP_PSC_QFI,
-	ITEM_GTP_PSC_PDU_T,
-	ITEM_PPPOES,
-	ITEM_PPPOED,
-	ITEM_PPPOE_SEID,
-	ITEM_PPPOE_PROTO_ID,
-	ITEM_HIGIG2,
-	ITEM_HIGIG2_CLASSIFICATION,
-	ITEM_HIGIG2_VID,
-	ITEM_TAG,
-	ITEM_TAG_DATA,
-	ITEM_TAG_INDEX,
-	ITEM_L2TPV3OIP,
-	ITEM_L2TPV3OIP_SESSION_ID,
-	ITEM_ESP,
-	ITEM_ESP_SPI,
-	ITEM_AH,
-	ITEM_AH_SPI,
-	ITEM_PFCP,
-	ITEM_PFCP_S_FIELD,
-	ITEM_PFCP_SEID,
-	ITEM_ECPRI,
-	ITEM_ECPRI_COMMON,
-	ITEM_ECPRI_COMMON_TYPE,
-	ITEM_ECPRI_COMMON_TYPE_IQ_DATA,
-	ITEM_ECPRI_COMMON_TYPE_RTC_CTRL,
-	ITEM_ECPRI_COMMON_TYPE_DLY_MSR,
-	ITEM_ECPRI_MSG_IQ_DATA_PCID,
-	ITEM_ECPRI_MSG_RTC_CTRL_RTCID,
-	ITEM_ECPRI_MSG_DLY_MSR_MSRID,
-	ITEM_GENEVE_OPT,
-	ITEM_GENEVE_OPT_CLASS,
-	ITEM_GENEVE_OPT_TYPE,
-	ITEM_GENEVE_OPT_LENGTH,
-	ITEM_GENEVE_OPT_DATA,
-	ITEM_INTEGRITY,
-	ITEM_INTEGRITY_LEVEL,
-	ITEM_INTEGRITY_VALUE,
-	ITEM_CONNTRACK,
-	ITEM_POL_PORT,
-	ITEM_POL_METER,
-	ITEM_POL_POLICY,
-	ITEM_PORT_REPRESENTOR,
-	ITEM_PORT_REPRESENTOR_PORT_ID,
-	ITEM_REPRESENTED_PORT,
-	ITEM_REPRESENTED_PORT_ETHDEV_PORT_ID,
-	ITEM_FLEX,
-	ITEM_FLEX_ITEM_HANDLE,
-	ITEM_FLEX_PATTERN_HANDLE,
-	ITEM_L2TPV2,
-	ITEM_L2TPV2_TYPE,
-	ITEM_L2TPV2_TYPE_DATA,
-	ITEM_L2TPV2_TYPE_DATA_L,
-	ITEM_L2TPV2_TYPE_DATA_S,
-	ITEM_L2TPV2_TYPE_DATA_O,
-	ITEM_L2TPV2_TYPE_DATA_L_S,
-	ITEM_L2TPV2_TYPE_CTRL,
-	ITEM_L2TPV2_MSG_DATA_TUNNEL_ID,
-	ITEM_L2TPV2_MSG_DATA_SESSION_ID,
-	ITEM_L2TPV2_MSG_DATA_L_LENGTH,
-	ITEM_L2TPV2_MSG_DATA_L_TUNNEL_ID,
-	ITEM_L2TPV2_MSG_DATA_L_SESSION_ID,
-	ITEM_L2TPV2_MSG_DATA_S_TUNNEL_ID,
-	ITEM_L2TPV2_MSG_DATA_S_SESSION_ID,
-	ITEM_L2TPV2_MSG_DATA_S_NS,
-	ITEM_L2TPV2_MSG_DATA_S_NR,
-	ITEM_L2TPV2_MSG_DATA_O_TUNNEL_ID,
-	ITEM_L2TPV2_MSG_DATA_O_SESSION_ID,
-	ITEM_L2TPV2_MSG_DATA_O_OFFSET,
-	ITEM_L2TPV2_MSG_DATA_L_S_LENGTH,
-	ITEM_L2TPV2_MSG_DATA_L_S_TUNNEL_ID,
-	ITEM_L2TPV2_MSG_DATA_L_S_SESSION_ID,
-	ITEM_L2TPV2_MSG_DATA_L_S_NS,
-	ITEM_L2TPV2_MSG_DATA_L_S_NR,
-	ITEM_L2TPV2_MSG_CTRL_LENGTH,
-	ITEM_L2TPV2_MSG_CTRL_TUNNEL_ID,
-	ITEM_L2TPV2_MSG_CTRL_SESSION_ID,
-	ITEM_L2TPV2_MSG_CTRL_NS,
-	ITEM_L2TPV2_MSG_CTRL_NR,
-	ITEM_PPP,
-	ITEM_PPP_ADDR,
-	ITEM_PPP_CTRL,
-	ITEM_PPP_PROTO_ID,
-	ITEM_METER,
-	ITEM_METER_COLOR,
-	ITEM_QUOTA,
-	ITEM_QUOTA_STATE,
-	ITEM_QUOTA_STATE_NAME,
-	ITEM_AGGR_AFFINITY,
-	ITEM_AGGR_AFFINITY_VALUE,
-	ITEM_TX_QUEUE,
-	ITEM_TX_QUEUE_VALUE,
-	ITEM_IB_BTH,
-	ITEM_IB_BTH_OPCODE,
-	ITEM_IB_BTH_PKEY,
-	ITEM_IB_BTH_DST_QPN,
-	ITEM_IB_BTH_PSN,
-	ITEM_IPV6_PUSH_REMOVE_EXT,
-	ITEM_IPV6_PUSH_REMOVE_EXT_TYPE,
-	ITEM_PTYPE,
-	ITEM_PTYPE_VALUE,
-	ITEM_NSH,
-	ITEM_COMPARE,
-	ITEM_COMPARE_OP,
-	ITEM_COMPARE_OP_VALUE,
-	ITEM_COMPARE_FIELD_A_TYPE,
-	ITEM_COMPARE_FIELD_A_TYPE_VALUE,
-	ITEM_COMPARE_FIELD_A_LEVEL,
-	ITEM_COMPARE_FIELD_A_LEVEL_VALUE,
-	ITEM_COMPARE_FIELD_A_TAG_INDEX,
-	ITEM_COMPARE_FIELD_A_TYPE_ID,
-	ITEM_COMPARE_FIELD_A_CLASS_ID,
-	ITEM_COMPARE_FIELD_A_OFFSET,
-	ITEM_COMPARE_FIELD_B_TYPE,
-	ITEM_COMPARE_FIELD_B_TYPE_VALUE,
-	ITEM_COMPARE_FIELD_B_LEVEL,
-	ITEM_COMPARE_FIELD_B_LEVEL_VALUE,
-	ITEM_COMPARE_FIELD_B_TAG_INDEX,
-	ITEM_COMPARE_FIELD_B_TYPE_ID,
-	ITEM_COMPARE_FIELD_B_CLASS_ID,
-	ITEM_COMPARE_FIELD_B_OFFSET,
-	ITEM_COMPARE_FIELD_B_VALUE,
-	ITEM_COMPARE_FIELD_B_POINTER,
-	ITEM_COMPARE_FIELD_WIDTH,
-
-	/* Validate/create actions. */
-	ACTIONS,
-	ACTION_NEXT,
-	ACTION_END,
-	ACTION_VOID,
-	ACTION_PASSTHRU,
-	ACTION_SKIP_CMAN,
-	ACTION_JUMP,
-	ACTION_JUMP_GROUP,
-	ACTION_MARK,
-	ACTION_MARK_ID,
-	ACTION_FLAG,
-	ACTION_QUEUE,
-	ACTION_QUEUE_INDEX,
-	ACTION_DROP,
-	ACTION_COUNT,
-	ACTION_COUNT_ID,
-	ACTION_RSS,
-	ACTION_RSS_FUNC,
-	ACTION_RSS_LEVEL,
-	ACTION_RSS_FUNC_DEFAULT,
-	ACTION_RSS_FUNC_TOEPLITZ,
-	ACTION_RSS_FUNC_SIMPLE_XOR,
-	ACTION_RSS_FUNC_SYMMETRIC_TOEPLITZ,
-	ACTION_RSS_TYPES,
-	ACTION_RSS_TYPE,
-	ACTION_RSS_KEY,
-	ACTION_RSS_KEY_LEN,
-	ACTION_RSS_QUEUES,
-	ACTION_RSS_QUEUE,
-	ACTION_PF,
-	ACTION_VF,
-	ACTION_VF_ORIGINAL,
-	ACTION_VF_ID,
-	ACTION_PORT_ID,
-	ACTION_PORT_ID_ORIGINAL,
-	ACTION_PORT_ID_ID,
-	ACTION_METER,
-	ACTION_METER_COLOR,
-	ACTION_METER_COLOR_TYPE,
-	ACTION_METER_COLOR_GREEN,
-	ACTION_METER_COLOR_YELLOW,
-	ACTION_METER_COLOR_RED,
-	ACTION_METER_ID,
-	ACTION_METER_MARK,
-	ACTION_METER_MARK_CONF,
-	ACTION_METER_MARK_CONF_COLOR,
-	ACTION_METER_PROFILE,
-	ACTION_METER_PROFILE_ID2PTR,
-	ACTION_METER_POLICY,
-	ACTION_METER_POLICY_ID2PTR,
-	ACTION_METER_COLOR_MODE,
-	ACTION_METER_STATE,
-	ACTION_OF_DEC_NW_TTL,
-	ACTION_OF_POP_VLAN,
-	ACTION_OF_PUSH_VLAN,
-	ACTION_OF_PUSH_VLAN_ETHERTYPE,
-	ACTION_OF_SET_VLAN_VID,
-	ACTION_OF_SET_VLAN_VID_VLAN_VID,
-	ACTION_OF_SET_VLAN_PCP,
-	ACTION_OF_SET_VLAN_PCP_VLAN_PCP,
-	ACTION_OF_POP_MPLS,
-	ACTION_OF_POP_MPLS_ETHERTYPE,
-	ACTION_OF_PUSH_MPLS,
-	ACTION_OF_PUSH_MPLS_ETHERTYPE,
-	ACTION_VXLAN_ENCAP,
-	ACTION_VXLAN_DECAP,
-	ACTION_NVGRE_ENCAP,
-	ACTION_NVGRE_DECAP,
-	ACTION_L2_ENCAP,
-	ACTION_L2_DECAP,
-	ACTION_MPLSOGRE_ENCAP,
-	ACTION_MPLSOGRE_DECAP,
-	ACTION_MPLSOUDP_ENCAP,
-	ACTION_MPLSOUDP_DECAP,
-	ACTION_SET_IPV4_SRC,
-	ACTION_SET_IPV4_SRC_IPV4_SRC,
-	ACTION_SET_IPV4_DST,
-	ACTION_SET_IPV4_DST_IPV4_DST,
-	ACTION_SET_IPV6_SRC,
-	ACTION_SET_IPV6_SRC_IPV6_SRC,
-	ACTION_SET_IPV6_DST,
-	ACTION_SET_IPV6_DST_IPV6_DST,
-	ACTION_SET_TP_SRC,
-	ACTION_SET_TP_SRC_TP_SRC,
-	ACTION_SET_TP_DST,
-	ACTION_SET_TP_DST_TP_DST,
-	ACTION_MAC_SWAP,
-	ACTION_DEC_TTL,
-	ACTION_SET_TTL,
-	ACTION_SET_TTL_TTL,
-	ACTION_SET_MAC_SRC,
-	ACTION_SET_MAC_SRC_MAC_SRC,
-	ACTION_SET_MAC_DST,
-	ACTION_SET_MAC_DST_MAC_DST,
-	ACTION_INC_TCP_SEQ,
-	ACTION_INC_TCP_SEQ_VALUE,
-	ACTION_DEC_TCP_SEQ,
-	ACTION_DEC_TCP_SEQ_VALUE,
-	ACTION_INC_TCP_ACK,
-	ACTION_INC_TCP_ACK_VALUE,
-	ACTION_DEC_TCP_ACK,
-	ACTION_DEC_TCP_ACK_VALUE,
-	ACTION_RAW_ENCAP,
-	ACTION_RAW_DECAP,
-	ACTION_RAW_ENCAP_SIZE,
-	ACTION_RAW_ENCAP_INDEX,
-	ACTION_RAW_ENCAP_INDEX_VALUE,
-	ACTION_RAW_DECAP_INDEX,
-	ACTION_RAW_DECAP_INDEX_VALUE,
-	ACTION_SET_TAG,
-	ACTION_SET_TAG_DATA,
-	ACTION_SET_TAG_INDEX,
-	ACTION_SET_TAG_MASK,
-	ACTION_SET_META,
-	ACTION_SET_META_DATA,
-	ACTION_SET_META_MASK,
-	ACTION_SET_IPV4_DSCP,
-	ACTION_SET_IPV4_DSCP_VALUE,
-	ACTION_SET_IPV6_DSCP,
-	ACTION_SET_IPV6_DSCP_VALUE,
-	ACTION_AGE,
-	ACTION_AGE_TIMEOUT,
-	ACTION_AGE_UPDATE,
-	ACTION_AGE_UPDATE_TIMEOUT,
-	ACTION_AGE_UPDATE_TOUCH,
-	ACTION_SAMPLE,
-	ACTION_SAMPLE_RATIO,
-	ACTION_SAMPLE_INDEX,
-	ACTION_SAMPLE_INDEX_VALUE,
-	ACTION_INDIRECT,
-	ACTION_INDIRECT_LIST,
-	ACTION_INDIRECT_LIST_HANDLE,
-	ACTION_INDIRECT_LIST_CONF,
-	INDIRECT_LIST_ACTION_ID2PTR_HANDLE,
-	INDIRECT_LIST_ACTION_ID2PTR_CONF,
-	ACTION_SHARED_INDIRECT,
-	INDIRECT_ACTION_PORT,
-	INDIRECT_ACTION_ID2PTR,
-	ACTION_MODIFY_FIELD,
-	ACTION_MODIFY_FIELD_OP,
-	ACTION_MODIFY_FIELD_OP_VALUE,
-	ACTION_MODIFY_FIELD_DST_TYPE,
-	ACTION_MODIFY_FIELD_DST_TYPE_VALUE,
-	ACTION_MODIFY_FIELD_DST_LEVEL,
-	ACTION_MODIFY_FIELD_DST_LEVEL_VALUE,
-	ACTION_MODIFY_FIELD_DST_TAG_INDEX,
-	ACTION_MODIFY_FIELD_DST_TYPE_ID,
-	ACTION_MODIFY_FIELD_DST_CLASS_ID,
-	ACTION_MODIFY_FIELD_DST_OFFSET,
-	ACTION_MODIFY_FIELD_SRC_TYPE,
-	ACTION_MODIFY_FIELD_SRC_TYPE_VALUE,
-	ACTION_MODIFY_FIELD_SRC_LEVEL,
-	ACTION_MODIFY_FIELD_SRC_LEVEL_VALUE,
-	ACTION_MODIFY_FIELD_SRC_TAG_INDEX,
-	ACTION_MODIFY_FIELD_SRC_TYPE_ID,
-	ACTION_MODIFY_FIELD_SRC_CLASS_ID,
-	ACTION_MODIFY_FIELD_SRC_OFFSET,
-	ACTION_MODIFY_FIELD_SRC_VALUE,
-	ACTION_MODIFY_FIELD_SRC_POINTER,
-	ACTION_MODIFY_FIELD_WIDTH,
-	ACTION_CONNTRACK,
-	ACTION_CONNTRACK_UPDATE,
-	ACTION_CONNTRACK_UPDATE_DIR,
-	ACTION_CONNTRACK_UPDATE_CTX,
-	ACTION_POL_G,
-	ACTION_POL_Y,
-	ACTION_POL_R,
-	ACTION_PORT_REPRESENTOR,
-	ACTION_PORT_REPRESENTOR_PORT_ID,
-	ACTION_REPRESENTED_PORT,
-	ACTION_REPRESENTED_PORT_ETHDEV_PORT_ID,
-	ACTION_SEND_TO_KERNEL,
-	ACTION_QUOTA_CREATE,
-	ACTION_QUOTA_CREATE_LIMIT,
-	ACTION_QUOTA_CREATE_MODE,
-	ACTION_QUOTA_CREATE_MODE_NAME,
-	ACTION_QUOTA_QU,
-	ACTION_QUOTA_QU_LIMIT,
-	ACTION_QUOTA_QU_UPDATE_OP,
-	ACTION_QUOTA_QU_UPDATE_OP_NAME,
-	ACTION_IPV6_EXT_REMOVE,
-	ACTION_IPV6_EXT_REMOVE_INDEX,
-	ACTION_IPV6_EXT_REMOVE_INDEX_VALUE,
-	ACTION_IPV6_EXT_PUSH,
-	ACTION_IPV6_EXT_PUSH_INDEX,
-	ACTION_IPV6_EXT_PUSH_INDEX_VALUE,
-	ACTION_NAT64,
-	ACTION_NAT64_MODE,
-	ACTION_JUMP_TO_TABLE_INDEX,
-	ACTION_JUMP_TO_TABLE_INDEX_TABLE,
-	ACTION_JUMP_TO_TABLE_INDEX_TABLE_VALUE,
-	ACTION_JUMP_TO_TABLE_INDEX_INDEX,
-};
 
 /** Maximum size for pattern in struct rte_flow_item_raw. */
 #define ITEM_RAW_PATTERN_SIZE 512
@@ -1040,169 +280,6 @@ static const char *const table_hash_funcs[] = {
 
 #define RAW_IPSEC_CONFS_MAX_NUM 8
 
-/** Maximum number of subsequent tokens and arguments on the stack. */
-#define CTX_STACK_SIZE 16
-
-/** Parser context. */
-struct context {
-	/** Stack of subsequent token lists to process. */
-	const enum index *next[CTX_STACK_SIZE];
-	/** Arguments for stacked tokens. */
-	const void *args[CTX_STACK_SIZE];
-	enum index curr; /**< Current token index. */
-	enum index prev; /**< Index of the last token seen. */
-	int next_num; /**< Number of entries in next[]. */
-	int args_num; /**< Number of entries in args[]. */
-	uint32_t eol:1; /**< EOL has been detected. */
-	uint32_t last:1; /**< No more arguments. */
-	portid_t port; /**< Current port ID (for completions). */
-	uint32_t objdata; /**< Object-specific data. */
-	void *object; /**< Address of current object for relative offsets. */
-	void *objmask; /**< Object a full mask must be written to. */
-};
-
-/** Token argument. */
-struct arg {
-	uint32_t hton:1; /**< Use network byte ordering. */
-	uint32_t sign:1; /**< Value is signed. */
-	uint32_t bounded:1; /**< Value is bounded. */
-	uintmax_t min; /**< Minimum value if bounded. */
-	uintmax_t max; /**< Maximum value if bounded. */
-	uint32_t offset; /**< Relative offset from ctx->object. */
-	uint32_t size; /**< Field size. */
-	const uint8_t *mask; /**< Bit-mask to use instead of offset/size. */
-};
-
-/** Parser token definition. */
-struct token {
-	/** Type displayed during completion (defaults to "TOKEN"). */
-	const char *type;
-	/** Help displayed during completion (defaults to token name). */
-	const char *help;
-	/** Private data used by parser functions. */
-	const void *priv;
-	/**
-	 * Lists of subsequent tokens to push on the stack. Each call to the
-	 * parser consumes the last entry of that stack.
-	 */
-	const enum index *const *next;
-	/** Arguments stack for subsequent tokens that need them. */
-	const struct arg *const *args;
-	/**
-	 * Token-processing callback, returns -1 in case of error, the
-	 * length of the matched string otherwise. If NULL, attempts to
-	 * match the token name.
-	 *
-	 * If buf is not NULL, the result should be stored in it according
-	 * to context. An error is returned if not large enough.
-	 */
-	int (*call)(struct context *ctx, const struct token *token,
-		    const char *str, unsigned int len,
-		    void *buf, unsigned int size);
-	/**
-	 * Callback that provides possible values for this token, used for
-	 * completion. Returns -1 in case of error, the number of possible
-	 * values otherwise. If NULL, the token name is used.
-	 *
-	 * If buf is not NULL, entry index ent is written to buf and the
-	 * full length of the entry is returned (same behavior as
-	 * snprintf()).
-	 */
-	int (*comp)(struct context *ctx, const struct token *token,
-		    unsigned int ent, char *buf, unsigned int size);
-	/** Mandatory token name, no default value. */
-	const char *name;
-};
-
-/** Static initializer for the next field. */
-#define NEXT(...) (const enum index *const []){ __VA_ARGS__, NULL, }
-
-/** Static initializer for a NEXT() entry. */
-#define NEXT_ENTRY(...) (const enum index []){ __VA_ARGS__, ZERO, }
-
-/** Static initializer for the args field. */
-#define ARGS(...) (const struct arg *const []){ __VA_ARGS__, NULL, }
-
-/** Static initializer for ARGS() to target a field. */
-#define ARGS_ENTRY(s, f) \
-	(&(const struct arg){ \
-		.offset = offsetof(s, f), \
-		.size = sizeof(((s *)0)->f), \
-	})
-
-/** Static initializer for ARGS() to target a bit-field. */
-#define ARGS_ENTRY_BF(s, f, b) \
-	(&(const struct arg){ \
-		.size = sizeof(s), \
-		.mask = (const void *)&(const s){ .f = (1 << (b)) - 1 }, \
-	})
-
-/** Static initializer for ARGS() to target a field with limits. */
-#define ARGS_ENTRY_BOUNDED(s, f, i, a) \
-	(&(const struct arg){ \
-		.bounded = 1, \
-		.min = (i), \
-		.max = (a), \
-		.offset = offsetof(s, f), \
-		.size = sizeof(((s *)0)->f), \
-	})
-
-/** Static initializer for ARGS() to target an arbitrary bit-mask. */
-#define ARGS_ENTRY_MASK(s, f, m) \
-	(&(const struct arg){ \
-		.offset = offsetof(s, f), \
-		.size = sizeof(((s *)0)->f), \
-		.mask = (const void *)(m), \
-	})
-
-/** Same as ARGS_ENTRY_MASK() using network byte ordering for the value. */
-#define ARGS_ENTRY_MASK_HTON(s, f, m) \
-	(&(const struct arg){ \
-		.hton = 1, \
-		.offset = offsetof(s, f), \
-		.size = sizeof(((s *)0)->f), \
-		.mask = (const void *)(m), \
-	})
-
-/** Static initializer for ARGS() to target a pointer. */
-#define ARGS_ENTRY_PTR(s, f) \
-	(&(const struct arg){ \
-		.size = sizeof(*((s *)0)->f), \
-	})
-
-/** Static initializer for ARGS() with arbitrary offset and size. */
-#define ARGS_ENTRY_ARB(o, s) \
-	(&(const struct arg){ \
-		.offset = (o), \
-		.size = (s), \
-	})
-
-/** Same as ARGS_ENTRY_ARB() with bounded values. */
-#define ARGS_ENTRY_ARB_BOUNDED(o, s, i, a) \
-	(&(const struct arg){ \
-		.bounded = 1, \
-		.min = (i), \
-		.max = (a), \
-		.offset = (o), \
-		.size = (s), \
-	})
-
-/** Same as ARGS_ENTRY() using network byte ordering. */
-#define ARGS_ENTRY_HTON(s, f) \
-	(&(const struct arg){ \
-		.hton = 1, \
-		.offset = offsetof(s, f), \
-		.size = sizeof(((s *)0)->f), \
-	})
-
-/** Same as ARGS_ENTRY_HTON() for a single argument, without structure. */
-#define ARG_ENTRY_HTON(s) \
-	(&(const struct arg){ \
-		.hton = 1, \
-		.offset = 0, \
-		.size = sizeof(s), \
-	})
-
 /** Parser output buffer layout expected by cmd_flow_parsed(). */
 struct buffer {
 	enum index command; /**< Flow command. */
@@ -1292,30 +369,6 @@ struct buffer {
 		} flex; /**< Flex arguments*/
 	} args; /**< Command arguments. */
 };
-
-/** Private data for pattern items. */
-struct parse_item_priv {
-	enum rte_flow_item_type type; /**< Item type. */
-	uint32_t size; /**< Size of item specification structure. */
-};
-
-#define PRIV_ITEM(t, s) \
-	(&(const struct parse_item_priv){ \
-		.type = RTE_FLOW_ITEM_TYPE_ ## t, \
-		.size = s, \
-	})
-
-/** Private data for actions. */
-struct parse_action_priv {
-	enum rte_flow_action_type type; /**< Action type. */
-	uint32_t size; /**< Size of action configuration structure. */
-};
-
-#define PRIV_ACTION(t, s) \
-	(&(const struct parse_action_priv){ \
-		.type = RTE_FLOW_ACTION_TYPE_ ## t, \
-		.size = s, \
-	})
 
 static const enum index next_flex_item[] = {
 	FLEX_ITEM_CREATE,
@@ -2697,354 +1750,354 @@ static const enum index action_jump_to_table_index[] = {
 	ZERO,
 };
 
-static int parse_set_raw_encap_decap(struct context *, const struct token *,
+static int parse_set_raw_encap_decap(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				     const char *, unsigned int,
 				     void *, unsigned int);
-static int parse_set_sample_action(struct context *, const struct token *,
+static int parse_set_sample_action(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				   const char *, unsigned int,
 				   void *, unsigned int);
-static int parse_set_ipv6_ext_action(struct context *, const struct token *,
+static int parse_set_ipv6_ext_action(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				     const char *, unsigned int,
 				     void *, unsigned int);
-static int parse_set_init(struct context *, const struct token *,
+static int parse_set_init(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			  const char *, unsigned int,
 			  void *, unsigned int);
 static int
-parse_flex_handle(struct context *, const struct token *,
+parse_flex_handle(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		  const char *, unsigned int, void *, unsigned int);
-static int parse_init(struct context *, const struct token *,
+static int parse_init(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		      const char *, unsigned int,
 		      void *, unsigned int);
-static int parse_vc(struct context *, const struct token *,
+static int parse_vc(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		    const char *, unsigned int,
 		    void *, unsigned int);
-static int parse_vc_spec(struct context *, const struct token *,
+static int parse_vc_spec(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			 const char *, unsigned int, void *, unsigned int);
-static int parse_vc_conf(struct context *, const struct token *,
+static int parse_vc_conf(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			 const char *, unsigned int, void *, unsigned int);
-static int parse_vc_conf_timeout(struct context *, const struct token *,
+static int parse_vc_conf_timeout(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				 const char *, unsigned int, void *,
 				 unsigned int);
-static int parse_vc_item_ecpri_type(struct context *, const struct token *,
+static int parse_vc_item_ecpri_type(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				    const char *, unsigned int,
 				    void *, unsigned int);
-static int parse_vc_item_l2tpv2_type(struct context *, const struct token *,
+static int parse_vc_item_l2tpv2_type(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				    const char *, unsigned int,
 				    void *, unsigned int);
-static int parse_vc_action_meter_color_type(struct context *,
+static int parse_vc_action_meter_color_type(struct rte_flow_cmd_parse_ctx *,
 					const struct token *,
 					const char *, unsigned int, void *,
 					unsigned int);
-static int parse_vc_action_rss(struct context *, const struct token *,
+static int parse_vc_action_rss(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			       const char *, unsigned int, void *,
 			       unsigned int);
-static int parse_vc_action_rss_func(struct context *, const struct token *,
+static int parse_vc_action_rss_func(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				    const char *, unsigned int, void *,
 				    unsigned int);
-static int parse_vc_action_rss_type(struct context *, const struct token *,
+static int parse_vc_action_rss_type(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				    const char *, unsigned int, void *,
 				    unsigned int);
-static int parse_vc_action_rss_queue(struct context *, const struct token *,
+static int parse_vc_action_rss_queue(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				     const char *, unsigned int, void *,
 				     unsigned int);
-static int parse_vc_action_vxlan_encap(struct context *, const struct token *,
+static int parse_vc_action_vxlan_encap(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				       const char *, unsigned int, void *,
 				       unsigned int);
-static int parse_vc_action_nvgre_encap(struct context *, const struct token *,
+static int parse_vc_action_nvgre_encap(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				       const char *, unsigned int, void *,
 				       unsigned int);
-static int parse_vc_action_l2_encap(struct context *, const struct token *,
+static int parse_vc_action_l2_encap(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				    const char *, unsigned int, void *,
 				    unsigned int);
-static int parse_vc_action_l2_decap(struct context *, const struct token *,
+static int parse_vc_action_l2_decap(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				    const char *, unsigned int, void *,
 				    unsigned int);
-static int parse_vc_action_mplsogre_encap(struct context *,
+static int parse_vc_action_mplsogre_encap(struct rte_flow_cmd_parse_ctx *,
 					  const struct token *, const char *,
 					  unsigned int, void *, unsigned int);
-static int parse_vc_action_mplsogre_decap(struct context *,
+static int parse_vc_action_mplsogre_decap(struct rte_flow_cmd_parse_ctx *,
 					  const struct token *, const char *,
 					  unsigned int, void *, unsigned int);
-static int parse_vc_action_mplsoudp_encap(struct context *,
+static int parse_vc_action_mplsoudp_encap(struct rte_flow_cmd_parse_ctx *,
 					  const struct token *, const char *,
 					  unsigned int, void *, unsigned int);
-static int parse_vc_action_mplsoudp_decap(struct context *,
+static int parse_vc_action_mplsoudp_decap(struct rte_flow_cmd_parse_ctx *,
 					  const struct token *, const char *,
 					  unsigned int, void *, unsigned int);
-static int parse_vc_action_raw_encap(struct context *,
+static int parse_vc_action_raw_encap(struct rte_flow_cmd_parse_ctx *,
 				     const struct token *, const char *,
 				     unsigned int, void *, unsigned int);
-static int parse_vc_action_raw_decap(struct context *,
+static int parse_vc_action_raw_decap(struct rte_flow_cmd_parse_ctx *,
 				     const struct token *, const char *,
 				     unsigned int, void *, unsigned int);
-static int parse_vc_action_raw_encap_index(struct context *,
+static int parse_vc_action_raw_encap_index(struct rte_flow_cmd_parse_ctx *,
 					   const struct token *, const char *,
 					   unsigned int, void *, unsigned int);
-static int parse_vc_action_raw_decap_index(struct context *,
+static int parse_vc_action_raw_decap_index(struct rte_flow_cmd_parse_ctx *,
 					   const struct token *, const char *,
 					   unsigned int, void *, unsigned int);
-static int parse_vc_action_ipv6_ext_remove(struct context *ctx, const struct token *token,
+static int parse_vc_action_ipv6_ext_remove(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 					   const char *str, unsigned int len, void *buf,
 					   unsigned int size);
-static int parse_vc_action_ipv6_ext_remove_index(struct context *ctx,
+static int parse_vc_action_ipv6_ext_remove_index(struct rte_flow_cmd_parse_ctx *ctx,
 						 const struct token *token,
 						 const char *str, unsigned int len,
 						 void *buf,
 						 unsigned int size);
-static int parse_vc_action_ipv6_ext_push(struct context *ctx, const struct token *token,
+static int parse_vc_action_ipv6_ext_push(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 					 const char *str, unsigned int len, void *buf,
 					 unsigned int size);
-static int parse_vc_action_ipv6_ext_push_index(struct context *ctx,
+static int parse_vc_action_ipv6_ext_push_index(struct rte_flow_cmd_parse_ctx *ctx,
 					       const struct token *token,
 					       const char *str, unsigned int len,
 					       void *buf,
 					       unsigned int size);
-static int parse_vc_action_set_meta(struct context *ctx,
+static int parse_vc_action_set_meta(struct rte_flow_cmd_parse_ctx *ctx,
 				    const struct token *token, const char *str,
 				    unsigned int len, void *buf,
 					unsigned int size);
-static int parse_vc_action_sample(struct context *ctx,
+static int parse_vc_action_sample(struct rte_flow_cmd_parse_ctx *ctx,
 				    const struct token *token, const char *str,
 				    unsigned int len, void *buf,
 				    unsigned int size);
 static int
-parse_vc_action_sample_index(struct context *ctx, const struct token *token,
+parse_vc_action_sample_index(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 				const char *str, unsigned int len, void *buf,
 				unsigned int size);
 static int
-parse_vc_modify_field_op(struct context *ctx, const struct token *token,
+parse_vc_modify_field_op(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 				const char *str, unsigned int len, void *buf,
 				unsigned int size);
 static int
-parse_vc_modify_field_id(struct context *ctx, const struct token *token,
+parse_vc_modify_field_id(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 				const char *str, unsigned int len, void *buf,
 				unsigned int size);
 static int
-parse_vc_modify_field_level(struct context *ctx, const struct token *token,
+parse_vc_modify_field_level(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 				const char *str, unsigned int len, void *buf,
 				unsigned int size);
 static int
-parse_vc_action_conntrack_update(struct context *ctx, const struct token *token,
+parse_vc_action_conntrack_update(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			 const char *str, unsigned int len, void *buf,
 			 unsigned int size);
-static int parse_destroy(struct context *, const struct token *,
+static int parse_destroy(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			 const char *, unsigned int,
 			 void *, unsigned int);
-static int parse_flush(struct context *, const struct token *,
+static int parse_flush(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		       const char *, unsigned int,
 		       void *, unsigned int);
-static int parse_dump(struct context *, const struct token *,
+static int parse_dump(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		      const char *, unsigned int,
 		      void *, unsigned int);
-static int parse_query(struct context *, const struct token *,
+static int parse_query(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		       const char *, unsigned int,
 		       void *, unsigned int);
-static int parse_action(struct context *, const struct token *,
+static int parse_action(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			const char *, unsigned int,
 			void *, unsigned int);
-static int parse_list(struct context *, const struct token *,
+static int parse_list(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		      const char *, unsigned int,
 		      void *, unsigned int);
-static int parse_aged(struct context *, const struct token *,
+static int parse_aged(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		      const char *, unsigned int,
 		      void *, unsigned int);
-static int parse_isolate(struct context *, const struct token *,
+static int parse_isolate(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			 const char *, unsigned int,
 			 void *, unsigned int);
-static int parse_configure(struct context *, const struct token *,
+static int parse_configure(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			   const char *, unsigned int,
 			   void *, unsigned int);
-static int parse_template(struct context *, const struct token *,
+static int parse_template(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			  const char *, unsigned int,
 			  void *, unsigned int);
-static int parse_template_destroy(struct context *, const struct token *,
+static int parse_template_destroy(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				  const char *, unsigned int,
 				  void *, unsigned int);
-static int parse_table(struct context *, const struct token *,
+static int parse_table(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		       const char *, unsigned int, void *, unsigned int);
-static int parse_table_destroy(struct context *, const struct token *,
+static int parse_table_destroy(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			       const char *, unsigned int,
 			       void *, unsigned int);
-static int parse_jump_table_id(struct context *, const struct token *,
+static int parse_jump_table_id(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			       const char *, unsigned int,
 			       void *, unsigned int);
-static int parse_qo(struct context *, const struct token *,
+static int parse_qo(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		    const char *, unsigned int,
 		    void *, unsigned int);
-static int parse_qo_destroy(struct context *, const struct token *,
+static int parse_qo_destroy(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			    const char *, unsigned int,
 			    void *, unsigned int);
-static int parse_qia(struct context *, const struct token *,
+static int parse_qia(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		     const char *, unsigned int,
 		     void *, unsigned int);
-static int parse_qia_destroy(struct context *, const struct token *,
+static int parse_qia_destroy(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			     const char *, unsigned int,
 			     void *, unsigned int);
-static int parse_push(struct context *, const struct token *,
+static int parse_push(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		      const char *, unsigned int,
 		      void *, unsigned int);
-static int parse_pull(struct context *, const struct token *,
+static int parse_pull(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		      const char *, unsigned int,
 		      void *, unsigned int);
-static int parse_group(struct context *, const struct token *,
+static int parse_group(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		       const char *, unsigned int,
 		       void *, unsigned int);
-static int parse_hash(struct context *, const struct token *,
+static int parse_hash(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		      const char *, unsigned int,
 		      void *, unsigned int);
-static int parse_tunnel(struct context *, const struct token *,
+static int parse_tunnel(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			const char *, unsigned int,
 			void *, unsigned int);
-static int parse_flex(struct context *, const struct token *,
+static int parse_flex(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		      const char *, unsigned int, void *, unsigned int);
-static int parse_int(struct context *, const struct token *,
+static int parse_int(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		     const char *, unsigned int,
 		     void *, unsigned int);
-static int parse_prefix(struct context *, const struct token *,
+static int parse_prefix(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			const char *, unsigned int,
 			void *, unsigned int);
-static int parse_boolean(struct context *, const struct token *,
+static int parse_boolean(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			 const char *, unsigned int,
 			 void *, unsigned int);
-static int parse_string(struct context *, const struct token *,
+static int parse_string(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			const char *, unsigned int,
 			void *, unsigned int);
-static int parse_hex(struct context *ctx, const struct token *token,
+static int parse_hex(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			const char *str, unsigned int len,
 			void *buf, unsigned int size);
-static int parse_string0(struct context *, const struct token *,
+static int parse_string0(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			const char *, unsigned int,
 			void *, unsigned int);
-static int parse_mac_addr(struct context *, const struct token *,
+static int parse_mac_addr(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			  const char *, unsigned int,
 			  void *, unsigned int);
-static int parse_ipv4_addr(struct context *, const struct token *,
+static int parse_ipv4_addr(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			   const char *, unsigned int,
 			   void *, unsigned int);
-static int parse_ipv6_addr(struct context *, const struct token *,
+static int parse_ipv6_addr(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			   const char *, unsigned int,
 			   void *, unsigned int);
-static int parse_port(struct context *, const struct token *,
+static int parse_port(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		      const char *, unsigned int,
 		      void *, unsigned int);
-static int parse_ia(struct context *, const struct token *,
+static int parse_ia(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		    const char *, unsigned int,
 		    void *, unsigned int);
-static int parse_ia_destroy(struct context *ctx, const struct token *token,
+static int parse_ia_destroy(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			    const char *str, unsigned int len,
 			    void *buf, unsigned int size);
-static int parse_ia_id2ptr(struct context *ctx, const struct token *token,
+static int parse_ia_id2ptr(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			   const char *str, unsigned int len, void *buf,
 			   unsigned int size);
 
-static int parse_indlst_id2ptr(struct context *ctx, const struct token *token,
+static int parse_indlst_id2ptr(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			       const char *str, unsigned int len, void *buf,
 			       unsigned int size);
-static int parse_ia_port(struct context *ctx, const struct token *token,
+static int parse_ia_port(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			 const char *str, unsigned int len, void *buf,
 			 unsigned int size);
-static int parse_mp(struct context *, const struct token *,
+static int parse_mp(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		    const char *, unsigned int,
 		    void *, unsigned int);
-static int parse_meter_profile_id2ptr(struct context *ctx,
+static int parse_meter_profile_id2ptr(struct rte_flow_cmd_parse_ctx *ctx,
 				      const struct token *token,
 				      const char *str, unsigned int len,
 				      void *buf, unsigned int size);
-static int parse_meter_policy_id2ptr(struct context *ctx,
+static int parse_meter_policy_id2ptr(struct rte_flow_cmd_parse_ctx *ctx,
 				     const struct token *token,
 				     const char *str, unsigned int len,
 				     void *buf, unsigned int size);
-static int parse_meter_color(struct context *ctx, const struct token *token,
+static int parse_meter_color(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			     const char *str, unsigned int len, void *buf,
 			     unsigned int size);
-static int parse_insertion_table_type(struct context *ctx, const struct token *token,
+static int parse_insertion_table_type(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 				      const char *str, unsigned int len, void *buf,
 				      unsigned int size);
-static int parse_hash_table_type(struct context *ctx, const struct token *token,
+static int parse_hash_table_type(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 				 const char *str, unsigned int len, void *buf,
 				 unsigned int size);
 static int
-parse_quota_state_name(struct context *ctx, const struct token *token,
+parse_quota_state_name(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		       const char *str, unsigned int len, void *buf,
 		       unsigned int size);
 static int
-parse_quota_mode_name(struct context *ctx, const struct token *token,
+parse_quota_mode_name(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		      const char *str, unsigned int len, void *buf,
 		      unsigned int size);
 static int
-parse_quota_update_name(struct context *ctx, const struct token *token,
+parse_quota_update_name(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			const char *str, unsigned int len, void *buf,
 			unsigned int size);
 static int
-parse_qu_mode_name(struct context *ctx, const struct token *token,
+parse_qu_mode_name(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		   const char *str, unsigned int len, void *buf,
 		   unsigned int size);
-static int comp_none(struct context *, const struct token *,
+static int comp_none(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		     unsigned int, char *, unsigned int);
-static int comp_boolean(struct context *, const struct token *,
+static int comp_boolean(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			unsigned int, char *, unsigned int);
-static int comp_action(struct context *, const struct token *,
+static int comp_action(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		       unsigned int, char *, unsigned int);
-static int comp_port(struct context *, const struct token *,
+static int comp_port(struct rte_flow_cmd_parse_ctx *, const struct token *,
 		     unsigned int, char *, unsigned int);
-static int comp_rule_id(struct context *, const struct token *,
+static int comp_rule_id(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			unsigned int, char *, unsigned int);
-static int comp_vc_action_rss_type(struct context *, const struct token *,
+static int comp_vc_action_rss_type(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				   unsigned int, char *, unsigned int);
-static int comp_vc_action_rss_queue(struct context *, const struct token *,
+static int comp_vc_action_rss_queue(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				    unsigned int, char *, unsigned int);
-static int comp_set_raw_index(struct context *, const struct token *,
+static int comp_set_raw_index(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			      unsigned int, char *, unsigned int);
-static int comp_set_sample_index(struct context *, const struct token *,
+static int comp_set_sample_index(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			      unsigned int, char *, unsigned int);
-static int comp_set_ipv6_ext_index(struct context *ctx, const struct token *token,
+static int comp_set_ipv6_ext_index(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 				   unsigned int ent, char *buf, unsigned int size);
-static int comp_set_modify_field_op(struct context *, const struct token *,
+static int comp_set_modify_field_op(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			      unsigned int, char *, unsigned int);
-static int comp_set_modify_field_id(struct context *, const struct token *,
+static int comp_set_modify_field_id(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			      unsigned int, char *, unsigned int);
-static int comp_pattern_template_id(struct context *, const struct token *,
+static int comp_pattern_template_id(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				    unsigned int, char *, unsigned int);
-static int comp_actions_template_id(struct context *, const struct token *,
+static int comp_actions_template_id(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				    unsigned int, char *, unsigned int);
-static int comp_table_id(struct context *, const struct token *,
+static int comp_table_id(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			 unsigned int, char *, unsigned int);
-static int comp_queue_id(struct context *, const struct token *,
+static int comp_queue_id(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			 unsigned int, char *, unsigned int);
-static int comp_meter_color(struct context *, const struct token *,
+static int comp_meter_color(struct rte_flow_cmd_parse_ctx *, const struct token *,
 			    unsigned int, char *, unsigned int);
-static int comp_insertion_table_type(struct context *, const struct token *,
+static int comp_insertion_table_type(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				     unsigned int, char *, unsigned int);
-static int comp_hash_table_type(struct context *, const struct token *,
+static int comp_hash_table_type(struct rte_flow_cmd_parse_ctx *, const struct token *,
 				unsigned int, char *, unsigned int);
 static int
-comp_quota_state_name(struct context *ctx, const struct token *token,
+comp_quota_state_name(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		      unsigned int ent, char *buf, unsigned int size);
 static int
-comp_quota_mode_name(struct context *ctx, const struct token *token,
+comp_quota_mode_name(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		     unsigned int ent, char *buf, unsigned int size);
 static int
-comp_quota_update_name(struct context *ctx, const struct token *token,
+comp_quota_update_name(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		       unsigned int ent, char *buf, unsigned int size);
 static int
-comp_qu_mode_name(struct context *ctx, const struct token *token,
+comp_qu_mode_name(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		  unsigned int ent, char *buf, unsigned int size);
 static int
-comp_set_compare_field_id(struct context *ctx, const struct token *token,
+comp_set_compare_field_id(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			  unsigned int ent, char *buf, unsigned int size);
 static int
-comp_set_compare_op(struct context *ctx, const struct token *token,
+comp_set_compare_op(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		    unsigned int ent, char *buf, unsigned int size);
 static int
-parse_vc_compare_op(struct context *ctx, const struct token *token,
+parse_vc_compare_op(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			 const char *str, unsigned int len, void *buf,
 			 unsigned int size);
 static int
-parse_vc_compare_field_id(struct context *ctx, const struct token *token,
+parse_vc_compare_field_id(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			  const char *str, unsigned int len, void *buf,
 			  unsigned int size);
 static int
-parse_vc_compare_field_level(struct context *ctx, const struct token *token,
+parse_vc_compare_field_level(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			     const char *str, unsigned int len, void *buf,
 			     unsigned int size);
 
@@ -8240,23 +7293,6 @@ static const struct token token_list[] = {
 	},
 };
 
-/** Remove and return last entry from argument stack. */
-static const struct arg *
-pop_args(struct context *ctx)
-{
-	return ctx->args_num ? ctx->args[--ctx->args_num] : NULL;
-}
-
-/** Add entry on top of the argument stack. */
-static int
-push_args(struct context *ctx, const struct arg *arg)
-{
-	if (ctx->args_num == CTX_STACK_SIZE)
-		return -1;
-	ctx->args[ctx->args_num++] = arg;
-	return 0;
-}
-
 /** Spread value into buffer according to bit-mask. */
 static size_t
 arg_entry_bf_fill(void *dst, uintmax_t val, const struct arg *arg)
@@ -8296,19 +7332,6 @@ arg_entry_bf_fill(void *dst, uintmax_t val, const struct arg *arg)
 	return len;
 }
 
-/** Compare a string with a partial one of a given length. */
-static int
-strcmp_partial(const char *full, const char *partial, size_t partial_len)
-{
-	int r = strncmp(full, partial, partial_len);
-
-	if (r)
-		return r;
-	if (strlen(full) <= partial_len)
-		return 0;
-	return full[partial_len];
-}
-
 /**
  * Parse a prefix length and generate a bit-mask.
  *
@@ -8316,11 +7339,11 @@ strcmp_partial(const char *full, const char *partial, size_t partial_len)
  * location and whether the result must use network byte ordering.
  */
 static int
-parse_prefix(struct context *ctx, const struct token *token,
+parse_prefix(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	     const char *str, unsigned int len,
 	     void *buf, unsigned int size)
 {
-	const struct arg *arg = pop_args(ctx);
+	const struct arg *arg = rte_flow_cmd_parse_ctx_pop_arg(ctx);
 	static const uint8_t conv[] = { 0x00, 0x80, 0xc0, 0xe0, 0xf0,
 					0xf8, 0xfc, 0xfe, 0xff };
 	char *end;
@@ -8381,34 +7404,20 @@ parse_prefix(struct context *ctx, const struct token *token,
 		memset((uint8_t *)ctx->objmask + arg->offset, 0xff, size);
 	return len;
 error:
-	push_args(ctx, arg);
+	rte_flow_cmd_parse_ctx_push_arg(ctx, arg);
 	return -1;
-}
-
-/** Default parsing function for token name matching. */
-static int
-parse_default(struct context *ctx, const struct token *token,
-	      const char *str, unsigned int len,
-	      void *buf, unsigned int size)
-{
-	(void)ctx;
-	(void)buf;
-	(void)size;
-	if (strcmp_partial(token->name, str, len))
-		return -1;
-	return len;
 }
 
 /** Parse flow command, initialize output buffer for subsequent tokens. */
 static int
-parse_init(struct context *ctx, const struct token *token,
+parse_init(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	   const char *str, unsigned int len,
 	   void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -8427,14 +7436,14 @@ parse_init(struct context *ctx, const struct token *token,
 
 /** Parse tokens for indirect action commands. */
 static int
-parse_ia(struct context *ctx, const struct token *token,
+parse_ia(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	 const char *str, unsigned int len,
 	 void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -8491,7 +7500,7 @@ parse_ia(struct context *ctx, const struct token *token,
 
 /** Parse tokens for indirect action destroy command. */
 static int
-parse_ia_destroy(struct context *ctx, const struct token *token,
+parse_ia_destroy(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		 const char *str, unsigned int len,
 		 void *buf, unsigned int size)
 {
@@ -8499,7 +7508,7 @@ parse_ia_destroy(struct context *ctx, const struct token *token,
 	uint32_t *action_id;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -8530,14 +7539,14 @@ parse_ia_destroy(struct context *ctx, const struct token *token,
 
 /** Parse tokens for indirect action commands. */
 static int
-parse_qia(struct context *ctx, const struct token *token,
+parse_qia(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	  const char *str, unsigned int len,
 	  void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -8590,7 +7599,7 @@ parse_qia(struct context *ctx, const struct token *token,
 
 /** Parse tokens for indirect action destroy command. */
 static int
-parse_qia_destroy(struct context *ctx, const struct token *token,
+parse_qia_destroy(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		  const char *str, unsigned int len,
 		  void *buf, unsigned int size)
 {
@@ -8598,7 +7607,7 @@ parse_qia_destroy(struct context *ctx, const struct token *token,
 	uint32_t *action_id;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -8642,14 +7651,14 @@ parse_qia_destroy(struct context *ctx, const struct token *token,
 
 /** Parse tokens for meter policy action commands. */
 static int
-parse_mp(struct context *ctx, const struct token *token,
+parse_mp(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	const char *str, unsigned int len,
 	void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -8683,7 +7692,7 @@ parse_mp(struct context *ctx, const struct token *token,
 
 /** Parse tokens for validate/create commands. */
 static int
-parse_vc(struct context *ctx, const struct token *token,
+parse_vc(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	 const char *str, unsigned int len,
 	 void *buf, unsigned int size)
 {
@@ -8692,7 +7701,7 @@ parse_vc(struct context *ctx, const struct token *token,
 	uint32_t data_size;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -8830,7 +7839,7 @@ parse_vc(struct context *ctx, const struct token *token,
 
 /** Parse pattern item parameter type. */
 static int
-parse_vc_spec(struct context *ctx, const struct token *token,
+parse_vc_spec(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	      const char *str, unsigned int len,
 	      void *buf, unsigned int size)
 {
@@ -8842,7 +7851,7 @@ parse_vc_spec(struct context *ctx, const struct token *token,
 
 	(void)size;
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Parse parameter types. */
 	switch (ctx->curr) {
@@ -8858,9 +7867,9 @@ parse_vc_spec(struct context *ctx, const struct token *token,
 		break;
 	case ITEM_PARAM_PREFIX:
 		/* Modify next token to expect a prefix. */
-		if (ctx->next_num < 2)
+		if (rte_flow_cmd_parse_ctx_replace_next(ctx, 1,
+						NEXT_ENTRY(COMMON_PREFIX)) < 0)
 			return -1;
-		ctx->next[ctx->next_num - 2] = NEXT_ENTRY(COMMON_PREFIX);
 		/* Fall through. */
 	case ITEM_PARAM_MASK:
 		index = 2;
@@ -8890,7 +7899,7 @@ parse_vc_spec(struct context *ctx, const struct token *token,
 
 /** Parse action configuration field. */
 static int
-parse_vc_conf(struct context *ctx, const struct token *token,
+parse_vc_conf(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	      const char *str, unsigned int len,
 	      void *buf, unsigned int size)
 {
@@ -8898,7 +7907,7 @@ parse_vc_conf(struct context *ctx, const struct token *token,
 
 	(void)size;
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -8911,7 +7920,7 @@ parse_vc_conf(struct context *ctx, const struct token *token,
 
 /** Parse action configuration field. */
 static int
-parse_vc_conf_timeout(struct context *ctx, const struct token *token,
+parse_vc_conf_timeout(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		      const char *str, unsigned int len,
 		      void *buf, unsigned int size)
 {
@@ -8922,7 +7931,7 @@ parse_vc_conf_timeout(struct context *ctx, const struct token *token,
 	if (ctx->curr != ACTION_AGE_UPDATE_TIMEOUT)
 		return -1;
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -8938,7 +7947,7 @@ parse_vc_conf_timeout(struct context *ctx, const struct token *token,
 
 /** Parse eCPRI common header type field. */
 static int
-parse_vc_item_ecpri_type(struct context *ctx, const struct token *token,
+parse_vc_item_ecpri_type(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			 const char *str, unsigned int len,
 			 void *buf, unsigned int size)
 {
@@ -8952,7 +7961,7 @@ parse_vc_item_ecpri_type(struct context *ctx, const struct token *token,
 
 	(void)size;
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	switch (ctx->curr) {
 	case ITEM_ECPRI_COMMON_TYPE_IQ_DATA:
@@ -8969,7 +7978,7 @@ parse_vc_item_ecpri_type(struct context *ctx, const struct token *token,
 	}
 	if (!ctx->object)
 		return len;
-	arg = pop_args(ctx);
+	arg = rte_flow_cmd_parse_ctx_pop_arg(ctx);
 	if (!arg)
 		return -1;
 	ecpri = (struct rte_flow_item_ecpri *)out->args.vc.data;
@@ -8991,7 +8000,7 @@ parse_vc_item_ecpri_type(struct context *ctx, const struct token *token,
 
 /** Parse L2TPv2 common header type field. */
 static int
-parse_vc_item_l2tpv2_type(struct context *ctx, const struct token *token,
+parse_vc_item_l2tpv2_type(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			 const char *str, unsigned int len,
 			 void *buf, unsigned int size)
 {
@@ -9005,7 +8014,7 @@ parse_vc_item_l2tpv2_type(struct context *ctx, const struct token *token,
 
 	(void)size;
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	switch (ctx->curr) {
 	case ITEM_L2TPV2_TYPE_DATA:
@@ -9031,7 +8040,7 @@ parse_vc_item_l2tpv2_type(struct context *ctx, const struct token *token,
 	}
 	if (!ctx->object)
 		return len;
-	arg = pop_args(ctx);
+	arg = rte_flow_cmd_parse_ctx_pop_arg(ctx);
 	if (!arg)
 		return -1;
 	l2tpv2 = (struct rte_flow_item_l2tpv2 *)out->args.vc.data;
@@ -9054,7 +8063,7 @@ parse_vc_item_l2tpv2_type(struct context *ctx, const struct token *token,
 
 /** Parse operation for compare match item. */
 static int
-parse_vc_compare_op(struct context *ctx, const struct token *token,
+parse_vc_compare_op(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			 const char *str, unsigned int len, void *buf,
 			 unsigned int size)
 {
@@ -9067,7 +8076,7 @@ parse_vc_compare_op(struct context *ctx, const struct token *token,
 	if (ctx->curr != ITEM_COMPARE_OP_VALUE)
 		return -1;
 	for (i = 0; compare_ops[i]; ++i)
-		if (!strcmp_partial(compare_ops[i], str, len))
+		if (!rte_flow_cmd_parser_strcmp_partial(compare_ops[i], str, len))
 			break;
 	if (!compare_ops[i])
 		return -1;
@@ -9080,7 +8089,7 @@ parse_vc_compare_op(struct context *ctx, const struct token *token,
 
 /** Parse id for compare match item. */
 static int
-parse_vc_compare_field_id(struct context *ctx, const struct token *token,
+parse_vc_compare_field_id(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			  const char *str, unsigned int len, void *buf,
 			  unsigned int size)
 {
@@ -9094,7 +8103,7 @@ parse_vc_compare_field_id(struct context *ctx, const struct token *token,
 		ctx->curr != ITEM_COMPARE_FIELD_B_TYPE_VALUE)
 		return -1;
 	for (i = 0; flow_field_ids[i]; ++i)
-		if (!strcmp_partial(flow_field_ids[i], str, len))
+		if (!rte_flow_cmd_parser_strcmp_partial(flow_field_ids[i], str, len))
 			break;
 	if (!flow_field_ids[i])
 		return -1;
@@ -9110,7 +8119,7 @@ parse_vc_compare_field_id(struct context *ctx, const struct token *token,
 
 /** Parse level for compare match item. */
 static int
-parse_vc_compare_field_level(struct context *ctx, const struct token *token,
+parse_vc_compare_field_level(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			     const char *str, unsigned int len, void *buf,
 			     unsigned int size)
 {
@@ -9170,7 +8179,7 @@ parse_vc_compare_field_level(struct context *ctx, const struct token *token,
 
 /** Parse meter color action type. */
 static int
-parse_vc_action_meter_color_type(struct context *ctx, const struct token *token,
+parse_vc_action_meter_color_type(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 				const char *str, unsigned int len,
 				void *buf, unsigned int size)
 {
@@ -9181,7 +8190,7 @@ parse_vc_action_meter_color_type(struct context *ctx, const struct token *token,
 	(void)buf;
 	(void)size;
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	switch (ctx->curr) {
 	case ACTION_METER_COLOR_GREEN:
@@ -9208,7 +8217,7 @@ parse_vc_action_meter_color_type(struct context *ctx, const struct token *token,
 
 /** Parse RSS action. */
 static int
-parse_vc_action_rss(struct context *ctx, const struct token *token,
+parse_vc_action_rss(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		    const char *str, unsigned int len,
 		    void *buf, unsigned int size)
 {
@@ -9257,7 +8266,7 @@ parse_vc_action_rss(struct context *ctx, const struct token *token,
  * ACTION_RSS_FUNC_* index that called this function.
  */
 static int
-parse_vc_action_rss_func(struct context *ctx, const struct token *token,
+parse_vc_action_rss_func(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			 const char *str, unsigned int len,
 			 void *buf, unsigned int size)
 {
@@ -9267,7 +8276,7 @@ parse_vc_action_rss_func(struct context *ctx, const struct token *token,
 	(void)buf;
 	(void)size;
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	switch (ctx->curr) {
 	case ACTION_RSS_FUNC_DEFAULT:
@@ -9298,7 +8307,7 @@ parse_vc_action_rss_func(struct context *ctx, const struct token *token,
  * Valid tokens are type field names and the "end" token.
  */
 static int
-parse_vc_action_rss_type(struct context *ctx, const struct token *token,
+parse_vc_action_rss_type(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			  const char *str, unsigned int len,
 			  void *buf, unsigned int size)
 {
@@ -9314,20 +8323,20 @@ parse_vc_action_rss_type(struct context *ctx, const struct token *token,
 		action_rss_data = ctx->object;
 		action_rss_data->conf.types = 0;
 	}
-	if (!strcmp_partial("end", str, len)) {
+	if (!rte_flow_cmd_parser_strcmp_partial("end", str, len)) {
 		ctx->objdata &= 0xffff;
 		return len;
 	}
 	for (i = 0; rss_type_table[i].str; ++i)
-		if (!strcmp_partial(rss_type_table[i].str, str, len))
+		if (!rte_flow_cmd_parser_strcmp_partial(rss_type_table[i].str, str, len))
 			break;
 	if (!rss_type_table[i].str)
 		return -1;
 	ctx->objdata = 1 << 16 | (ctx->objdata & 0xffff);
 	/* Repeat token. */
-	if (ctx->next_num == RTE_DIM(ctx->next))
+	if (rte_flow_cmd_parse_ctx_push_next(ctx,
+						NEXT_ENTRY(ACTION_RSS_TYPE)) < 0)
 		return -1;
-	ctx->next[ctx->next_num++] = NEXT_ENTRY(ACTION_RSS_TYPE);
 	if (!ctx->object)
 		return len;
 	action_rss_data = ctx->object;
@@ -9341,7 +8350,7 @@ parse_vc_action_rss_type(struct context *ctx, const struct token *token,
  * Valid tokens are queue indices and the "end" token.
  */
 static int
-parse_vc_action_rss_queue(struct context *ctx, const struct token *token,
+parse_vc_action_rss_queue(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			  const char *str, unsigned int len,
 			  void *buf, unsigned int size)
 {
@@ -9356,7 +8365,7 @@ parse_vc_action_rss_queue(struct context *ctx, const struct token *token,
 	if (ctx->curr != ACTION_RSS_QUEUE)
 		return -1;
 	i = ctx->objdata >> 16;
-	if (!strcmp_partial("end", str, len)) {
+	if (!rte_flow_cmd_parser_strcmp_partial("end", str, len)) {
 		ctx->objdata &= 0xffff;
 		goto end;
 	}
@@ -9365,19 +8374,19 @@ parse_vc_action_rss_queue(struct context *ctx, const struct token *token,
 	arg = ARGS_ENTRY_ARB(offsetof(struct action_rss_data, queue) +
 			     i * sizeof(action_rss_data->queue[i]),
 			     sizeof(action_rss_data->queue[i]));
-	if (push_args(ctx, arg))
+	if (rte_flow_cmd_parse_ctx_push_arg(ctx, arg))
 		return -1;
 	ret = parse_int(ctx, token, str, len, NULL, 0);
 	if (ret < 0) {
-		pop_args(ctx);
+		rte_flow_cmd_parse_ctx_pop_arg(ctx);
 		return -1;
 	}
 	++i;
 	ctx->objdata = i << 16 | (ctx->objdata & 0xffff);
 	/* Repeat token. */
-	if (ctx->next_num == RTE_DIM(ctx->next))
+	if (rte_flow_cmd_parse_ctx_push_next(ctx,
+						NEXT_ENTRY(ACTION_RSS_QUEUE)) < 0)
 		return -1;
-	ctx->next[ctx->next_num++] = NEXT_ENTRY(ACTION_RSS_QUEUE);
 end:
 	if (!ctx->object)
 		return len;
@@ -9500,7 +8509,7 @@ parse_setup_vxlan_encap_data(struct action_vxlan_encap_data *action_vxlan_encap_
 
 /** Parse VXLAN encap action. */
 static int
-parse_vc_action_vxlan_encap(struct context *ctx, const struct token *token,
+parse_vc_action_vxlan_encap(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			    const char *str, unsigned int len,
 			    void *buf, unsigned int size)
 {
@@ -9601,7 +8610,7 @@ parse_setup_nvgre_encap_data(struct action_nvgre_encap_data *action_nvgre_encap_
 
 /** Parse NVGRE encap action. */
 static int
-parse_vc_action_nvgre_encap(struct context *ctx, const struct token *token,
+parse_vc_action_nvgre_encap(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			    const char *str, unsigned int len,
 			    void *buf, unsigned int size)
 {
@@ -9630,7 +8639,7 @@ parse_vc_action_nvgre_encap(struct context *ctx, const struct token *token,
 
 /** Parse l2 encap action. */
 static int
-parse_vc_action_l2_encap(struct context *ctx, const struct token *token,
+parse_vc_action_l2_encap(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			 const char *str, unsigned int len,
 			 void *buf, unsigned int size)
 {
@@ -9694,7 +8703,7 @@ parse_vc_action_l2_encap(struct context *ctx, const struct token *token,
 
 /** Parse l2 decap action. */
 static int
-parse_vc_action_l2_decap(struct context *ctx, const struct token *token,
+parse_vc_action_l2_decap(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			 const char *str, unsigned int len,
 			 void *buf, unsigned int size)
 {
@@ -9748,7 +8757,7 @@ parse_vc_action_l2_decap(struct context *ctx, const struct token *token,
 
 /** Parse MPLSOGRE encap action. */
 static int
-parse_vc_action_mplsogre_encap(struct context *ctx, const struct token *token,
+parse_vc_action_mplsogre_encap(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			       const char *str, unsigned int len,
 			       void *buf, unsigned int size)
 {
@@ -9854,7 +8863,7 @@ parse_vc_action_mplsogre_encap(struct context *ctx, const struct token *token,
 
 /** Parse MPLSOGRE decap action. */
 static int
-parse_vc_action_mplsogre_decap(struct context *ctx, const struct token *token,
+parse_vc_action_mplsogre_decap(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			       const char *str, unsigned int len,
 			       void *buf, unsigned int size)
 {
@@ -9941,7 +8950,7 @@ parse_vc_action_mplsogre_decap(struct context *ctx, const struct token *token,
 
 /** Parse MPLSOUDP encap action. */
 static int
-parse_vc_action_mplsoudp_encap(struct context *ctx, const struct token *token,
+parse_vc_action_mplsoudp_encap(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			       const char *str, unsigned int len,
 			       void *buf, unsigned int size)
 {
@@ -10048,7 +9057,7 @@ parse_vc_action_mplsoudp_encap(struct context *ctx, const struct token *token,
 
 /** Parse MPLSOUDP decap action. */
 static int
-parse_vc_action_mplsoudp_decap(struct context *ctx, const struct token *token,
+parse_vc_action_mplsoudp_decap(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			       const char *str, unsigned int len,
 			       void *buf, unsigned int size)
 {
@@ -10136,7 +9145,7 @@ parse_vc_action_mplsoudp_decap(struct context *ctx, const struct token *token,
 }
 
 static int
-parse_vc_action_raw_decap_index(struct context *ctx, const struct token *token,
+parse_vc_action_raw_decap_index(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 				const char *str, unsigned int len, void *buf,
 				unsigned int size)
 {
@@ -10154,11 +9163,11 @@ parse_vc_action_raw_decap_index(struct context *ctx, const struct token *token,
 		(offsetof(struct action_raw_decap_data, idx),
 		 sizeof(((struct action_raw_decap_data *)0)->idx),
 		 0, RAW_ENCAP_CONFS_MAX_NUM - 1);
-	if (push_args(ctx, arg))
+	if (rte_flow_cmd_parse_ctx_push_arg(ctx, arg))
 		return -1;
 	ret = parse_int(ctx, token, str, len, NULL, 0);
 	if (ret < 0) {
-		pop_args(ctx);
+		rte_flow_cmd_parse_ctx_pop_arg(ctx);
 		return -1;
 	}
 	if (!ctx->object)
@@ -10174,7 +9183,7 @@ parse_vc_action_raw_decap_index(struct context *ctx, const struct token *token,
 
 
 static int
-parse_vc_action_raw_encap_index(struct context *ctx, const struct token *token,
+parse_vc_action_raw_encap_index(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 				const char *str, unsigned int len, void *buf,
 				unsigned int size)
 {
@@ -10194,11 +9203,11 @@ parse_vc_action_raw_encap_index(struct context *ctx, const struct token *token,
 		(offsetof(struct action_raw_encap_data, idx),
 		 sizeof(((struct action_raw_encap_data *)0)->idx),
 		 0, RAW_ENCAP_CONFS_MAX_NUM - 1);
-	if (push_args(ctx, arg))
+	if (rte_flow_cmd_parse_ctx_push_arg(ctx, arg))
 		return -1;
 	ret = parse_int(ctx, token, str, len, NULL, 0);
 	if (ret < 0) {
-		pop_args(ctx);
+		rte_flow_cmd_parse_ctx_pop_arg(ctx);
 		return -1;
 	}
 	if (!ctx->object)
@@ -10214,7 +9223,7 @@ parse_vc_action_raw_encap_index(struct context *ctx, const struct token *token,
 }
 
 static int
-parse_vc_action_raw_encap(struct context *ctx, const struct token *token,
+parse_vc_action_raw_encap(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			  const char *str, unsigned int len, void *buf,
 			  unsigned int size)
 {
@@ -10236,7 +9245,7 @@ parse_vc_action_raw_encap(struct context *ctx, const struct token *token,
 }
 
 static int
-parse_vc_action_raw_decap(struct context *ctx, const struct token *token,
+parse_vc_action_raw_decap(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			  const char *str, unsigned int len, void *buf,
 			  unsigned int size)
 {
@@ -10266,7 +9275,7 @@ parse_vc_action_raw_decap(struct context *ctx, const struct token *token,
 }
 
 static int
-parse_vc_action_ipv6_ext_remove(struct context *ctx, const struct token *token,
+parse_vc_action_ipv6_ext_remove(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 				const char *str, unsigned int len, void *buf,
 				unsigned int size)
 {
@@ -10295,7 +9304,7 @@ parse_vc_action_ipv6_ext_remove(struct context *ctx, const struct token *token,
 }
 
 static int
-parse_vc_action_ipv6_ext_remove_index(struct context *ctx, const struct token *token,
+parse_vc_action_ipv6_ext_remove_index(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 				      const char *str, unsigned int len, void *buf,
 				      unsigned int size)
 {
@@ -10313,11 +9322,11 @@ parse_vc_action_ipv6_ext_remove_index(struct context *ctx, const struct token *t
 		(offsetof(struct action_ipv6_ext_remove_data, idx),
 		 sizeof(((struct action_ipv6_ext_remove_data *)0)->idx),
 		 0, IPV6_EXT_PUSH_CONFS_MAX_NUM - 1);
-	if (push_args(ctx, arg))
+	if (rte_flow_cmd_parse_ctx_push_arg(ctx, arg))
 		return -1;
 	ret = parse_int(ctx, token, str, len, NULL, 0);
 	if (ret < 0) {
-		pop_args(ctx);
+		rte_flow_cmd_parse_ctx_pop_arg(ctx);
 		return -1;
 	}
 	if (!ctx->object)
@@ -10331,7 +9340,7 @@ parse_vc_action_ipv6_ext_remove_index(struct context *ctx, const struct token *t
 }
 
 static int
-parse_vc_action_ipv6_ext_push(struct context *ctx, const struct token *token,
+parse_vc_action_ipv6_ext_push(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			      const char *str, unsigned int len, void *buf,
 			      unsigned int size)
 {
@@ -10362,7 +9371,7 @@ parse_vc_action_ipv6_ext_push(struct context *ctx, const struct token *token,
 }
 
 static int
-parse_vc_action_ipv6_ext_push_index(struct context *ctx, const struct token *token,
+parse_vc_action_ipv6_ext_push_index(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 				    const char *str, unsigned int len, void *buf,
 				    unsigned int size)
 {
@@ -10380,11 +9389,11 @@ parse_vc_action_ipv6_ext_push_index(struct context *ctx, const struct token *tok
 		(offsetof(struct action_ipv6_ext_push_data, idx),
 		 sizeof(((struct action_ipv6_ext_push_data *)0)->idx),
 		 0, IPV6_EXT_PUSH_CONFS_MAX_NUM - 1);
-	if (push_args(ctx, arg))
+	if (rte_flow_cmd_parse_ctx_push_arg(ctx, arg))
 		return -1;
 	ret = parse_int(ctx, token, str, len, NULL, 0);
 	if (ret < 0) {
-		pop_args(ctx);
+		rte_flow_cmd_parse_ctx_pop_arg(ctx);
 		return -1;
 	}
 	if (!ctx->object)
@@ -10400,7 +9409,7 @@ parse_vc_action_ipv6_ext_push_index(struct context *ctx, const struct token *tok
 }
 
 static int
-parse_vc_action_set_meta(struct context *ctx, const struct token *token,
+parse_vc_action_set_meta(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			 const char *str, unsigned int len, void *buf,
 			 unsigned int size)
 {
@@ -10416,7 +9425,7 @@ parse_vc_action_set_meta(struct context *ctx, const struct token *token,
 }
 
 static int
-parse_vc_action_sample(struct context *ctx, const struct token *token,
+parse_vc_action_sample(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			 const char *str, unsigned int len, void *buf,
 			 unsigned int size)
 {
@@ -10448,7 +9457,7 @@ parse_vc_action_sample(struct context *ctx, const struct token *token,
 }
 
 static int
-parse_vc_action_sample_index(struct context *ctx, const struct token *token,
+parse_vc_action_sample_index(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 				const char *str, unsigned int len, void *buf,
 				unsigned int size)
 {
@@ -10468,11 +9477,11 @@ parse_vc_action_sample_index(struct context *ctx, const struct token *token,
 		(offsetof(struct action_sample_data, idx),
 		 sizeof(((struct action_sample_data *)0)->idx),
 		 0, RAW_SAMPLE_CONFS_MAX_NUM - 1);
-	if (push_args(ctx, arg))
+	if (rte_flow_cmd_parse_ctx_push_arg(ctx, arg))
 		return -1;
 	ret = parse_int(ctx, token, str, len, NULL, 0);
 	if (ret < 0) {
-		pop_args(ctx);
+		rte_flow_cmd_parse_ctx_pop_arg(ctx);
 		return -1;
 	}
 	if (!ctx->object)
@@ -10487,7 +9496,7 @@ parse_vc_action_sample_index(struct context *ctx, const struct token *token,
 
 /** Parse operation for modify_field command. */
 static int
-parse_vc_modify_field_op(struct context *ctx, const struct token *token,
+parse_vc_modify_field_op(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			 const char *str, unsigned int len, void *buf,
 			 unsigned int size)
 {
@@ -10500,7 +9509,7 @@ parse_vc_modify_field_op(struct context *ctx, const struct token *token,
 	if (ctx->curr != ACTION_MODIFY_FIELD_OP_VALUE)
 		return -1;
 	for (i = 0; modify_field_ops[i]; ++i)
-		if (!strcmp_partial(modify_field_ops[i], str, len))
+		if (!rte_flow_cmd_parser_strcmp_partial(modify_field_ops[i], str, len))
 			break;
 	if (!modify_field_ops[i])
 		return -1;
@@ -10513,7 +9522,7 @@ parse_vc_modify_field_op(struct context *ctx, const struct token *token,
 
 /** Parse id for modify_field command. */
 static int
-parse_vc_modify_field_id(struct context *ctx, const struct token *token,
+parse_vc_modify_field_id(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			 const char *str, unsigned int len, void *buf,
 			 unsigned int size)
 {
@@ -10527,7 +9536,7 @@ parse_vc_modify_field_id(struct context *ctx, const struct token *token,
 		ctx->curr != ACTION_MODIFY_FIELD_SRC_TYPE_VALUE)
 		return -1;
 	for (i = 0; flow_field_ids[i]; ++i)
-		if (!strcmp_partial(flow_field_ids[i], str, len))
+		if (!rte_flow_cmd_parser_strcmp_partial(flow_field_ids[i], str, len))
 			break;
 	if (!flow_field_ids[i])
 		return -1;
@@ -10543,7 +9552,7 @@ parse_vc_modify_field_id(struct context *ctx, const struct token *token,
 
 /** Parse level for modify_field command. */
 static int
-parse_vc_modify_field_level(struct context *ctx, const struct token *token,
+parse_vc_modify_field_level(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			 const char *str, unsigned int len, void *buf,
 			 unsigned int size)
 {
@@ -10603,7 +9612,7 @@ parse_vc_modify_field_level(struct context *ctx, const struct token *token,
 
 /** Parse the conntrack update, not a rte_flow_action. */
 static int
-parse_vc_action_conntrack_update(struct context *ctx, const struct token *token,
+parse_vc_action_conntrack_update(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			 const char *str, unsigned int len, void *buf,
 			 unsigned int size)
 {
@@ -10615,7 +9624,7 @@ parse_vc_action_conntrack_update(struct context *ctx, const struct token *token,
 	    ctx->curr != ACTION_CONNTRACK_UPDATE_DIR)
 		return -1;
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -10639,14 +9648,14 @@ parse_vc_action_conntrack_update(struct context *ctx, const struct token *token,
 
 /** Parse tokens for destroy command. */
 static int
-parse_destroy(struct context *ctx, const struct token *token,
+parse_destroy(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	      const char *str, unsigned int len,
 	      void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -10680,14 +9689,14 @@ parse_destroy(struct context *ctx, const struct token *token,
 
 /** Parse tokens for flush command. */
 static int
-parse_flush(struct context *ctx, const struct token *token,
+parse_flush(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	    const char *str, unsigned int len,
 	    void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -10707,14 +9716,14 @@ parse_flush(struct context *ctx, const struct token *token,
 
 /** Parse tokens for dump command. */
 static int
-parse_dump(struct context *ctx, const struct token *token,
+parse_dump(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	    const char *str, unsigned int len,
 	    void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -10749,14 +9758,14 @@ parse_dump(struct context *ctx, const struct token *token,
 
 /** Parse tokens for query command. */
 static int
-parse_query(struct context *ctx, const struct token *token,
+parse_query(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	    const char *str, unsigned int len,
 	    void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -10780,12 +9789,12 @@ parse_query(struct context *ctx, const struct token *token,
 
 /** Parse action names. */
 static int
-parse_action(struct context *ctx, const struct token *token,
+parse_action(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	     const char *str, unsigned int len,
 	     void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
-	const struct arg *arg = pop_args(ctx);
+	const struct arg *arg = rte_flow_cmd_parse_ctx_pop_arg(ctx);
 	unsigned int i;
 
 	(void)size;
@@ -10797,7 +9806,7 @@ parse_action(struct context *ctx, const struct token *token,
 		const struct parse_action_priv *priv;
 
 		token = &token_list[next_action[i]];
-		if (strcmp_partial(token->name, str, len))
+		if (rte_flow_cmd_parser_strcmp_partial(token->name, str, len))
 			continue;
 		priv = token->priv;
 		if (!priv)
@@ -10809,20 +9818,20 @@ parse_action(struct context *ctx, const struct token *token,
 		return len;
 	}
 error:
-	push_args(ctx, arg);
+	rte_flow_cmd_parse_ctx_push_arg(ctx, arg);
 	return -1;
 }
 
 /** Parse tokens for list command. */
 static int
-parse_list(struct context *ctx, const struct token *token,
+parse_list(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	   const char *str, unsigned int len,
 	   void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -10852,14 +9861,14 @@ parse_list(struct context *ctx, const struct token *token,
 
 /** Parse tokens for list all aged flows command. */
 static int
-parse_aged(struct context *ctx, const struct token *token,
+parse_aged(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	   const char *str, unsigned int len,
 	   void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -10881,14 +9890,14 @@ parse_aged(struct context *ctx, const struct token *token,
 
 /** Parse tokens for isolate command. */
 static int
-parse_isolate(struct context *ctx, const struct token *token,
+parse_isolate(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	      const char *str, unsigned int len,
 	      void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -10908,14 +9917,14 @@ parse_isolate(struct context *ctx, const struct token *token,
 
 /** Parse tokens for info/configure command. */
 static int
-parse_configure(struct context *ctx, const struct token *token,
+parse_configure(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		const char *str, unsigned int len,
 		void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -10935,14 +9944,14 @@ parse_configure(struct context *ctx, const struct token *token,
 
 /** Parse tokens for template create command. */
 static int
-parse_template(struct context *ctx, const struct token *token,
+parse_template(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	       const char *str, unsigned int len,
 	       void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -11019,7 +10028,7 @@ parse_template(struct context *ctx, const struct token *token,
 
 /** Parse tokens for template destroy command. */
 static int
-parse_template_destroy(struct context *ctx, const struct token *token,
+parse_template_destroy(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		       const char *str, unsigned int len,
 		       void *buf, unsigned int size)
 {
@@ -11027,7 +10036,7 @@ parse_template_destroy(struct context *ctx, const struct token *token,
 	uint32_t *template_id;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -11061,7 +10070,7 @@ parse_template_destroy(struct context *ctx, const struct token *token,
 
 /** Parse tokens for table create command. */
 static int
-parse_table(struct context *ctx, const struct token *token,
+parse_table(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	    const char *str, unsigned int len,
 	    void *buf, unsigned int size)
 {
@@ -11069,7 +10078,7 @@ parse_table(struct context *ctx, const struct token *token,
 	uint32_t *template_id;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -11158,7 +10167,7 @@ parse_table(struct context *ctx, const struct token *token,
 
 /** Parse tokens for table destroy command. */
 static int
-parse_table_destroy(struct context *ctx, const struct token *token,
+parse_table_destroy(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		    const char *str, unsigned int len,
 		    void *buf, unsigned int size)
 {
@@ -11166,7 +10175,7 @@ parse_table_destroy(struct context *ctx, const struct token *token,
 	uint32_t *table_id;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -11198,7 +10207,7 @@ parse_table_destroy(struct context *ctx, const struct token *token,
 
 /** Parse table id and convert to table pointer for jump_to_table_index action. */
 static int
-parse_jump_table_id(struct context *ctx, const struct token *token,
+parse_jump_table_id(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		    const char *str, unsigned int len,
 		    void *buf, unsigned int size)
 {
@@ -11210,11 +10219,11 @@ parse_jump_table_id(struct context *ctx, const struct token *token,
 	void *entry_ptr;
 
 	/* Get the arg before parse_int consumes it */
-	arg = pop_args(ctx);
+	arg = rte_flow_cmd_parse_ctx_pop_arg(ctx);
 	if (!arg)
 		return -1;
 	/* Push it back and do the standard integer parsing */
-	if (push_args(ctx, arg) < 0)
+	if (rte_flow_cmd_parse_ctx_push_arg(ctx, arg) < 0)
 		return -1;
 	if (parse_int(ctx, token, str, len, buf, size) < 0)
 		return -1;
@@ -11241,14 +10250,14 @@ parse_jump_table_id(struct context *ctx, const struct token *token,
 
 /** Parse tokens for queue create commands. */
 static int
-parse_qo(struct context *ctx, const struct token *token,
+parse_qo(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	 const char *str, unsigned int len,
 	 void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -11304,7 +10313,7 @@ parse_qo(struct context *ctx, const struct token *token,
 
 /** Parse tokens for queue destroy command. */
 static int
-parse_qo_destroy(struct context *ctx, const struct token *token,
+parse_qo_destroy(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		 const char *str, unsigned int len,
 		 void *buf, unsigned int size)
 {
@@ -11312,7 +10321,7 @@ parse_qo_destroy(struct context *ctx, const struct token *token,
 	uint64_t *flow_id;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -11351,14 +10360,14 @@ parse_qo_destroy(struct context *ctx, const struct token *token,
 
 /** Parse tokens for push queue command. */
 static int
-parse_push(struct context *ctx, const struct token *token,
+parse_push(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	   const char *str, unsigned int len,
 	   void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -11379,14 +10388,14 @@ parse_push(struct context *ctx, const struct token *token,
 
 /** Parse tokens for pull command. */
 static int
-parse_pull(struct context *ctx, const struct token *token,
+parse_pull(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	   const char *str, unsigned int len,
 	   void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -11407,14 +10416,14 @@ parse_pull(struct context *ctx, const struct token *token,
 
 /** Parse tokens for hash calculation commands. */
 static int
-parse_hash(struct context *ctx, const struct token *token,
+parse_hash(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	 const char *str, unsigned int len,
 	 void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -11457,14 +10466,14 @@ parse_hash(struct context *ctx, const struct token *token,
 }
 
 static int
-parse_group(struct context *ctx, const struct token *token,
+parse_group(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	    const char *str, unsigned int len,
 	    void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -11505,14 +10514,14 @@ parse_group(struct context *ctx, const struct token *token,
 }
 
 static int
-parse_flex(struct context *ctx, const struct token *token,
+parse_flex(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	     const char *str, unsigned int len,
 	     void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -11541,14 +10550,14 @@ parse_flex(struct context *ctx, const struct token *token,
 }
 
 static int
-parse_tunnel(struct context *ctx, const struct token *token,
+parse_tunnel(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	     const char *str, unsigned int len,
 	     void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -11588,11 +10597,11 @@ parse_tunnel(struct context *ctx, const struct token *token,
  * storage location.
  */
 static int
-parse_int(struct context *ctx, const struct token *token,
+parse_int(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	  const char *str, unsigned int len,
 	  void *buf, unsigned int size)
 {
-	const struct arg *arg = pop_args(ctx);
+	const struct arg *arg = rte_flow_cmd_parse_ctx_pop_arg(ctx);
 	uintmax_t u;
 	char *end;
 
@@ -11660,7 +10669,7 @@ objmask:
 	}
 	return len;
 error:
-	push_args(ctx, arg);
+	rte_flow_cmd_parse_ctx_push_arg(ctx, arg);
 	return -1;
 }
 
@@ -11671,13 +10680,13 @@ error:
  * its actual length and address (in that order).
  */
 static int
-parse_string(struct context *ctx, const struct token *token,
+parse_string(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	     const char *str, unsigned int len,
 	     void *buf, unsigned int size)
 {
-	const struct arg *arg_data = pop_args(ctx);
-	const struct arg *arg_len = pop_args(ctx);
-	const struct arg *arg_addr = pop_args(ctx);
+	const struct arg *arg_data = rte_flow_cmd_parse_ctx_pop_arg(ctx);
+	const struct arg *arg_len = rte_flow_cmd_parse_ctx_pop_arg(ctx);
+	const struct arg *arg_addr = rte_flow_cmd_parse_ctx_pop_arg(ctx);
 	char tmp[16]; /* Ought to be enough. */
 	int ret;
 
@@ -11685,12 +10694,12 @@ parse_string(struct context *ctx, const struct token *token,
 	if (!arg_data)
 		return -1;
 	if (!arg_len) {
-		push_args(ctx, arg_data);
+		rte_flow_cmd_parse_ctx_push_arg(ctx, arg_data);
 		return -1;
 	}
 	if (!arg_addr) {
-		push_args(ctx, arg_len);
-		push_args(ctx, arg_data);
+		rte_flow_cmd_parse_ctx_push_arg(ctx, arg_len);
+		rte_flow_cmd_parse_ctx_push_arg(ctx, arg_data);
 		return -1;
 	}
 	size = arg_data->size;
@@ -11703,10 +10712,10 @@ parse_string(struct context *ctx, const struct token *token,
 	ret = snprintf(tmp, sizeof(tmp), "%u", len);
 	if (ret < 0)
 		goto error;
-	push_args(ctx, arg_len);
+	rte_flow_cmd_parse_ctx_push_arg(ctx, arg_len);
 	ret = parse_int(ctx, token, tmp, ret, NULL, 0);
 	if (ret < 0) {
-		pop_args(ctx);
+		rte_flow_cmd_parse_ctx_pop_arg(ctx);
 		goto error;
 	}
 	buf = (uint8_t *)ctx->object + arg_data->offset;
@@ -11731,9 +10740,9 @@ parse_string(struct context *ctx, const struct token *token,
 	}
 	return len;
 error:
-	push_args(ctx, arg_addr);
-	push_args(ctx, arg_len);
-	push_args(ctx, arg_data);
+	rte_flow_cmd_parse_ctx_push_arg(ctx, arg_addr);
+	rte_flow_cmd_parse_ctx_push_arg(ctx, arg_len);
+	rte_flow_cmd_parse_ctx_push_arg(ctx, arg_data);
 	return -1;
 }
 
@@ -11770,13 +10779,13 @@ parse_hex_string(const char *src, uint8_t *dst, uint32_t *size)
 }
 
 static int
-parse_hex(struct context *ctx, const struct token *token,
+parse_hex(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		const char *str, unsigned int len,
 		void *buf, unsigned int size)
 {
-	const struct arg *arg_data = pop_args(ctx);
-	const struct arg *arg_len = pop_args(ctx);
-	const struct arg *arg_addr = pop_args(ctx);
+	const struct arg *arg_data = rte_flow_cmd_parse_ctx_pop_arg(ctx);
+	const struct arg *arg_len = rte_flow_cmd_parse_ctx_pop_arg(ctx);
+	const struct arg *arg_addr = rte_flow_cmd_parse_ctx_pop_arg(ctx);
 	char tmp[16]; /* Ought to be enough. */
 	int ret;
 	unsigned int hexlen = len;
@@ -11786,12 +10795,12 @@ parse_hex(struct context *ctx, const struct token *token,
 	if (!arg_data)
 		return -1;
 	if (!arg_len) {
-		push_args(ctx, arg_data);
+		rte_flow_cmd_parse_ctx_push_arg(ctx, arg_data);
 		return -1;
 	}
 	if (!arg_addr) {
-		push_args(ctx, arg_len);
-		push_args(ctx, arg_data);
+		rte_flow_cmd_parse_ctx_push_arg(ctx, arg_len);
+		rte_flow_cmd_parse_ctx_push_arg(ctx, arg_data);
 		return -1;
 	}
 	size = arg_data->size;
@@ -11821,10 +10830,10 @@ parse_hex(struct context *ctx, const struct token *token,
 		goto error;
 	/* Save length if requested. */
 	if (arg_len->size) {
-		push_args(ctx, arg_len);
+		rte_flow_cmd_parse_ctx_push_arg(ctx, arg_len);
 		ret = parse_int(ctx, token, tmp, ret, NULL, 0);
 		if (ret < 0) {
-			pop_args(ctx);
+			rte_flow_cmd_parse_ctx_pop_arg(ctx);
 			goto error;
 		}
 	}
@@ -11851,9 +10860,9 @@ parse_hex(struct context *ctx, const struct token *token,
 	}
 	return len;
 error:
-	push_args(ctx, arg_addr);
-	push_args(ctx, arg_len);
-	push_args(ctx, arg_data);
+	rte_flow_cmd_parse_ctx_push_arg(ctx, arg_addr);
+	rte_flow_cmd_parse_ctx_push_arg(ctx, arg_len);
+	rte_flow_cmd_parse_ctx_push_arg(ctx, arg_data);
 	return -1;
 
 }
@@ -11862,11 +10871,11 @@ error:
  * Parse a zero-ended string.
  */
 static int
-parse_string0(struct context *ctx, const struct token *token __rte_unused,
+parse_string0(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token __rte_unused,
 	     const char *str, unsigned int len,
 	     void *buf, unsigned int size)
 {
-	const struct arg *arg_data = pop_args(ctx);
+	const struct arg *arg_data = rte_flow_cmd_parse_ctx_pop_arg(ctx);
 
 	/* Arguments are expected. */
 	if (!arg_data)
@@ -11883,7 +10892,7 @@ parse_string0(struct context *ctx, const struct token *token __rte_unused,
 		memset((uint8_t *)ctx->objmask + arg_data->offset, 0xff, len);
 	return len;
 error:
-	push_args(ctx, arg_data);
+	rte_flow_cmd_parse_ctx_push_arg(ctx, arg_data);
 	return -1;
 }
 
@@ -11894,11 +10903,11 @@ error:
  * location.
  */
 static int
-parse_mac_addr(struct context *ctx, const struct token *token,
+parse_mac_addr(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	       const char *str, unsigned int len,
 	       void *buf, unsigned int size)
 {
-	const struct arg *arg = pop_args(ctx);
+	const struct arg *arg = rte_flow_cmd_parse_ctx_pop_arg(ctx);
 	struct rte_ether_addr tmp;
 	int ret;
 
@@ -11924,7 +10933,7 @@ parse_mac_addr(struct context *ctx, const struct token *token,
 		memset((uint8_t *)ctx->objmask + arg->offset, 0xff, size);
 	return len;
 error:
-	push_args(ctx, arg);
+	rte_flow_cmd_parse_ctx_push_arg(ctx, arg);
 	return -1;
 }
 
@@ -11935,11 +10944,11 @@ error:
  * location.
  */
 static int
-parse_ipv4_addr(struct context *ctx, const struct token *token,
+parse_ipv4_addr(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		const char *str, unsigned int len,
 		void *buf, unsigned int size)
 {
-	const struct arg *arg = pop_args(ctx);
+	const struct arg *arg = rte_flow_cmd_parse_ctx_pop_arg(ctx);
 	char str2[INET_ADDRSTRLEN];
 	struct in_addr tmp;
 	int ret;
@@ -11962,7 +10971,7 @@ parse_ipv4_addr(struct context *ctx, const struct token *token,
 	ret = inet_pton(AF_INET, str2, &tmp);
 	if (ret != 1) {
 		/* Attempt integer parsing. */
-		push_args(ctx, arg);
+		rte_flow_cmd_parse_ctx_push_arg(ctx, arg);
 		return parse_int(ctx, token, str, len, buf, size);
 	}
 	if (!ctx->object)
@@ -11973,7 +10982,7 @@ parse_ipv4_addr(struct context *ctx, const struct token *token,
 		memset((uint8_t *)ctx->objmask + arg->offset, 0xff, size);
 	return len;
 error:
-	push_args(ctx, arg);
+	rte_flow_cmd_parse_ctx_push_arg(ctx, arg);
 	return -1;
 }
 
@@ -11984,11 +10993,11 @@ error:
  * location.
  */
 static int
-parse_ipv6_addr(struct context *ctx, const struct token *token,
+parse_ipv6_addr(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		const char *str, unsigned int len,
 		void *buf, unsigned int size)
 {
-	const struct arg *arg = pop_args(ctx);
+	const struct arg *arg = rte_flow_cmd_parse_ctx_pop_arg(ctx);
 	char str2[INET6_ADDRSTRLEN];
 	struct rte_ipv6_addr tmp;
 	int ret;
@@ -12020,7 +11029,7 @@ parse_ipv6_addr(struct context *ctx, const struct token *token,
 		memset((uint8_t *)ctx->objmask + arg->offset, 0xff, size);
 	return len;
 error:
-	push_args(ctx, arg);
+	rte_flow_cmd_parse_ctx_push_arg(ctx, arg);
 	return -1;
 }
 
@@ -12041,11 +11050,11 @@ static const char *const boolean_name[] = {
  * location.
  */
 static int
-parse_boolean(struct context *ctx, const struct token *token,
+parse_boolean(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	      const char *str, unsigned int len,
 	      void *buf, unsigned int size)
 {
-	const struct arg *arg = pop_args(ctx);
+	const struct arg *arg = rte_flow_cmd_parse_ctx_pop_arg(ctx);
 	unsigned int i;
 	int ret;
 
@@ -12053,19 +11062,19 @@ parse_boolean(struct context *ctx, const struct token *token,
 	if (!arg)
 		return -1;
 	for (i = 0; boolean_name[i]; ++i)
-		if (!strcmp_partial(boolean_name[i], str, len))
+		if (!rte_flow_cmd_parser_strcmp_partial(boolean_name[i], str, len))
 			break;
 	/* Process token as integer. */
 	if (boolean_name[i])
 		str = i & 1 ? "1" : "0";
-	push_args(ctx, arg);
+	rte_flow_cmd_parse_ctx_push_arg(ctx, arg);
 	ret = parse_int(ctx, token, str, strlen(str), buf, size);
 	return ret > 0 ? (int)len : ret;
 }
 
 /** Parse port and update context. */
 static int
-parse_port(struct context *ctx, const struct token *token,
+parse_port(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	   const char *str, unsigned int len,
 	   void *buf, unsigned int size)
 {
@@ -12090,7 +11099,7 @@ parse_port(struct context *ctx, const struct token *token,
 
 /** Parse tokens for shared indirect actions. */
 static int
-parse_ia_port(struct context *ctx, const struct token *token,
+parse_ia_port(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	      const char *str, unsigned int len,
 	      void *buf, unsigned int size)
 {
@@ -12114,7 +11123,7 @@ parse_ia_port(struct context *ctx, const struct token *token,
 }
 
 static int
-parse_ia_id2ptr(struct context *ctx, const struct token *token,
+parse_ia_id2ptr(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		const char *str, unsigned int len,
 		void *buf, unsigned int size)
 {
@@ -12143,7 +11152,7 @@ parse_ia_id2ptr(struct context *ctx, const struct token *token,
 }
 
 static int
-parse_indlst_id2ptr(struct context *ctx, const struct token *token,
+parse_indlst_id2ptr(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		    const char *str, unsigned int len,
 		    __rte_unused void *buf, __rte_unused unsigned int size)
 {
@@ -12188,7 +11197,7 @@ parse_indlst_id2ptr(struct context *ctx, const struct token *token,
 }
 
 static int
-parse_meter_profile_id2ptr(struct context *ctx, const struct token *token,
+parse_meter_profile_id2ptr(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		const char *str, unsigned int len,
 		void *buf, unsigned int size)
 {
@@ -12219,7 +11228,7 @@ parse_meter_profile_id2ptr(struct context *ctx, const struct token *token,
 }
 
 static int
-parse_meter_policy_id2ptr(struct context *ctx, const struct token *token,
+parse_meter_policy_id2ptr(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		const char *str, unsigned int len,
 		void *buf, unsigned int size)
 {
@@ -12251,14 +11260,14 @@ parse_meter_policy_id2ptr(struct context *ctx, const struct token *token,
 
 /** Parse set command, initialize output buffer for subsequent tokens. */
 static int
-parse_set_raw_encap_decap(struct context *ctx, const struct token *token,
+parse_set_raw_encap_decap(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			  const char *str, unsigned int len,
 			  void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -12280,14 +11289,14 @@ parse_set_raw_encap_decap(struct context *ctx, const struct token *token,
 
 /** Parse set command, initialize output buffer for subsequent tokens. */
 static int
-parse_set_sample_action(struct context *ctx, const struct token *token,
+parse_set_sample_action(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			  const char *str, unsigned int len,
 			  void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -12309,14 +11318,14 @@ parse_set_sample_action(struct context *ctx, const struct token *token,
 
 /** Parse set command, initialize output buffer for subsequent tokens. */
 static int
-parse_set_ipv6_ext_action(struct context *ctx, const struct token *token,
+parse_set_ipv6_ext_action(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			  const char *str, unsigned int len,
 			  void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -12341,14 +11350,14 @@ parse_set_ipv6_ext_action(struct context *ctx, const struct token *token,
  * initialize output buffer for subsequent tokens.
  */
 static int
-parse_set_init(struct context *ctx, const struct token *token,
+parse_set_init(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	       const char *str, unsigned int len,
 	       void *buf, unsigned int size)
 {
 	struct buffer *out = buf;
 
 	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
+	if (rte_flow_cmd_parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
@@ -12379,13 +11388,13 @@ parse_set_init(struct context *ctx, const struct token *token,
  * Replace testpmd handles in a flex flow item with real values.
  */
 static int
-parse_flex_handle(struct context *ctx, const struct token *token,
+parse_flex_handle(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		  const char *str, unsigned int len,
 		  void *buf, unsigned int size)
 {
 	struct rte_flow_item_flex *spec, *mask;
 	const struct rte_flow_item_flex *src_spec, *src_mask;
-	const struct arg *arg = pop_args(ctx);
+	const struct arg *arg = rte_flow_cmd_parse_ctx_pop_arg(ctx);
 	uint32_t offset;
 	uint16_t handle;
 	int ret;
@@ -12395,7 +11404,7 @@ parse_flex_handle(struct context *ctx, const struct token *token,
 		return -1;
 	}
 	offset = arg->offset;
-	push_args(ctx, arg);
+	rte_flow_cmd_parse_ctx_push_arg(ctx, arg);
 	ret = parse_int(ctx, token, str, len, buf, size);
 	if (ret <= 0 || !ctx->object)
 		return ret;
@@ -12444,7 +11453,7 @@ parse_flex_handle(struct context *ctx, const struct token *token,
 
 /** Parse Meter color name */
 static int
-parse_meter_color(struct context *ctx, const struct token *token,
+parse_meter_color(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		  const char *str, unsigned int len, void *buf,
 		  unsigned int size)
 {
@@ -12455,7 +11464,7 @@ parse_meter_color(struct context *ctx, const struct token *token,
 	(void)buf;
 	(void)size;
 	for (i = 0; meter_colors[i]; ++i)
-		if (!strcmp_partial(meter_colors[i], str, len))
+		if (!rte_flow_cmd_parser_strcmp_partial(meter_colors[i], str, len))
 			break;
 	if (!meter_colors[i])
 		return -1;
@@ -12464,7 +11473,7 @@ parse_meter_color(struct context *ctx, const struct token *token,
 	if (ctx->prev == ACTION_METER_MARK_CONF_COLOR) {
 		struct rte_flow_action *action =
 			out->args.vc.actions + out->args.vc.actions_n - 1;
-		const struct arg *arg = pop_args(ctx);
+		const struct arg *arg = rte_flow_cmd_parse_ctx_pop_arg(ctx);
 
 		if (!arg)
 			return -1;
@@ -12478,11 +11487,11 @@ parse_meter_color(struct context *ctx, const struct token *token,
 
 /** Parse Insertion Table Type name */
 static int
-parse_insertion_table_type(struct context *ctx, const struct token *token,
+parse_insertion_table_type(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			   const char *str, unsigned int len, void *buf,
 			   unsigned int size)
 {
-	const struct arg *arg = pop_args(ctx);
+	const struct arg *arg = rte_flow_cmd_parse_ctx_pop_arg(ctx);
 	unsigned int i;
 	char tmp[2];
 	int ret;
@@ -12492,11 +11501,11 @@ parse_insertion_table_type(struct context *ctx, const struct token *token,
 	if (!arg)
 		return -1;
 	for (i = 0; table_insertion_types[i]; ++i)
-		if (!strcmp_partial(table_insertion_types[i], str, len))
+		if (!rte_flow_cmd_parser_strcmp_partial(table_insertion_types[i], str, len))
 			break;
 	if (!table_insertion_types[i])
 		return -1;
-	push_args(ctx, arg);
+	rte_flow_cmd_parse_ctx_push_arg(ctx, arg);
 	snprintf(tmp, sizeof(tmp), "%u", i);
 	ret = parse_int(ctx, token, tmp, strlen(tmp), buf, sizeof(i));
 	return ret > 0 ? (int)len : ret;
@@ -12504,11 +11513,11 @@ parse_insertion_table_type(struct context *ctx, const struct token *token,
 
 /** Parse Hash Calculation Table Type name */
 static int
-parse_hash_table_type(struct context *ctx, const struct token *token,
+parse_hash_table_type(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		      const char *str, unsigned int len, void *buf,
 		      unsigned int size)
 {
-	const struct arg *arg = pop_args(ctx);
+	const struct arg *arg = rte_flow_cmd_parse_ctx_pop_arg(ctx);
 	unsigned int i;
 	char tmp[2];
 	int ret;
@@ -12518,18 +11527,18 @@ parse_hash_table_type(struct context *ctx, const struct token *token,
 	if (!arg)
 		return -1;
 	for (i = 0; table_hash_funcs[i]; ++i)
-		if (!strcmp_partial(table_hash_funcs[i], str, len))
+		if (!rte_flow_cmd_parser_strcmp_partial(table_hash_funcs[i], str, len))
 			break;
 	if (!table_hash_funcs[i])
 		return -1;
-	push_args(ctx, arg);
+	rte_flow_cmd_parse_ctx_push_arg(ctx, arg);
 	snprintf(tmp, sizeof(tmp), "%u", i);
 	ret = parse_int(ctx, token, tmp, strlen(tmp), buf, sizeof(i));
 	return ret > 0 ? (int)len : ret;
 }
 
 static int
-parse_name_to_index(struct context *ctx, const struct token *token,
+parse_name_to_index(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		    const char *str, unsigned int len, void *buf,
 		    unsigned int size,
 		    const char *const names[], size_t names_size, uint32_t *dst)
@@ -12545,7 +11554,7 @@ parse_name_to_index(struct context *ctx, const struct token *token,
 	for (i = 0; i < names_size; i++) {
 		if (!names[i])
 			continue;
-		ret = strcmp_partial(names[i], str,
+		ret = rte_flow_cmd_parser_strcmp_partial(names[i], str,
 				     RTE_MIN(len, strlen(names[i])));
 		if (!ret) {
 			*dst = i;
@@ -12578,7 +11587,7 @@ static const char *const query_update_mode_names[] = {
 };
 
 static int
-parse_quota_state_name(struct context *ctx, const struct token *token,
+parse_quota_state_name(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		       const char *str, unsigned int len, void *buf,
 		       unsigned int size)
 {
@@ -12591,7 +11600,7 @@ parse_quota_state_name(struct context *ctx, const struct token *token,
 }
 
 static int
-parse_quota_mode_name(struct context *ctx, const struct token *token,
+parse_quota_mode_name(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		      const char *str, unsigned int len, void *buf,
 		      unsigned int size)
 {
@@ -12604,7 +11613,7 @@ parse_quota_mode_name(struct context *ctx, const struct token *token,
 }
 
 static int
-parse_quota_update_name(struct context *ctx, const struct token *token,
+parse_quota_update_name(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			const char *str, unsigned int len, void *buf,
 			unsigned int size)
 {
@@ -12617,7 +11626,7 @@ parse_quota_update_name(struct context *ctx, const struct token *token,
 }
 
 static int
-parse_qu_mode_name(struct context *ctx, const struct token *token,
+parse_qu_mode_name(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		   const char *str, unsigned int len, void *buf,
 		   unsigned int size)
 {
@@ -12631,7 +11640,7 @@ parse_qu_mode_name(struct context *ctx, const struct token *token,
 
 /** No completion. */
 static int
-comp_none(struct context *ctx, const struct token *token,
+comp_none(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	  unsigned int ent, char *buf, unsigned int size)
 {
 	(void)ctx;
@@ -12644,7 +11653,7 @@ comp_none(struct context *ctx, const struct token *token,
 
 /** Complete boolean values. */
 static int
-comp_boolean(struct context *ctx, const struct token *token,
+comp_boolean(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	     unsigned int ent, char *buf, unsigned int size)
 {
 	unsigned int i;
@@ -12661,7 +11670,7 @@ comp_boolean(struct context *ctx, const struct token *token,
 
 /** Complete action names. */
 static int
-comp_action(struct context *ctx, const struct token *token,
+comp_action(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	    unsigned int ent, char *buf, unsigned int size)
 {
 	unsigned int i;
@@ -12679,7 +11688,7 @@ comp_action(struct context *ctx, const struct token *token,
 
 /** Complete available ports. */
 static int
-comp_port(struct context *ctx, const struct token *token,
+comp_port(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	  unsigned int ent, char *buf, unsigned int size)
 {
 	unsigned int i = 0;
@@ -12699,7 +11708,7 @@ comp_port(struct context *ctx, const struct token *token,
 
 /** Complete available rule IDs. */
 static int
-comp_rule_id(struct context *ctx, const struct token *token,
+comp_rule_id(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	     unsigned int ent, char *buf, unsigned int size)
 {
 	unsigned int i = 0;
@@ -12723,7 +11732,7 @@ comp_rule_id(struct context *ctx, const struct token *token,
 
 /** Complete operation for compare match item. */
 static int
-comp_set_compare_op(struct context *ctx, const struct token *token,
+comp_set_compare_op(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		    unsigned int ent, char *buf, unsigned int size)
 {
 	RTE_SET_USED(ctx);
@@ -12737,7 +11746,7 @@ comp_set_compare_op(struct context *ctx, const struct token *token,
 
 /** Complete field id for compare match item. */
 static int
-comp_set_compare_field_id(struct context *ctx, const struct token *token,
+comp_set_compare_field_id(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			  unsigned int ent, char *buf, unsigned int size)
 {
 	const char *name;
@@ -12756,7 +11765,7 @@ comp_set_compare_field_id(struct context *ctx, const struct token *token,
 
 /** Complete type field for RSS action. */
 static int
-comp_vc_action_rss_type(struct context *ctx, const struct token *token,
+comp_vc_action_rss_type(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			unsigned int ent, char *buf, unsigned int size)
 {
 	unsigned int i;
@@ -12776,7 +11785,7 @@ comp_vc_action_rss_type(struct context *ctx, const struct token *token,
 
 /** Complete queue field for RSS action. */
 static int
-comp_vc_action_rss_queue(struct context *ctx, const struct token *token,
+comp_vc_action_rss_queue(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			 unsigned int ent, char *buf, unsigned int size)
 {
 	(void)ctx;
@@ -12792,7 +11801,7 @@ comp_vc_action_rss_queue(struct context *ctx, const struct token *token,
 
 /** Complete index number for set raw_encap/raw_decap commands. */
 static int
-comp_set_raw_index(struct context *ctx, const struct token *token,
+comp_set_raw_index(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		   unsigned int ent, char *buf, unsigned int size)
 {
 	uint16_t idx = 0;
@@ -12810,7 +11819,7 @@ comp_set_raw_index(struct context *ctx, const struct token *token,
 
 /** Complete index number for set raw_ipv6_ext_push/ipv6_ext_remove commands. */
 static int
-comp_set_ipv6_ext_index(struct context *ctx, const struct token *token,
+comp_set_ipv6_ext_index(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			unsigned int ent, char *buf, unsigned int size)
 {
 	uint16_t idx = 0;
@@ -12828,7 +11837,7 @@ comp_set_ipv6_ext_index(struct context *ctx, const struct token *token,
 
 /** Complete index number for set raw_encap/raw_decap commands. */
 static int
-comp_set_sample_index(struct context *ctx, const struct token *token,
+comp_set_sample_index(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		   unsigned int ent, char *buf, unsigned int size)
 {
 	uint16_t idx = 0;
@@ -12846,7 +11855,7 @@ comp_set_sample_index(struct context *ctx, const struct token *token,
 
 /** Complete operation for modify_field command. */
 static int
-comp_set_modify_field_op(struct context *ctx, const struct token *token,
+comp_set_modify_field_op(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		   unsigned int ent, char *buf, unsigned int size)
 {
 	RTE_SET_USED(ctx);
@@ -12860,7 +11869,7 @@ comp_set_modify_field_op(struct context *ctx, const struct token *token,
 
 /** Complete field id for modify_field command. */
 static int
-comp_set_modify_field_id(struct context *ctx, const struct token *token,
+comp_set_modify_field_id(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		   unsigned int ent, char *buf, unsigned int size)
 {
 	const char *name;
@@ -12879,7 +11888,7 @@ comp_set_modify_field_id(struct context *ctx, const struct token *token,
 
 /** Complete available pattern template IDs. */
 static int
-comp_pattern_template_id(struct context *ctx, const struct token *token,
+comp_pattern_template_id(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			 unsigned int ent, char *buf, unsigned int size)
 {
 	unsigned int i = 0;
@@ -12903,7 +11912,7 @@ comp_pattern_template_id(struct context *ctx, const struct token *token,
 
 /** Complete available actions template IDs. */
 static int
-comp_actions_template_id(struct context *ctx, const struct token *token,
+comp_actions_template_id(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			 unsigned int ent, char *buf, unsigned int size)
 {
 	unsigned int i = 0;
@@ -12927,7 +11936,7 @@ comp_actions_template_id(struct context *ctx, const struct token *token,
 
 /** Complete available table IDs. */
 static int
-comp_table_id(struct context *ctx, const struct token *token,
+comp_table_id(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	      unsigned int ent, char *buf, unsigned int size)
 {
 	unsigned int i = 0;
@@ -12951,7 +11960,7 @@ comp_table_id(struct context *ctx, const struct token *token,
 
 /** Complete available queue IDs. */
 static int
-comp_queue_id(struct context *ctx, const struct token *token,
+comp_queue_id(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 	      unsigned int ent, char *buf, unsigned int size)
 {
 	unsigned int i = 0;
@@ -12972,7 +11981,7 @@ comp_queue_id(struct context *ctx, const struct token *token,
 }
 
 static int
-comp_names_to_index(struct context *ctx, const struct token *token,
+comp_names_to_index(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		    unsigned int ent, char *buf, unsigned int size,
 		    const char *const names[], size_t names_size)
 {
@@ -12988,7 +11997,7 @@ comp_names_to_index(struct context *ctx, const struct token *token,
 
 /** Complete available Meter colors. */
 static int
-comp_meter_color(struct context *ctx, const struct token *token,
+comp_meter_color(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		 unsigned int ent, char *buf, unsigned int size)
 {
 	RTE_SET_USED(ctx);
@@ -13002,7 +12011,7 @@ comp_meter_color(struct context *ctx, const struct token *token,
 
 /** Complete available Insertion Table types. */
 static int
-comp_insertion_table_type(struct context *ctx, const struct token *token,
+comp_insertion_table_type(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 			  unsigned int ent, char *buf, unsigned int size)
 {
 	RTE_SET_USED(ctx);
@@ -13016,7 +12025,7 @@ comp_insertion_table_type(struct context *ctx, const struct token *token,
 
 /** Complete available Hash Calculation Table types. */
 static int
-comp_hash_table_type(struct context *ctx, const struct token *token,
+comp_hash_table_type(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		     unsigned int ent, char *buf, unsigned int size)
 {
 	RTE_SET_USED(ctx);
@@ -13029,7 +12038,7 @@ comp_hash_table_type(struct context *ctx, const struct token *token,
 }
 
 static int
-comp_quota_state_name(struct context *ctx, const struct token *token,
+comp_quota_state_name(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		      unsigned int ent, char *buf, unsigned int size)
 {
 	return comp_names_to_index(ctx, token, ent, buf, size,
@@ -13038,7 +12047,7 @@ comp_quota_state_name(struct context *ctx, const struct token *token,
 }
 
 static int
-comp_quota_mode_name(struct context *ctx, const struct token *token,
+comp_quota_mode_name(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		     unsigned int ent, char *buf, unsigned int size)
 {
 	return comp_names_to_index(ctx, token, ent, buf, size,
@@ -13047,7 +12056,7 @@ comp_quota_mode_name(struct context *ctx, const struct token *token,
 }
 
 static int
-comp_quota_update_name(struct context *ctx, const struct token *token,
+comp_quota_update_name(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		       unsigned int ent, char *buf, unsigned int size)
 {
 	return comp_names_to_index(ctx, token, ent, buf, size,
@@ -13056,7 +12065,7 @@ comp_quota_update_name(struct context *ctx, const struct token *token,
 }
 
 static int
-comp_qu_mode_name(struct context *ctx, const struct token *token,
+comp_qu_mode_name(struct rte_flow_cmd_parse_ctx *ctx, const struct token *token,
 		  unsigned int ent, char *buf, unsigned int size)
 {
 	return comp_names_to_index(ctx, token, ent, buf, size,
@@ -13065,7 +12074,7 @@ comp_qu_mode_name(struct context *ctx, const struct token *token,
 }
 
 /** Internal context. */
-static struct context cmd_flow_context;
+static struct rte_flow_cmd_parse_ctx cmd_flow_context;
 
 /** Global parser instance (cmdline API). */
 cmdline_parse_inst_t cmd_flow;
@@ -13073,19 +12082,9 @@ cmdline_parse_inst_t cmd_set_raw;
 
 /** Initialize context. */
 static void
-cmd_flow_context_init(struct context *ctx)
+cmd_flow_context_init(struct rte_flow_cmd_parse_ctx *ctx)
 {
-	/* A full memset() is not necessary. */
-	ctx->curr = ZERO;
-	ctx->prev = ZERO;
-	ctx->next_num = 0;
-	ctx->args_num = 0;
-	ctx->eol = 0;
-	ctx->last = 0;
-	ctx->port = 0;
-	ctx->objdata = 0;
-	ctx->object = NULL;
-	ctx->objmask = NULL;
+	rte_flow_cmd_parse_ctx_reset(ctx);
 }
 
 /** Parse a token (cmdline API). */
@@ -13093,7 +12092,7 @@ static int
 cmd_flow_parse(cmdline_parse_token_hdr_t *hdr, const char *src, void *result,
 	       unsigned int size)
 {
-	struct context *ctx = &cmd_flow_context;
+	struct rte_flow_cmd_parse_ctx *ctx = &cmd_flow_context;
 	const struct token *token;
 	const enum index *list;
 	int len;
@@ -13126,11 +12125,14 @@ cmd_flow_parse(cmdline_parse_token_hdr_t *hdr, const char *src, void *result,
 	if (!ctx->next_num) {
 		if (!token->next)
 			return 0;
-		ctx->next[ctx->next_num++] = token->next[0];
+		if (rte_flow_cmd_parse_ctx_push_next(ctx, token->next[0]) < 0)
+			return -1;
 	}
 	/* Process argument through candidates. */
 	ctx->prev = ctx->curr;
-	list = ctx->next[ctx->next_num - 1];
+	list = rte_flow_cmd_parse_ctx_peek_next(ctx);
+	if (!list)
+		return -1;
 	for (i = 0; list[i]; ++i) {
 		const struct token *next = &token_list[list[i]];
 		int tmp;
@@ -13139,7 +12141,7 @@ cmd_flow_parse(cmdline_parse_token_hdr_t *hdr, const char *src, void *result,
 		if (next->call)
 			tmp = next->call(ctx, next, src, len, result, size);
 		else
-			tmp = parse_default(ctx, next, src, len, result, size);
+			tmp = rte_flow_cmd_parse_default(ctx, next, src, len, result, size);
 		if (tmp == -1 || tmp != len)
 			continue;
 		token = next;
@@ -13147,20 +12149,21 @@ cmd_flow_parse(cmdline_parse_token_hdr_t *hdr, const char *src, void *result,
 	}
 	if (!list[i])
 		return -1;
-	--ctx->next_num;
+	if (!rte_flow_cmd_parse_ctx_pop_next(ctx))
+		return -1;
 	/* Push subsequent tokens if any. */
 	if (token->next)
 		for (i = 0; token->next[i]; ++i) {
-			if (ctx->next_num == RTE_DIM(ctx->next))
+			if (rte_flow_cmd_parse_ctx_push_next(ctx,
+						     token->next[i]) < 0)
 				return -1;
-			ctx->next[ctx->next_num++] = token->next[i];
 		}
 	/* Push arguments if any. */
 	if (token->args)
 		for (i = 0; token->args[i]; ++i) {
-			if (ctx->args_num == RTE_DIM(ctx->args))
+			if (rte_flow_cmd_parse_ctx_push_arg(ctx,
+						    token->args[i]) < 0)
 				return -1;
-			ctx->args[ctx->args_num++] = token->args[i];
 		}
 	return len;
 }
@@ -13169,16 +12172,15 @@ cmd_flow_parse(cmdline_parse_token_hdr_t *hdr, const char *src, void *result,
 static int
 cmd_flow_complete_get_nb(cmdline_parse_token_hdr_t *hdr)
 {
-	struct context *ctx = &cmd_flow_context;
+	struct rte_flow_cmd_parse_ctx *ctx = &cmd_flow_context;
 	const struct token *token = &token_list[ctx->curr];
 	const enum index *list;
 	int i;
 
 	(void)hdr;
 	/* Count number of tokens in current list. */
-	if (ctx->next_num)
-		list = ctx->next[ctx->next_num - 1];
-	else
+	list = rte_flow_cmd_parse_ctx_peek_next(ctx);
+	if (!list)
 		list = token->next[0];
 	for (i = 0; list[i]; ++i)
 		;
@@ -13202,16 +12204,15 @@ static int
 cmd_flow_complete_get_elt(cmdline_parse_token_hdr_t *hdr, int index,
 			  char *dst, unsigned int size)
 {
-	struct context *ctx = &cmd_flow_context;
+	struct rte_flow_cmd_parse_ctx *ctx = &cmd_flow_context;
 	const struct token *token = &token_list[ctx->curr];
 	const enum index *list;
 	int i;
 
 	(void)hdr;
 	/* Count number of tokens in current list. */
-	if (ctx->next_num)
-		list = ctx->next[ctx->next_num - 1];
-	else
+	list = rte_flow_cmd_parse_ctx_peek_next(ctx);
+	if (!list)
 		list = token->next[0];
 	for (i = 0; list[i]; ++i)
 		;
@@ -13238,7 +12239,7 @@ cmd_flow_complete_get_elt(cmdline_parse_token_hdr_t *hdr, int index,
 static int
 cmd_flow_get_help(cmdline_parse_token_hdr_t *hdr, char *dst, unsigned int size)
 {
-	struct context *ctx = &cmd_flow_context;
+	struct rte_flow_cmd_parse_ctx *ctx = &cmd_flow_context;
 	const struct token *token = &token_list[ctx->prev];
 
 	(void)hdr;
@@ -13269,7 +12270,7 @@ static void
 cmd_flow_tok(cmdline_parse_token_hdr_t **hdr,
 	     cmdline_parse_token_hdr_t **hdr_inst)
 {
-	struct context *ctx = &cmd_flow_context;
+	struct rte_flow_cmd_parse_ctx *ctx = &cmd_flow_context;
 
 	/* Always reinitialize context before requesting the first token. */
 	if (!(hdr_inst - cmd_flow.tokens))
@@ -13281,9 +12282,13 @@ cmd_flow_tok(cmdline_parse_token_hdr_t **hdr,
 	}
 	/* Determine if command should end here. */
 	if (ctx->eol && ctx->last && ctx->next_num) {
-		const enum index *list = ctx->next[ctx->next_num - 1];
+		const enum index *list = rte_flow_cmd_parse_ctx_peek_next(ctx);
 		int i;
 
+		if (!list) {
+			*hdr = NULL;
+			return;
+		}
 		for (i = 0; list[i]; ++i) {
 			if (list[i] != END)
 				continue;
@@ -14253,7 +13258,7 @@ static int
 cmd_set_raw_get_help(cmdline_parse_token_hdr_t *hdr, char *dst,
 		     unsigned int size)
 {
-	struct context *ctx = &cmd_flow_context;
+	struct rte_flow_cmd_parse_ctx *ctx = &cmd_flow_context;
 	const struct token *token = &token_list[ctx->prev];
 
 	(void)hdr;
@@ -14284,7 +13289,7 @@ static void
 cmd_set_raw_tok(cmdline_parse_token_hdr_t **hdr,
 	     cmdline_parse_token_hdr_t **hdr_inst)
 {
-	struct context *ctx = &cmd_flow_context;
+	struct rte_flow_cmd_parse_ctx *ctx = &cmd_flow_context;
 
 	/* Always reinitialize context before requesting the first token. */
 	if (!(hdr_inst - cmd_set_raw.tokens)) {
@@ -14298,9 +13303,13 @@ cmd_set_raw_tok(cmdline_parse_token_hdr_t **hdr,
 	}
 	/* Determine if command should end here. */
 	if (ctx->eol && ctx->last && ctx->next_num) {
-		const enum index *list = ctx->next[ctx->next_num - 1];
+		const enum index *list = rte_flow_cmd_parse_ctx_peek_next(ctx);
 		int i;
 
+		if (!list) {
+			*hdr = NULL;
+			return;
+		}
 		for (i = 0; list[i]; ++i) {
 			if (list[i] != END)
 				continue;

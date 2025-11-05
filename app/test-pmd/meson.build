@@ -74,6 +74,6 @@ if dpdk_conf.has('RTE_NET_DPAA')
 endif
 
 # Driver-specific commands are located in driver directories.
-includes = include_directories('.')
+includes = include_directories('.', '../../lib/ethdev')
 sources += testpmd_drivers_sources
 deps += testpmd_drivers_deps
