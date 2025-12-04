@@ -14,6 +14,7 @@ sources = files(
         'csumonly.c',
         'flowgen.c',
         'flow_parser.c',
+        'flow_parser_cli.c',
         'hairpin.c',
         'icmpecho.c',
         'ieee1588fwd.c',
