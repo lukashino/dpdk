@@ -17,12 +17,6 @@ extern "C" {
 #endif
 
 struct rte_flow_parser;
-struct rte_flow_template_table;
-struct rte_flow_action_handle;
-struct rte_flow_meter_policy;
-struct rte_flow_meter_profile;
-struct rte_flow_item_flex_handle;
-
 struct rte_flow_parser_rss_type_info {
 	const char *str;
 	uint64_t rss_type;
