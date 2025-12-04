@@ -17,54 +17,15 @@
 
 #include "testpmd.h"
 
-#define ACTION_RAW_ENCAP_MAX_DATA 512
-#define RAW_ENCAP_CONFS_MAX_NUM 8
-#define ACTION_IPV6_EXT_PUSH_MAX_DATA 512
-#define IPV6_EXT_PUSH_CONFS_MAX_NUM 8
-#define ACTION_SAMPLE_ACTIONS_NUM 10
-#define RAW_SAMPLE_CONFS_MAX_NUM 8
-#define ACTION_RSS_QUEUE_NUM 128
+struct rte_flow_parser_vxlan_encap_conf vxlan_encap_conf;
+struct rte_flow_parser_nvgre_encap_conf nvgre_encap_conf;
+struct rte_flow_parser_l2_encap_conf l2_encap_conf;
+struct rte_flow_parser_l2_decap_conf l2_decap_conf;
+struct rte_flow_parser_mplsogre_encap_conf mplsogre_encap_conf;
+struct rte_flow_parser_mplsogre_decap_conf mplsogre_decap_conf;
+struct rte_flow_parser_mplsoudp_encap_conf mplsoudp_encap_conf;
+struct rte_flow_parser_mplsoudp_decap_conf mplsoudp_decap_conf;
 
-/* Default encapsulation configs mirrored from the legacy parser. */
-struct vxlan_encap_conf vxlan_encap_conf = {
-	.select_ipv4 = 1,
-	.select_vlan = 0,
-	.select_tos_ttl = 0,
-	.vni = { 0x00, 0x00, 0x00 },
-	.udp_src = 0,
-	.udp_dst = RTE_BE16(RTE_VXLAN_DEFAULT_PORT),
-	.ipv4_src = RTE_IPV4(127, 0, 0, 1),
-	.ipv4_dst = RTE_IPV4(255, 255, 255, 255),
-	.ipv6_src = RTE_IPV6_ADDR_LOOPBACK,
-	.ipv6_dst = RTE_IPV6(0, 0, 0, 0, 0, 0, 0, 0x1111),
-	.vlan_tci = 0,
-	.ip_tos = 0,
-	.ip_ttl = 255,
-	.eth_src = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-	.eth_dst = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-};
-
-struct nvgre_encap_conf nvgre_encap_conf = {
-	.select_ipv4 = 1,
-	.select_vlan = 0,
-	.tni = { 0x00, 0x00, 0x00 },
-	.ipv4_src = RTE_IPV4(127, 0, 0, 1),
-	.ipv4_dst = RTE_IPV4(255, 255, 255, 255),
-	.ipv6_src = RTE_IPV6_ADDR_LOOPBACK,
-	.ipv6_dst = RTE_IPV6(0, 0, 0, 0, 0, 0, 0, 0x1111),
-	.vlan_tci = 0,
-	.eth_src = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-	.eth_dst = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-};
-
-struct l2_encap_conf l2_encap_conf;
-struct l2_decap_conf l2_decap_conf;
-struct mplsogre_encap_conf mplsogre_encap_conf;
-struct mplsogre_decap_conf mplsogre_decap_conf;
-struct mplsoudp_encap_conf mplsoudp_encap_conf;
-struct mplsoudp_decap_conf mplsoudp_decap_conf;
-
-#define ACTION_VXLAN_ENCAP_ITEMS_NUM 6
 struct action_vxlan_encap_data {
 	struct rte_flow_action_vxlan_encap conf;
 	struct rte_flow_item items[ACTION_VXLAN_ENCAP_ITEMS_NUM];
@@ -78,7 +39,6 @@ struct action_vxlan_encap_data {
 	struct rte_flow_item_vxlan item_vxlan;
 };
 
-#define ACTION_NVGRE_ENCAP_ITEMS_NUM 5
 struct action_nvgre_encap_data {
 	struct rte_flow_action_nvgre_encap conf;
 	struct rte_flow_item items[ACTION_NVGRE_ENCAP_ITEMS_NUM];
@@ -158,6 +118,19 @@ parser_storage(void)
 }
 
 static void
+flow_parser_reset_defaults(void)
+{
+	vxlan_encap_conf = rte_flow_parser_default_vxlan_encap_conf;
+	nvgre_encap_conf = rte_flow_parser_default_nvgre_encap_conf;
+	l2_encap_conf = rte_flow_parser_default_l2_encap_conf;
+	l2_decap_conf = rte_flow_parser_default_l2_decap_conf;
+	mplsogre_encap_conf = rte_flow_parser_default_mplsogre_encap_conf;
+	mplsogre_decap_conf = rte_flow_parser_default_mplsogre_decap_conf;
+	mplsoudp_encap_conf = rte_flow_parser_default_mplsoudp_encap_conf;
+	mplsoudp_decap_conf = rte_flow_parser_default_mplsoudp_decap_conf;
+}
+
+static void
 update_fields(uint8_t *buf, struct rte_flow_item *item, uint16_t next_proto)
 {
 	struct rte_ipv4_hdr *ipv4;
@@ -207,80 +180,6 @@ update_fields(uint8_t *buf, struct rte_flow_item *item, uint16_t next_proto)
 	default:
 		break;
 	}
-}
-
-static const struct rte_flow_parser_rss_type_info *
-parser_rss_type_table_get_cb(void *userdata)
-{
-	RTE_SET_USED(userdata);
-	return (const struct rte_flow_parser_rss_type_info *)rss_type_table;
-}
-
-static uint64_t
-parser_rss_hf_get_cb(void *userdata)
-{
-	RTE_SET_USED(userdata);
-	return rss_hf;
-}
-
-static const struct rte_flow_parser_vxlan_encap_conf *
-parser_vxlan_conf_get_cb(void *userdata)
-{
-	RTE_SET_USED(userdata);
-	return (const struct rte_flow_parser_vxlan_encap_conf *)&vxlan_encap_conf;
-}
-
-static const struct rte_flow_parser_nvgre_encap_conf *
-parser_nvgre_conf_get_cb(void *userdata)
-{
-	RTE_SET_USED(userdata);
-	return (const struct rte_flow_parser_nvgre_encap_conf *)&nvgre_encap_conf;
-}
-
-static const struct rte_flow_parser_l2_encap_conf *
-parser_l2_encap_conf_get_cb(void *userdata)
-{
-	RTE_SET_USED(userdata);
-	return (const struct rte_flow_parser_l2_encap_conf *)&l2_encap_conf;
-}
-
-static const struct rte_flow_parser_l2_decap_conf *
-parser_l2_decap_conf_get_cb(void *userdata)
-{
-	RTE_SET_USED(userdata);
-	return (const struct rte_flow_parser_l2_decap_conf *)&l2_decap_conf;
-}
-
-static const struct rte_flow_parser_mplsogre_encap_conf *
-parser_mplsogre_encap_conf_get_cb(void *userdata)
-{
-	RTE_SET_USED(userdata);
-	return (const struct rte_flow_parser_mplsogre_encap_conf *)
-		&mplsogre_encap_conf;
-}
-
-static const struct rte_flow_parser_mplsogre_decap_conf *
-parser_mplsogre_decap_conf_get_cb(void *userdata)
-{
-	RTE_SET_USED(userdata);
-	return (const struct rte_flow_parser_mplsogre_decap_conf *)
-		&mplsogre_decap_conf;
-}
-
-static const struct rte_flow_parser_mplsoudp_encap_conf *
-parser_mplsoudp_encap_conf_get_cb(void *userdata)
-{
-	RTE_SET_USED(userdata);
-	return (const struct rte_flow_parser_mplsoudp_encap_conf *)
-		&mplsoudp_encap_conf;
-}
-
-static const struct rte_flow_parser_mplsoudp_decap_conf *
-parser_mplsoudp_decap_conf_get_cb(void *userdata)
-{
-	RTE_SET_USED(userdata);
-	return (const struct rte_flow_parser_mplsoudp_decap_conf *)
-		&mplsoudp_decap_conf;
 }
 
 static const void *
@@ -1856,16 +1755,6 @@ static const struct rte_flow_parser_query_ops parser_query_ops = {
 	.ipv6_ext_push_conf_get = parser_ipv6_ext_push_conf_get_cb,
 	.ipv6_ext_remove_conf_get = parser_ipv6_ext_remove_conf_get_cb,
 	.sample_actions_get = parser_sample_actions_get_cb,
-	.rss_type_table_get = parser_rss_type_table_get_cb,
-	.rss_hf_get = parser_rss_hf_get_cb,
-	.vxlan_encap_conf_get = parser_vxlan_conf_get_cb,
-	.nvgre_encap_conf_get = parser_nvgre_conf_get_cb,
-	.l2_encap_conf_get = parser_l2_encap_conf_get_cb,
-	.l2_decap_conf_get = parser_l2_decap_conf_get_cb,
-	.mplsogre_encap_conf_get = parser_mplsogre_encap_conf_get_cb,
-	.mplsogre_decap_conf_get = parser_mplsogre_decap_conf_get_cb,
-	.mplsoudp_encap_conf_get = parser_mplsoudp_encap_conf_get_cb,
-	.mplsoudp_decap_conf_get = parser_mplsoudp_decap_conf_get_cb,
 	.verbose_level_get = parser_verbose_level_get,
 	.flex_handle_get = parser_flex_handle_get,
 	.flex_pattern_get = parser_flex_pattern_get,
@@ -1935,5 +1824,6 @@ static const struct rte_flow_parser_ops parser_ops = {
 int
 testpmd_flow_parser_init(void)
 {
+	flow_parser_reset_defaults();
 	return rte_flow_parser_set_default_ops(&parser_ops, NULL);
 }

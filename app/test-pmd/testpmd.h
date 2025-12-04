@@ -16,6 +16,7 @@
 #include <rte_os_shim.h>
 #include <rte_ethdev.h>
 #include <rte_flow.h>
+#include <rte_flow_parser.h>
 #include <rte_mbuf_dyn.h>
 
 #include <cmdline.h>
@@ -725,104 +726,14 @@ extern struct gso_status gso_ports[RTE_MAX_ETHPORTS];
 extern uint16_t gso_max_segment_size;
 #endif /* RTE_LIB_GSO */
 
-/* VXLAN encap/decap parameters. */
-struct vxlan_encap_conf {
-	uint32_t select_ipv4:1;
-	uint32_t select_vlan:1;
-	uint32_t select_tos_ttl:1;
-	uint8_t vni[3];
-	rte_be16_t udp_src;
-	rte_be16_t udp_dst;
-	rte_be32_t ipv4_src;
-	rte_be32_t ipv4_dst;
-	struct rte_ipv6_addr ipv6_src;
-	struct rte_ipv6_addr ipv6_dst;
-	rte_be16_t vlan_tci;
-	uint8_t ip_tos;
-	uint8_t ip_ttl;
-	uint8_t eth_src[RTE_ETHER_ADDR_LEN];
-	uint8_t eth_dst[RTE_ETHER_ADDR_LEN];
-};
-
-extern struct vxlan_encap_conf vxlan_encap_conf;
-
-/* NVGRE encap/decap parameters. */
-struct nvgre_encap_conf {
-	uint32_t select_ipv4:1;
-	uint32_t select_vlan:1;
-	uint8_t tni[3];
-	rte_be32_t ipv4_src;
-	rte_be32_t ipv4_dst;
-	struct rte_ipv6_addr ipv6_src;
-	struct rte_ipv6_addr ipv6_dst;
-	rte_be16_t vlan_tci;
-	uint8_t eth_src[RTE_ETHER_ADDR_LEN];
-	uint8_t eth_dst[RTE_ETHER_ADDR_LEN];
-};
-
-extern struct nvgre_encap_conf nvgre_encap_conf;
-
-/* L2 encap parameters. */
-struct l2_encap_conf {
-	uint32_t select_ipv4:1;
-	uint32_t select_vlan:1;
-	rte_be16_t vlan_tci;
-	uint8_t eth_src[RTE_ETHER_ADDR_LEN];
-	uint8_t eth_dst[RTE_ETHER_ADDR_LEN];
-};
-extern struct l2_encap_conf l2_encap_conf;
-
-/* L2 decap parameters. */
-struct l2_decap_conf {
-	uint32_t select_vlan:1;
-};
-extern struct l2_decap_conf l2_decap_conf;
-
-/* MPLSoGRE encap parameters. */
-struct mplsogre_encap_conf {
-	uint32_t select_ipv4:1;
-	uint32_t select_vlan:1;
-	uint8_t label[3];
-	rte_be32_t ipv4_src;
-	rte_be32_t ipv4_dst;
-	struct rte_ipv6_addr ipv6_src;
-	struct rte_ipv6_addr ipv6_dst;
-	rte_be16_t vlan_tci;
-	uint8_t eth_src[RTE_ETHER_ADDR_LEN];
-	uint8_t eth_dst[RTE_ETHER_ADDR_LEN];
-};
-extern struct mplsogre_encap_conf mplsogre_encap_conf;
-
-/* MPLSoGRE decap parameters. */
-struct mplsogre_decap_conf {
-	uint32_t select_ipv4:1;
-	uint32_t select_vlan:1;
-};
-extern struct mplsogre_decap_conf mplsogre_decap_conf;
-
-/* MPLSoUDP encap parameters. */
-struct mplsoudp_encap_conf {
-	uint32_t select_ipv4:1;
-	uint32_t select_vlan:1;
-	uint8_t label[3];
-	rte_be16_t udp_src;
-	rte_be16_t udp_dst;
-	rte_be32_t ipv4_src;
-	rte_be32_t ipv4_dst;
-	struct rte_ipv6_addr ipv6_src;
-	struct rte_ipv6_addr ipv6_dst;
-	rte_be16_t vlan_tci;
-	uint8_t eth_src[RTE_ETHER_ADDR_LEN];
-	uint8_t eth_dst[RTE_ETHER_ADDR_LEN];
-};
-extern struct mplsoudp_encap_conf mplsoudp_encap_conf;
-
-/* MPLSoUDP decap parameters. */
-struct mplsoudp_decap_conf {
-	uint32_t select_ipv4:1;
-	uint32_t select_vlan:1;
-};
-extern struct mplsoudp_decap_conf mplsoudp_decap_conf;
+extern struct rte_flow_parser_vxlan_encap_conf vxlan_encap_conf;
+extern struct rte_flow_parser_nvgre_encap_conf nvgre_encap_conf;
+extern struct rte_flow_parser_l2_encap_conf l2_encap_conf;
+extern struct rte_flow_parser_l2_decap_conf l2_decap_conf;
+extern struct rte_flow_parser_mplsogre_encap_conf mplsogre_encap_conf;
+extern struct rte_flow_parser_mplsogre_decap_conf mplsogre_decap_conf;
+extern struct rte_flow_parser_mplsoudp_encap_conf mplsoudp_encap_conf;
+extern struct rte_flow_parser_mplsoudp_decap_conf mplsoudp_decap_conf;
 
 extern enum rte_eth_rx_mq_mode rx_mq_mode;
 

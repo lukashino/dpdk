@@ -28,6 +28,7 @@
 #include <rte_gtp.h>
 #include <rte_geneve.h>
 
+#include <eal_export.h>
 #include <rte_flow_parser.h>
 
 #ifndef RTE_PORT_ALL
@@ -48,20 +49,9 @@ enum print_warning {
 
 struct context;
 
-/* Shared limits used across parser helpers. */
-#define ACTION_RAW_ENCAP_MAX_DATA 512
-#define RAW_ENCAP_CONFS_MAX_NUM 8
-#define ACTION_IPV6_EXT_PUSH_MAX_DATA 512
-#define IPV6_EXT_PUSH_CONFS_MAX_NUM 8
-#define ACTION_SAMPLE_ACTIONS_NUM 10
-#define RAW_SAMPLE_CONFS_MAX_NUM 8
-
 static const char *const compare_ops[] = {
 	"eq", "ne", "lt", "le", "gt", "ge", NULL
 };
-
-/** Maximum number of queue indices in struct rte_flow_action_rss. */
-#define ACTION_RSS_QUEUE_NUM 128
 
 /** Storage for struct rte_flow_action_rss including external data. */
 struct action_rss_data {
@@ -71,24 +61,11 @@ struct action_rss_data {
 };
 
 /** Storage for struct rte_flow_action_raw_encap. */
-struct raw_encap_conf {
-	uint8_t data[ACTION_RAW_ENCAP_MAX_DATA];
-	uint8_t preserve[ACTION_RAW_ENCAP_MAX_DATA];
-	size_t size;
-};
-
-/** Storage for struct rte_flow_action_raw_encap including external data. */
 struct action_raw_encap_data {
 	struct rte_flow_action_raw_encap conf;
 	uint8_t data[ACTION_RAW_ENCAP_MAX_DATA];
 	uint8_t preserve[ACTION_RAW_ENCAP_MAX_DATA];
 	uint16_t idx;
-};
-
-/** Storage for struct rte_flow_action_raw_decap. */
-struct raw_decap_conf {
-	uint8_t data[ACTION_RAW_ENCAP_MAX_DATA];
-	size_t size;
 };
 
 /** Storage for struct rte_flow_action_raw_decap including external data. */
@@ -113,12 +90,6 @@ struct action_ipv6_ext_push_data {
 	uint16_t idx;
 };
 
-/** Storage for struct rte_flow_action_ipv6_ext_remove. */
-struct ipv6_ext_remove_conf {
-	struct rte_flow_action_ipv6_ext_remove conf;
-	uint8_t type;
-};
-
 /** Storage for struct rte_flow_action_ipv6_ext_remove including external data. */
 struct action_ipv6_ext_remove_data {
 	struct rte_flow_action_ipv6_ext_remove conf;
@@ -126,7 +97,8 @@ struct action_ipv6_ext_remove_data {
 	uint16_t idx;
 };
 
-static struct rte_flow_parser_vxlan_encap_conf vxlan_encap_conf = {
+const struct rte_flow_parser_vxlan_encap_conf
+rte_flow_parser_default_vxlan_encap_conf = {
 	.select_ipv4 = 1,
 	.select_vlan = 0,
 	.select_tos_ttl = 0,
@@ -144,9 +116,6 @@ static struct rte_flow_parser_vxlan_encap_conf vxlan_encap_conf = {
 	.eth_dst = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
 };
 
-/** Maximum number of items in struct rte_flow_action_vxlan_encap. */
-#define ACTION_VXLAN_ENCAP_ITEMS_NUM 6
-
 /** Storage for struct rte_flow_action_vxlan_encap including external data. */
 struct action_vxlan_encap_data {
 	struct rte_flow_action_vxlan_encap conf;
@@ -161,7 +130,8 @@ struct action_vxlan_encap_data {
 	struct rte_flow_item_vxlan item_vxlan;
 };
 
-static struct rte_flow_parser_nvgre_encap_conf nvgre_encap_conf = {
+const struct rte_flow_parser_nvgre_encap_conf
+rte_flow_parser_default_nvgre_encap_conf = {
 	.select_ipv4 = 1,
 	.select_vlan = 0,
 	.tni = { 0x00, 0x00, 0x00 },
@@ -173,9 +143,6 @@ static struct rte_flow_parser_nvgre_encap_conf nvgre_encap_conf = {
 	.eth_src = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
 	.eth_dst = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
 };
-
-/** Maximum number of items in struct rte_flow_action_nvgre_encap. */
-#define ACTION_NVGRE_ENCAP_ITEMS_NUM 5
 
 /** Storage for struct rte_flow_action_nvgre_encap including external data. */
 struct action_nvgre_encap_data {
@@ -190,17 +157,23 @@ struct action_nvgre_encap_data {
 	struct rte_flow_item_nvgre item_nvgre;
 };
 
-static struct rte_flow_parser_l2_encap_conf l2_encap_conf;
+const struct rte_flow_parser_l2_encap_conf
+rte_flow_parser_default_l2_encap_conf = { 0 };
 
-static struct rte_flow_parser_l2_decap_conf l2_decap_conf;
+const struct rte_flow_parser_l2_decap_conf
+rte_flow_parser_default_l2_decap_conf = { 0 };
 
-static struct rte_flow_parser_mplsogre_encap_conf mplsogre_encap_conf;
+const struct rte_flow_parser_mplsogre_encap_conf
+rte_flow_parser_default_mplsogre_encap_conf = { 0 };
 
-static struct rte_flow_parser_mplsogre_decap_conf mplsogre_decap_conf;
+const struct rte_flow_parser_mplsogre_decap_conf
+rte_flow_parser_default_mplsogre_decap_conf = { 0 };
 
-static struct rte_flow_parser_mplsoudp_encap_conf mplsoudp_encap_conf;
+const struct rte_flow_parser_mplsoudp_encap_conf
+rte_flow_parser_default_mplsoudp_encap_conf = { 0 };
 
-static struct rte_flow_parser_mplsoudp_decap_conf mplsoudp_decap_conf;
+const struct rte_flow_parser_mplsoudp_decap_conf
+rte_flow_parser_default_mplsoudp_decap_conf = { 0 };
 
 struct rte_flow_action_conntrack conntrack_context;
 
@@ -214,7 +187,7 @@ static struct rte_flow_parser default_parser;
 static struct rte_flow_parser *parser_inst = &default_parser;
 
 /* Default RSS type table; applications can override via query ops callback. */
-static const struct rte_flow_parser_rss_type_info rss_type_table[] = {
+static const struct rte_flow_parser_rss_type_info parser_default_rss_type_table[] = {
 	/* Group types */
 	{ "all", RTE_ETH_RSS_ETH | RTE_ETH_RSS_VLAN | RTE_ETH_RSS_IP |
 		RTE_ETH_RSS_TCP | RTE_ETH_RSS_UDP | RTE_ETH_RSS_SCTP |
@@ -304,123 +277,6 @@ parser_pop_current(struct rte_flow_parser *parser)
 	parser_inst = parser ? parser : &default_parser;
 }
 
-static enum rte_flow_parser_command
-parser_public_command(enum index idx)
-{
-	switch (idx) {
-	case INFO:
-		return RTE_FLOW_PARSER_CMD_INFO;
-	case CONFIGURE:
-		return RTE_FLOW_PARSER_CMD_CONFIGURE;
-	case PATTERN_TEMPLATE_CREATE:
-		return RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_CREATE;
-	case PATTERN_TEMPLATE_DESTROY:
-		return RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_DESTROY;
-	case ACTIONS_TEMPLATE_CREATE:
-		return RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_CREATE;
-	case ACTIONS_TEMPLATE_DESTROY:
-		return RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_DESTROY;
-	case TABLE_CREATE:
-		return RTE_FLOW_PARSER_CMD_TABLE_CREATE;
-	case TABLE_DESTROY:
-		return RTE_FLOW_PARSER_CMD_TABLE_DESTROY;
-	case TABLE_RESIZE:
-		return RTE_FLOW_PARSER_CMD_TABLE_RESIZE;
-	case TABLE_RESIZE_COMPLETE:
-		return RTE_FLOW_PARSER_CMD_TABLE_RESIZE_COMPLETE;
-	case GROUP_SET_MISS_ACTIONS:
-		return RTE_FLOW_PARSER_CMD_GROUP_SET_MISS_ACTIONS;
-	case QUEUE_CREATE:
-		return RTE_FLOW_PARSER_CMD_QUEUE_CREATE;
-	case QUEUE_DESTROY:
-		return RTE_FLOW_PARSER_CMD_QUEUE_DESTROY;
-	case QUEUE_FLOW_UPDATE_RESIZED:
-		return RTE_FLOW_PARSER_CMD_QUEUE_FLOW_UPDATE_RESIZED;
-	case QUEUE_UPDATE:
-		return RTE_FLOW_PARSER_CMD_QUEUE_UPDATE;
-	case QUEUE_AGED:
-		return RTE_FLOW_PARSER_CMD_QUEUE_AGED;
-	case QUEUE_INDIRECT_ACTION_CREATE:
-		return RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_CREATE;
-	case QUEUE_INDIRECT_ACTION_LIST_CREATE:
-		return RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_LIST_CREATE;
-	case QUEUE_INDIRECT_ACTION_UPDATE:
-		return RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_UPDATE;
-	case QUEUE_INDIRECT_ACTION_DESTROY:
-		return RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_DESTROY;
-	case QUEUE_INDIRECT_ACTION_QUERY:
-		return RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QUERY;
-	case QUEUE_INDIRECT_ACTION_QUERY_UPDATE:
-		return RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QUERY_UPDATE;
-	case PUSH:
-		return RTE_FLOW_PARSER_CMD_PUSH;
-	case PULL:
-		return RTE_FLOW_PARSER_CMD_PULL;
-	case HASH:
-		return RTE_FLOW_PARSER_CMD_HASH;
-	case INDIRECT_ACTION_CREATE:
-		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_CREATE;
-	case INDIRECT_ACTION_LIST_CREATE:
-		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_LIST_CREATE;
-	case INDIRECT_ACTION_UPDATE:
-		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_UPDATE;
-	case INDIRECT_ACTION_DESTROY:
-		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_DESTROY;
-	case INDIRECT_ACTION_QUERY:
-		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QUERY;
-	case INDIRECT_ACTION_QUERY_UPDATE:
-		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QUERY_UPDATE;
-	case INDIRECT_ACTION_FLOW_CONF_CREATE:
-		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_FLOW_CONF_CREATE;
-	case VALIDATE:
-		return RTE_FLOW_PARSER_CMD_VALIDATE;
-	case CREATE:
-		return RTE_FLOW_PARSER_CMD_CREATE;
-	case DESTROY:
-		return RTE_FLOW_PARSER_CMD_DESTROY;
-	case UPDATE:
-		return RTE_FLOW_PARSER_CMD_UPDATE;
-	case FLUSH:
-		return RTE_FLOW_PARSER_CMD_FLUSH;
-	case DUMP_ONE:
-		return RTE_FLOW_PARSER_CMD_DUMP_ONE;
-	case DUMP_ALL:
-		return RTE_FLOW_PARSER_CMD_DUMP_ALL;
-	case QUERY:
-		return RTE_FLOW_PARSER_CMD_QUERY;
-	case LIST:
-		return RTE_FLOW_PARSER_CMD_LIST;
-	case ISOLATE:
-		return RTE_FLOW_PARSER_CMD_ISOLATE;
-	case AGED:
-		return RTE_FLOW_PARSER_CMD_AGED;
-	case TUNNEL_CREATE:
-		return RTE_FLOW_PARSER_CMD_TUNNEL_CREATE;
-	case TUNNEL_DESTROY:
-		return RTE_FLOW_PARSER_CMD_TUNNEL_DESTROY;
-	case TUNNEL_LIST:
-		return RTE_FLOW_PARSER_CMD_TUNNEL_LIST;
-	case ACTION_POL_G:
-		return RTE_FLOW_PARSER_CMD_METER_POLICY_ADD;
-	case FLEX_ITEM_CREATE:
-		return RTE_FLOW_PARSER_CMD_FLEX_ITEM_CREATE;
-	case FLEX_ITEM_DESTROY:
-		return RTE_FLOW_PARSER_CMD_FLEX_ITEM_DESTROY;
-	case SET_RAW_ENCAP:
-		return RTE_FLOW_PARSER_CMD_SET_RAW_ENCAP;
-	case SET_RAW_DECAP:
-		return RTE_FLOW_PARSER_CMD_SET_RAW_DECAP;
-	case SET_SAMPLE_ACTIONS:
-		return RTE_FLOW_PARSER_CMD_SET_SAMPLE_ACTIONS;
-	case SET_IPV6_EXT_PUSH:
-		return RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_PUSH;
-	case SET_IPV6_EXT_REMOVE:
-		return RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_REMOVE;
-	default:
-		return RTE_FLOW_PARSER_CMD_NONE;
-	}
-}
-
 static inline void *parser_userdata(void);
 
 int
@@ -447,7 +303,7 @@ parser_rss_type_table(void)
 
 	if (ops && ops->rss_type_table_get)
 		tbl = ops->rss_type_table_get(parser_userdata());
-	return tbl ? tbl : rss_type_table;
+	return tbl ? tbl : parser_default_rss_type_table;
 }
 
 static inline uint64_t
@@ -468,7 +324,7 @@ parser_vxlan_conf(void)
 
 	if (ops && ops->vxlan_encap_conf_get)
 		conf = ops->vxlan_encap_conf_get(parser_userdata());
-	return conf ? conf : &vxlan_encap_conf;
+	return conf ? conf : &rte_flow_parser_default_vxlan_encap_conf;
 }
 
 static inline const struct rte_flow_parser_nvgre_encap_conf *
@@ -479,7 +335,7 @@ parser_nvgre_conf(void)
 
 	if (ops && ops->nvgre_encap_conf_get)
 		conf = ops->nvgre_encap_conf_get(parser_userdata());
-	return conf ? conf : &nvgre_encap_conf;
+	return conf ? conf : &rte_flow_parser_default_nvgre_encap_conf;
 }
 
 static inline const struct rte_flow_parser_l2_encap_conf *
@@ -490,7 +346,7 @@ parser_l2_encap_conf_get(void)
 
 	if (ops && ops->l2_encap_conf_get)
 		conf = ops->l2_encap_conf_get(parser_userdata());
-	return conf ? conf : &l2_encap_conf;
+	return conf ? conf : &rte_flow_parser_default_l2_encap_conf;
 }
 
 static inline const struct rte_flow_parser_l2_decap_conf *
@@ -501,7 +357,7 @@ parser_l2_decap_conf_get(void)
 
 	if (ops && ops->l2_decap_conf_get)
 		conf = ops->l2_decap_conf_get(parser_userdata());
-	return conf ? conf : &l2_decap_conf;
+	return conf ? conf : &rte_flow_parser_default_l2_decap_conf;
 }
 
 static inline const struct rte_flow_parser_mplsogre_encap_conf *
@@ -512,7 +368,7 @@ parser_mplsogre_encap_conf_get(void)
 
 	if (ops && ops->mplsogre_encap_conf_get)
 		conf = ops->mplsogre_encap_conf_get(parser_userdata());
-	return conf ? conf : &mplsogre_encap_conf;
+	return conf ? conf : &rte_flow_parser_default_mplsogre_encap_conf;
 }
 
 static inline const struct rte_flow_parser_mplsogre_decap_conf *
@@ -523,7 +379,7 @@ parser_mplsogre_decap_conf_get(void)
 
 	if (ops && ops->mplsogre_decap_conf_get)
 		conf = ops->mplsogre_decap_conf_get(parser_userdata());
-	return conf ? conf : &mplsogre_decap_conf;
+	return conf ? conf : &rte_flow_parser_default_mplsogre_decap_conf;
 }
 
 static inline const struct rte_flow_parser_mplsoudp_encap_conf *
@@ -534,7 +390,7 @@ parser_mplsoudp_encap_conf_get(void)
 
 	if (ops && ops->mplsoudp_encap_conf_get)
 		conf = ops->mplsoudp_encap_conf_get(parser_userdata());
-	return conf ? conf : &mplsoudp_encap_conf;
+	return conf ? conf : &rte_flow_parser_default_mplsoudp_encap_conf;
 }
 
 static inline const struct rte_flow_parser_mplsoudp_decap_conf *
@@ -545,7 +401,7 @@ parser_mplsoudp_decap_conf_get(void)
 
 	if (ops && ops->mplsoudp_decap_conf_get)
 		conf = ops->mplsoudp_decap_conf_get(parser_userdata());
-	return conf ? conf : &mplsoudp_decap_conf;
+	return conf ? conf : &rte_flow_parser_default_mplsoudp_decap_conf;
 }
 
 static inline const struct rte_flow_parser_command_ops *
@@ -2174,6 +2030,123 @@ enum index {
 	ACTION_JUMP_TO_TABLE_INDEX_TABLE_VALUE,
 	ACTION_JUMP_TO_TABLE_INDEX_INDEX,
 };
+
+static enum rte_flow_parser_command
+parser_public_command(enum index idx)
+{
+	switch (idx) {
+	case INFO:
+		return RTE_FLOW_PARSER_CMD_INFO;
+	case CONFIGURE:
+		return RTE_FLOW_PARSER_CMD_CONFIGURE;
+	case PATTERN_TEMPLATE_CREATE:
+		return RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_CREATE;
+	case PATTERN_TEMPLATE_DESTROY:
+		return RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_DESTROY;
+	case ACTIONS_TEMPLATE_CREATE:
+		return RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_CREATE;
+	case ACTIONS_TEMPLATE_DESTROY:
+		return RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_DESTROY;
+	case TABLE_CREATE:
+		return RTE_FLOW_PARSER_CMD_TABLE_CREATE;
+	case TABLE_DESTROY:
+		return RTE_FLOW_PARSER_CMD_TABLE_DESTROY;
+	case TABLE_RESIZE:
+		return RTE_FLOW_PARSER_CMD_TABLE_RESIZE;
+	case TABLE_RESIZE_COMPLETE:
+		return RTE_FLOW_PARSER_CMD_TABLE_RESIZE_COMPLETE;
+	case GROUP_SET_MISS_ACTIONS:
+		return RTE_FLOW_PARSER_CMD_GROUP_SET_MISS_ACTIONS;
+	case QUEUE_CREATE:
+		return RTE_FLOW_PARSER_CMD_QUEUE_CREATE;
+	case QUEUE_DESTROY:
+		return RTE_FLOW_PARSER_CMD_QUEUE_DESTROY;
+	case QUEUE_FLOW_UPDATE_RESIZED:
+		return RTE_FLOW_PARSER_CMD_QUEUE_FLOW_UPDATE_RESIZED;
+	case QUEUE_UPDATE:
+		return RTE_FLOW_PARSER_CMD_QUEUE_UPDATE;
+	case QUEUE_AGED:
+		return RTE_FLOW_PARSER_CMD_QUEUE_AGED;
+	case QUEUE_INDIRECT_ACTION_CREATE:
+		return RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_CREATE;
+	case QUEUE_INDIRECT_ACTION_LIST_CREATE:
+		return RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_LIST_CREATE;
+	case QUEUE_INDIRECT_ACTION_UPDATE:
+		return RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_UPDATE;
+	case QUEUE_INDIRECT_ACTION_DESTROY:
+		return RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_DESTROY;
+	case QUEUE_INDIRECT_ACTION_QUERY:
+		return RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QUERY;
+	case QUEUE_INDIRECT_ACTION_QUERY_UPDATE:
+		return RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QUERY_UPDATE;
+	case PUSH:
+		return RTE_FLOW_PARSER_CMD_PUSH;
+	case PULL:
+		return RTE_FLOW_PARSER_CMD_PULL;
+	case HASH:
+		return RTE_FLOW_PARSER_CMD_HASH;
+	case INDIRECT_ACTION_CREATE:
+		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_CREATE;
+	case INDIRECT_ACTION_LIST_CREATE:
+		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_LIST_CREATE;
+	case INDIRECT_ACTION_UPDATE:
+		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_UPDATE;
+	case INDIRECT_ACTION_DESTROY:
+		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_DESTROY;
+	case INDIRECT_ACTION_QUERY:
+		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QUERY;
+	case INDIRECT_ACTION_QUERY_UPDATE:
+		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QUERY_UPDATE;
+	case INDIRECT_ACTION_FLOW_CONF_CREATE:
+		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_FLOW_CONF_CREATE;
+	case VALIDATE:
+		return RTE_FLOW_PARSER_CMD_VALIDATE;
+	case CREATE:
+		return RTE_FLOW_PARSER_CMD_CREATE;
+	case DESTROY:
+		return RTE_FLOW_PARSER_CMD_DESTROY;
+	case UPDATE:
+		return RTE_FLOW_PARSER_CMD_UPDATE;
+	case FLUSH:
+		return RTE_FLOW_PARSER_CMD_FLUSH;
+	case DUMP_ONE:
+		return RTE_FLOW_PARSER_CMD_DUMP_ONE;
+	case DUMP_ALL:
+		return RTE_FLOW_PARSER_CMD_DUMP_ALL;
+	case QUERY:
+		return RTE_FLOW_PARSER_CMD_QUERY;
+	case LIST:
+		return RTE_FLOW_PARSER_CMD_LIST;
+	case ISOLATE:
+		return RTE_FLOW_PARSER_CMD_ISOLATE;
+	case AGED:
+		return RTE_FLOW_PARSER_CMD_AGED;
+	case TUNNEL_CREATE:
+		return RTE_FLOW_PARSER_CMD_TUNNEL_CREATE;
+	case TUNNEL_DESTROY:
+		return RTE_FLOW_PARSER_CMD_TUNNEL_DESTROY;
+	case TUNNEL_LIST:
+		return RTE_FLOW_PARSER_CMD_TUNNEL_LIST;
+	case ACTION_POL_G:
+		return RTE_FLOW_PARSER_CMD_METER_POLICY_ADD;
+	case FLEX_ITEM_CREATE:
+		return RTE_FLOW_PARSER_CMD_FLEX_ITEM_CREATE;
+	case FLEX_ITEM_DESTROY:
+		return RTE_FLOW_PARSER_CMD_FLEX_ITEM_DESTROY;
+	case SET_RAW_ENCAP:
+		return RTE_FLOW_PARSER_CMD_SET_RAW_ENCAP;
+	case SET_RAW_DECAP:
+		return RTE_FLOW_PARSER_CMD_SET_RAW_DECAP;
+	case SET_SAMPLE_ACTIONS:
+		return RTE_FLOW_PARSER_CMD_SET_SAMPLE_ACTIONS;
+	case SET_IPV6_EXT_PUSH:
+		return RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_PUSH;
+	case SET_IPV6_EXT_REMOVE:
+		return RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_REMOVE;
+	default:
+		return RTE_FLOW_PARSER_CMD_NONE;
+	}
+}
 
 /** Maximum size for pattern in struct rte_flow_item_raw. */
 #define ITEM_RAW_PATTERN_SIZE 512
@@ -10927,9 +10900,11 @@ parse_vc_action_l2_decap(struct context *ctx, const struct token *token,
 	struct rte_flow_action *action;
 	struct action_raw_decap_data *action_decap_data;
 	const struct rte_flow_parser_l2_decap_conf *conf = parser_l2_decap_conf_get();
+	const struct rte_flow_parser_mplsoudp_encap_conf *mpls_conf =
+		parser_mplsoudp_encap_conf_get();
 	struct rte_flow_item_eth eth = { .hdr.ether_type = 0, };
 	struct rte_flow_item_vlan vlan = {
-		.hdr.vlan_tci = mplsoudp_encap_conf.vlan_tci,
+		.hdr.vlan_tci = mpls_conf->vlan_tci,
 		.hdr.eth_proto = 0,
 	};
 	uint8_t *header;
@@ -14428,47 +14403,6 @@ cmd_flow_parse(cmdline_parse_token_hdr_t *hdr, const char *src, void *result,
 }
 
 
-/** Token definition template (cmdline API). */
-static struct cmdline_token_hdr cmd_flow_token_hdr = {
-	.ops = &(struct cmdline_token_ops){
-		.parse = cmd_flow_parse,
-		.complete_get_nb = cmd_flow_complete_get_nb,
-		.complete_get_elt = cmd_flow_complete_get_elt,
-		.get_help = cmd_flow_get_help,
-	},
-	.offset = 0,
-};
-
-/** Populate the next dynamic token. */
-static void
-cmd_flow_tok(cmdline_parse_token_hdr_t **hdr,
-	     cmdline_parse_token_hdr_t **hdr_inst)
-{
-	struct context *ctx = parser_cmd_context();
-
-	/* Always reinitialize context before requesting the first token. */
-	if (!(hdr_inst - cmd_flow.tokens))
-		cmd_flow_context_init(ctx);
-	/* Return NULL when no more tokens are expected. */
-	if (!ctx->next_num && ctx->curr) {
-		*hdr = NULL;
-		return;
-	}
-	/* Determine if command should end here. */
-	if (ctx->eol && ctx->last && ctx->next_num) {
-		const enum index *list = ctx->next[ctx->next_num - 1];
-		int i;
-
-		for (i = 0; list[i]; ++i) {
-			if (list[i] != END)
-				continue;
-			*hdr = NULL;
-			return;
-		}
-	}
-	*hdr = &cmd_flow_token_hdr;
-}
-
 static SLIST_HEAD(, indlst_conf) indlst_conf_head =
 	SLIST_HEAD_INITIALIZER();
 
@@ -15044,3 +14978,12 @@ rte_flow_parser_parse_actions_str(const char *src,
 	*actions_n = out->args.flow.actions_n;
 	return 0;
 }
+
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_create, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_destroy, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_set_default_ops, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_parse, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_run, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_parse_attr_str, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_parse_pattern_str, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_parse_actions_str, 26.0);

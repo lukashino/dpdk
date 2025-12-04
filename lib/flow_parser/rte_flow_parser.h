@@ -103,6 +103,35 @@ struct rte_flow_parser_mplsoudp_decap_conf {
 	uint32_t select_vlan:1;
 };
 
+/* Shared limits used across parser helpers. */
+#define ACTION_RAW_ENCAP_MAX_DATA 512
+#define RAW_ENCAP_CONFS_MAX_NUM 8
+#define ACTION_IPV6_EXT_PUSH_MAX_DATA 512
+#define IPV6_EXT_PUSH_CONFS_MAX_NUM 8
+#define ACTION_SAMPLE_ACTIONS_NUM 10
+#define RAW_SAMPLE_CONFS_MAX_NUM 8
+#define ACTION_RSS_QUEUE_NUM 128
+#define ACTION_VXLAN_ENCAP_ITEMS_NUM 6
+#define ACTION_NVGRE_ENCAP_ITEMS_NUM 5
+
+/* Default encapsulation/decapsulation configurations. */
+extern const struct rte_flow_parser_vxlan_encap_conf
+	rte_flow_parser_default_vxlan_encap_conf;
+extern const struct rte_flow_parser_nvgre_encap_conf
+	rte_flow_parser_default_nvgre_encap_conf;
+extern const struct rte_flow_parser_l2_encap_conf
+	rte_flow_parser_default_l2_encap_conf;
+extern const struct rte_flow_parser_l2_decap_conf
+	rte_flow_parser_default_l2_decap_conf;
+extern const struct rte_flow_parser_mplsogre_encap_conf
+	rte_flow_parser_default_mplsogre_encap_conf;
+extern const struct rte_flow_parser_mplsogre_decap_conf
+	rte_flow_parser_default_mplsogre_decap_conf;
+extern const struct rte_flow_parser_mplsoudp_encap_conf
+	rte_flow_parser_default_mplsoudp_encap_conf;
+extern const struct rte_flow_parser_mplsoudp_decap_conf
+	rte_flow_parser_default_mplsoudp_decap_conf;
+
 /* Maximum number of patterns supported by the parser. */
 #define RTE_FLOW_PARSER_MAX_PATTERNS   64
 /* Maximum number of flex items supported by the parser. */
