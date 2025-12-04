@@ -74,6 +74,10 @@ On success the ``result`` fields describe the parsed command:
 * ``pattern``/``actions`` point into the caller buffer; copy or consume them
   before parsing the next command.
 
+``int rte_flow_parser_run(struct rte_flow_parser *parser, const char *src)``
+is a convenience wrapper that parses and immediately dispatches the command
+through the installed ``command_ops`` callbacks.
+
 Callback Model
 --------------
 
@@ -97,20 +101,6 @@ Implement only the callbacks your application needs; unused hooks may be NULL.
 The parser never stores raw encap/decap/sample/IPv6-ext payloads internally;
 the corresponding ``set_*`` callbacks must persist data if the application
 expects later lookup.
-
-Cmdline Integration
--------------------
-
-The library exposes pre-built cmdline instances mirroring testpmd:
-
-* ``rte_flow_parser_cmd_flow()`` — the ``flow`` command.
-* ``rte_flow_parser_cmd_set_raw()`` — ``set raw_encap/raw_decap`` and related.
-* ``rte_flow_parser_cmd_show_set_raw()`` / ``_all()`` — dump previously set raw
-  buffers via callbacks.
-
-Attach these instances to a ``cmdline`` context just like testpmd does. The
-instances are bound to the parser handle you pass in and return parsed commands
-through the ``command_ops`` callbacks.
 
 Lightweight Parsing Helpers
 ---------------------------

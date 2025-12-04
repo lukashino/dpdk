@@ -207,10 +207,6 @@ struct rte_flow_action_conntrack conntrack_context;
 struct rte_flow_parser {
 	const struct rte_flow_parser_ops *ops;
 	void *userdata;
-	cmdline_parse_inst_t *cmd_flow_inst;
-	cmdline_parse_inst_t *cmd_set_raw_inst;
-	cmdline_parse_inst_t *cmd_show_set_raw_inst;
-	cmdline_parse_inst_t *cmd_show_set_raw_all_inst;
 	struct context *flow_ctx;
 };
 
@@ -14337,9 +14333,6 @@ comp_qu_mode_name(struct context *ctx, const struct token *token,
 }
 
 /** Global parser instances (cmdline API). */
-extern cmdline_parse_inst_t cmd_flow;
-extern cmdline_parse_inst_t cmd_set_raw;
-
 /** Initialize context. */
 static void
 cmd_flow_context_init(struct context *ctx)
@@ -14434,93 +14427,6 @@ cmd_flow_parse(cmdline_parse_token_hdr_t *hdr, const char *src, void *result,
 	return len;
 }
 
-/** Return number of completion entries (cmdline API). */
-static int
-cmd_flow_complete_get_nb(cmdline_parse_token_hdr_t *hdr)
-{
-	struct context *ctx = parser_cmd_context();
-	const struct token *token = &token_list[ctx->curr];
-	const enum index *list;
-	int i;
-
-	(void)hdr;
-	/* Count number of tokens in current list. */
-	if (ctx->next_num)
-		list = ctx->next[ctx->next_num - 1];
-	else
-		list = token->next[0];
-	for (i = 0; list[i]; ++i)
-		;
-	if (!i)
-		return 0;
-	/*
-	 * If there is a single token, use its completion callback, otherwise
-	 * return the number of entries.
-	 */
-	token = &token_list[list[0]];
-	if (i == 1 && token->comp) {
-		/* Save index for cmd_flow_get_help(). */
-		ctx->prev = list[0];
-		return token->comp(ctx, token, 0, NULL, 0);
-	}
-	return i;
-}
-
-/** Return a completion entry (cmdline API). */
-static int
-cmd_flow_complete_get_elt(cmdline_parse_token_hdr_t *hdr, int index,
-			  char *dst, unsigned int size)
-{
-	struct context *ctx = parser_cmd_context();
-	const struct token *token = &token_list[ctx->curr];
-	const enum index *list;
-	int i;
-
-	(void)hdr;
-	/* Count number of tokens in current list. */
-	if (ctx->next_num)
-		list = ctx->next[ctx->next_num - 1];
-	else
-		list = token->next[0];
-	for (i = 0; list[i]; ++i)
-		;
-	if (!i)
-		return -1;
-	/* If there is a single token, use its completion callback. */
-	token = &token_list[list[0]];
-	if (i == 1 && token->comp) {
-		/* Save index for cmd_flow_get_help(). */
-		ctx->prev = list[0];
-		return token->comp(ctx, token, index, dst, size) < 0 ? -1 : 0;
-	}
-	/* Otherwise make sure the index is valid and use defaults. */
-	if (index >= i)
-		return -1;
-	token = &token_list[list[index]];
-	strlcpy(dst, token->name, size);
-	/* Save index for cmd_flow_get_help(). */
-	ctx->prev = list[index];
-	return 0;
-}
-
-/** Populate help strings for current token (cmdline API). */
-static int
-cmd_flow_get_help(cmdline_parse_token_hdr_t *hdr, char *dst, unsigned int size)
-{
-	struct context *ctx = parser_cmd_context();
-	const struct token *token = &token_list[ctx->prev];
-
-	(void)hdr;
-	if (!size)
-		return -1;
-	/* Set token type and update global help with details. */
-	strlcpy(dst, (token->type ? token->type : "TOKEN"), size);
-	if (token->help)
-		cmd_flow.help_str = token->help;
-	else
-		cmd_flow.help_str = token->name;
-	return 0;
-}
 
 /** Token definition template (cmdline API). */
 static struct cmdline_token_hdr cmd_flow_token_hdr = {
@@ -14884,34 +14790,6 @@ cmd_flow_parsed(struct buffer *in)
 	fflush(stdout);
 }
 
-/** Token generator and output processing callback (cmdline API). */
-static void
-cmd_flow_cb(void *arg0, struct cmdline *cl, void *arg2)
-{
-	struct rte_flow_parser *prev = NULL;
-
-	if (cl != NULL)
-		prev = parser_push_current(arg2);
-
-	if (cl == NULL)
-		cmd_flow_tok(arg0, arg2);
-	else
-		cmd_flow_parsed(arg0);
-
-	if (cl != NULL)
-		parser_pop_current(prev);
-}
-
-/** Global parser instance (cmdline API). */
-cmdline_parse_inst_t cmd_flow = {
-	.f = cmd_flow_cb,
-	.data = &default_parser, /**< Default parser instance. */
-	.help_str = NULL, /**< Updated by cmd_flow_get_help(). */
-	.tokens = {
-		NULL,
-	}, /**< Tokens are returned by cmd_flow_tok(). */
-};
-
 /** Dispatch parsed buffer to function calls. */
 static void
 cmd_set_raw_parsed(const struct buffer *in)
@@ -14944,200 +14822,7 @@ cmd_set_raw_parsed(const struct buffer *in)
 	}
 }
 
-/** Populate help strings for current token (cmdline API). */
-static int
-cmd_set_raw_get_help(cmdline_parse_token_hdr_t *hdr, char *dst,
-		     unsigned int size)
-{
-	struct context *ctx = parser_cmd_context();
-	const struct token *token = &token_list[ctx->prev];
-
-	(void)hdr;
-	if (!size)
-		return -1;
-	/* Set token type and update global help with details. */
-	snprintf(dst, size, "%s", (token->type ? token->type : "TOKEN"));
-	if (token->help)
-		cmd_set_raw.help_str = token->help;
-	else
-		cmd_set_raw.help_str = token->name;
-	return 0;
-}
-
-/** Token definition template (cmdline API). */
-static struct cmdline_token_hdr cmd_set_raw_token_hdr = {
-	.ops = &(struct cmdline_token_ops){
-		.parse = cmd_flow_parse,
-		.complete_get_nb = cmd_flow_complete_get_nb,
-		.complete_get_elt = cmd_flow_complete_get_elt,
-		.get_help = cmd_set_raw_get_help,
-	},
-	.offset = 0,
-};
-
-/** Populate the next dynamic token. */
-static void
-cmd_set_raw_tok(cmdline_parse_token_hdr_t **hdr,
-	     cmdline_parse_token_hdr_t **hdr_inst)
-{
-	struct context *ctx = parser_cmd_context();
-
-	/* Always reinitialize context before requesting the first token. */
-	if (!(hdr_inst - cmd_set_raw.tokens)) {
-		cmd_flow_context_init(ctx);
-		ctx->curr = START_SET;
-	}
-	/* Return NULL when no more tokens are expected. */
-	if (!ctx->next_num && (ctx->curr != START_SET)) {
-		*hdr = NULL;
-		return;
-	}
-	/* Determine if command should end here. */
-	if (ctx->eol && ctx->last && ctx->next_num) {
-		const enum index *list = ctx->next[ctx->next_num - 1];
-		int i;
-
-		for (i = 0; list[i]; ++i) {
-			if (list[i] != END)
-				continue;
-			*hdr = NULL;
-			return;
-		}
-	}
-	*hdr = &cmd_set_raw_token_hdr;
-}
-
-/** Token generator and output processing callback (cmdline API). */
-static void
-cmd_set_raw_cb(void *arg0, struct cmdline *cl, void *arg2)
-{
-	struct rte_flow_parser *prev = NULL;
-
-	if (cl != NULL)
-		prev = parser_push_current(arg2);
-
-	if (cl == NULL)
-		cmd_set_raw_tok(arg0, arg2);
-	else
-		cmd_set_raw_parsed(arg0);
-
-	if (cl != NULL)
-		parser_pop_current(prev);
-}
-
-/** Global parser instance (cmdline API). */
-cmdline_parse_inst_t cmd_set_raw = {
-	.f = cmd_set_raw_cb,
-	.data = &default_parser, /**< Default parser instance. */
-	.help_str = NULL, /**< Updated by cmd_flow_get_help(). */
-	.tokens = {
-		NULL,
-	}, /**< Tokens are returned by cmd_flow_tok(). */
-};
-
-/* *** display raw_encap/raw_decap buf */
-struct cmd_show_set_raw_result {
-	cmdline_fixed_string_t cmd_show;
-	cmdline_fixed_string_t cmd_what;
-	cmdline_fixed_string_t cmd_all;
-	uint16_t cmd_index;
-};
-
-static void
-cmd_show_set_raw_parsed(void *parsed_result, struct cmdline *cl, void *data)
-{
-	struct cmd_show_set_raw_result *res = parsed_result;
-	uint16_t index = res->cmd_index;
-	uint8_t all = 0;
-	char title[16] = {0};
-
-	RTE_SET_USED(cl);
-	struct rte_flow_parser *prev = parser_push_current(data);
-	if (!strcmp(res->cmd_all, "all")) {
-		all = 1;
-		index = 0;
-	} else if (index >= RAW_ENCAP_CONFS_MAX_NUM) {
-		fprintf(stderr, "index should be 0-%u\n",
-			RAW_ENCAP_CONFS_MAX_NUM - 1);
-		parser_pop_current(prev);
-		return;
-	}
-	do {
-		if (!strcmp(res->cmd_what, "raw_encap")) {
-			const struct rte_flow_action_raw_encap *conf =
-				parser_raw_encap_conf_get(index);
-			if (!conf || !conf->data || !conf->size) {
-				fprintf(stderr,
-					"raw_encap index %u is empty\n", index);
-			} else {
-				snprintf(title, 16, "\nindex: %u", index);
-				rte_hexdump(stdout, title, conf->data,
-					    conf->size);
-			}
-		} else {
-			const struct rte_flow_action_raw_decap *conf =
-				parser_raw_decap_conf_get(index);
-			if (!conf || !conf->data || !conf->size) {
-				fprintf(stderr,
-					"raw_decap index %u is empty\n", index);
-			} else {
-				snprintf(title, 16, "\nindex: %u", index);
-				rte_hexdump(stdout, title, conf->data,
-					    conf->size);
-			}
-		}
-	} while (all && ++index < RAW_ENCAP_CONFS_MAX_NUM);
-	parser_pop_current(prev);
-}
-
-static cmdline_parse_token_string_t cmd_show_set_raw_cmd_show =
-	TOKEN_STRING_INITIALIZER(struct cmd_show_set_raw_result,
-			cmd_show, "show");
-static cmdline_parse_token_string_t cmd_show_set_raw_cmd_what =
-	TOKEN_STRING_INITIALIZER(struct cmd_show_set_raw_result,
-			cmd_what, "raw_encap#raw_decap");
-static cmdline_parse_token_num_t cmd_show_set_raw_cmd_index =
-	TOKEN_NUM_INITIALIZER(struct cmd_show_set_raw_result,
-			cmd_index, RTE_UINT16);
-static cmdline_parse_token_string_t cmd_show_set_raw_cmd_all =
-	TOKEN_STRING_INITIALIZER(struct cmd_show_set_raw_result,
-			cmd_all, "all");
-cmdline_parse_inst_t cmd_show_set_raw = {
-	.f = cmd_show_set_raw_parsed,
-	.data = &default_parser,
-	.help_str = "show <raw_encap|raw_decap> <index>",
-	.tokens = {
-		(void *)&cmd_show_set_raw_cmd_show,
-		(void *)&cmd_show_set_raw_cmd_what,
-		(void *)&cmd_show_set_raw_cmd_index,
-		NULL,
-	},
-};
-cmdline_parse_inst_t cmd_show_set_raw_all = {
-	.f = cmd_show_set_raw_parsed,
-	.data = &default_parser,
-	.help_str = "show <raw_encap|raw_decap> all",
-	.tokens = {
-		(void *)&cmd_show_set_raw_cmd_show,
-		(void *)&cmd_show_set_raw_cmd_what,
-		(void *)&cmd_show_set_raw_cmd_all,
-		NULL,
-	},
-};
-
-static cmdline_parse_inst_t *
-parser_cmdline_inst_clone(const cmdline_parse_inst_t *src, size_t size,
-			  struct rte_flow_parser *parser)
-{
-	cmdline_parse_inst_t *inst;
-
-	inst = calloc(1, size);
-	if (!inst)
-		return NULL;
-	memcpy(inst, src, size);
-	inst->data = parser;
-	return inst;
-}
+/* cmdline bindings removed; parsing is driven directly by rte_flow_parser_run(). */
 
 struct rte_flow_parser *
 rte_flow_parser_create(const struct rte_flow_parser_ops *ops, void *userdata)
@@ -15154,24 +14839,6 @@ rte_flow_parser_create(const struct rte_flow_parser_ops *ops, void *userdata)
 	}
 	parser->ops = ops;
 	parser->userdata = userdata;
-	parser->cmd_flow_inst =
-		parser_cmdline_inst_clone(&cmd_flow, sizeof(cmd_flow), parser);
-	parser->cmd_set_raw_inst =
-		parser_cmdline_inst_clone(&cmd_set_raw, sizeof(cmd_set_raw),
-					  parser);
-	parser->cmd_show_set_raw_inst =
-		parser_cmdline_inst_clone(&cmd_show_set_raw,
-					  sizeof(cmd_show_set_raw), parser);
-	parser->cmd_show_set_raw_all_inst =
-		parser_cmdline_inst_clone(&cmd_show_set_raw_all,
-					  sizeof(cmd_show_set_raw_all),
-					  parser);
-	if (!parser->cmd_flow_inst || !parser->cmd_set_raw_inst ||
-	    !parser->cmd_show_set_raw_inst ||
-	    !parser->cmd_show_set_raw_all_inst) {
-		rte_flow_parser_destroy(parser);
-		return NULL;
-	}
 	return parser;
 }
 
@@ -15185,47 +14852,7 @@ rte_flow_parser_destroy(struct rte_flow_parser *parser)
 	if (parser != &default_parser) {
 		free(parser->flow_ctx);
 	}
-	free(parser->cmd_flow_inst);
-	free(parser->cmd_set_raw_inst);
-	free(parser->cmd_show_set_raw_inst);
-	free(parser->cmd_show_set_raw_all_inst);
 	free(parser);
-}
-
-cmdline_parse_inst_t *
-rte_flow_parser_cmd_flow(struct rte_flow_parser *parser)
-{
-	if (!parser)
-		return NULL;
-	parser_inst = parser;
-	return parser->cmd_flow_inst;
-}
-
-cmdline_parse_inst_t *
-rte_flow_parser_cmd_set_raw(struct rte_flow_parser *parser)
-{
-	if (!parser)
-		return NULL;
-	parser_inst = parser;
-	return parser->cmd_set_raw_inst;
-}
-
-cmdline_parse_inst_t *
-rte_flow_parser_cmd_show_set_raw(struct rte_flow_parser *parser)
-{
-	if (!parser)
-		return NULL;
-	parser_inst = parser;
-	return parser->cmd_show_set_raw_inst;
-}
-
-cmdline_parse_inst_t *
-rte_flow_parser_cmd_show_set_raw_all(struct rte_flow_parser *parser)
-{
-	if (!parser)
-		return NULL;
-	parser_inst = parser;
-	return parser->cmd_show_set_raw_all_inst;
 }
 
 int
@@ -15264,6 +14891,33 @@ rte_flow_parser_parse(struct rte_flow_parser *parser, const char *src,
 	if (*pos)
 		return -EINVAL;
 	result->command = parser_public_command(((const struct buffer *)result)->command);
+	return 0;
+}
+
+int
+rte_flow_parser_run(struct rte_flow_parser *parser, const char *src)
+{
+	uint8_t buf[4096];
+	struct buffer *out = (struct buffer *)buf;
+	int ret;
+
+	ret = rte_flow_parser_parse(parser, src,
+				    (struct rte_flow_parser_output *)buf,
+				    sizeof(buf));
+	if (ret < 0)
+		return ret;
+	switch (out->command) {
+	case SET_SAMPLE_ACTIONS:
+	case SET_IPV6_EXT_PUSH:
+	case SET_IPV6_EXT_REMOVE:
+	case SET_RAW_ENCAP:
+	case SET_RAW_DECAP:
+		cmd_set_raw_parsed(out);
+		break;
+	default:
+		cmd_flow_parsed(out);
+		break;
+	}
 	return 0;
 }
 

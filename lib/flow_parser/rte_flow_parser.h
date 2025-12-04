@@ -522,31 +522,6 @@ __rte_experimental
 void rte_flow_parser_destroy(struct rte_flow_parser *parser);
 
 /**
- * Retrieve cmdline instance for "flow" commands.
- */
-__rte_experimental
-cmdline_parse_inst_t *
-rte_flow_parser_cmd_flow(struct rte_flow_parser *parser);
-/**
- * Retrieve cmdline instance for "set raw" commands.
- */
-__rte_experimental
-cmdline_parse_inst_t *
-rte_flow_parser_cmd_set_raw(struct rte_flow_parser *parser);
-/**
- * Retrieve cmdline instance for "show set raw" command.
- */
-__rte_experimental
-cmdline_parse_inst_t *
-rte_flow_parser_cmd_show_set_raw(struct rte_flow_parser *parser);
-/**
- * Retrieve cmdline instance for "show set raw all" command.
- */
-__rte_experimental
-cmdline_parse_inst_t *
-rte_flow_parser_cmd_show_set_raw_all(struct rte_flow_parser *parser);
-
-/**
  * Set default ops for the global parser (testpmd integration helper).
  */
 __rte_experimental
@@ -572,6 +547,20 @@ __rte_experimental
 int rte_flow_parser_parse(struct rte_flow_parser *parser, const char *src,
 			 struct rte_flow_parser_output *result,
 			 size_t result_size);
+
+/**
+ * Parse and execute a flow CLI string using installed command ops.
+ *
+ * @param parser
+ *   Parser instance (may be NULL to use the default one).
+ * @param src
+ *   NUL-terminated string containing one or more flow commands.
+ * @return
+ *   0 on success, -EINVAL on syntax error, or a negative errno-style value
+ *   on other errors.
+ */
+__rte_experimental
+int rte_flow_parser_run(struct rte_flow_parser *parser, const char *src);
 
 /**
  * Parse only flow attributes from a CLI snippet.
