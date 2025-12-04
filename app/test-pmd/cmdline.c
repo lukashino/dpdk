@@ -9349,7 +9349,10 @@ do { \
 } while (0)
 
 /* Generic flow interface command. */
-extern cmdline_parse_inst_t cmd_flow_parser;
+extern cmdline_parse_inst_t cmd_flow;
+extern cmdline_parse_inst_t cmd_set_raw;
+extern cmdline_parse_inst_t cmd_show_set_raw;
+extern cmdline_parse_inst_t cmd_show_set_raw_all;
 
 /* *** ADD/REMOVE A MULTICAST MAC ADDRESS TO/FROM A PORT *** */
 struct cmd_mcast_addr_result {
@@ -14106,7 +14109,7 @@ static cmdline_parse_ctx_t builtin_ctx[] = {
 	&cmd_dump_mbuf_history_to_file,
 	&cmd_dump_mbuf_pool_history_stdout,
 	&cmd_dump_mbuf_pool_history_to_file,
-	&cmd_flow_parser,
+	&cmd_flow,
 	&cmd_show_port_meter_cap,
 	&cmd_add_port_meter_profile_srtcm,
 	&cmd_add_port_meter_profile_trtcm,

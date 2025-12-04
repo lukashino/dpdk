@@ -282,7 +282,7 @@ static const struct rte_flow_parser_rss_type_info rss_type_table[] = {
 	{ NULL, 0 },
 };
 
-__attribute__((weak)) uint64_t rss_hf = RTE_ETH_RSS_IP;
+static uint64_t rss_hf = RTE_ETH_RSS_IP;
 
 /** Storage for struct rte_flow_action_sample. */
 struct raw_sample_conf {
