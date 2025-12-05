@@ -2127,7 +2127,7 @@ parser_public_command(enum index idx)
 		return RTE_FLOW_PARSER_CMD_TUNNEL_DESTROY;
 	case TUNNEL_LIST:
 		return RTE_FLOW_PARSER_CMD_TUNNEL_LIST;
-	case ACTION_POL_G:
+	case ADD:
 		return RTE_FLOW_PARSER_CMD_METER_POLICY_ADD;
 	case FLEX_ITEM_CREATE:
 		return RTE_FLOW_PARSER_CMD_FLEX_ITEM_CREATE;
@@ -2393,7 +2393,7 @@ parser_cmd_context(void)
 
 /** Parser output buffer layout expected by cmd_flow_parsed(). */
 struct buffer {
-	enum index command; /**< Flow command. */
+	enum rte_flow_parser_command command; /**< Flow command. */
 	portid_t port; /**< Affected port ID. */
 	queueid_t queue; /** Async queue ID. */
 	bool postpone; /** Postpone async operation */
@@ -9643,15 +9643,15 @@ parse_ia(struct context *ctx, const struct token *token,
 		return len;
 	}
 	switch (ctx->curr) {
-	case INDIRECT_ACTION_CREATE:
-	case INDIRECT_ACTION_UPDATE:
-	case INDIRECT_ACTION_QUERY_UPDATE:
+	case RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_CREATE:
+	case RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_UPDATE:
+	case RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QUERY_UPDATE:
 		out->args.vc.actions =
 			(void *)RTE_ALIGN_CEIL((uintptr_t)(out + 1),
 					       sizeof(double));
 		out->args.vc.attr.group = UINT32_MAX;
 		/* fallthrough */
-	case INDIRECT_ACTION_QUERY:
+	case RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QUERY:
 		out->command = ctx->curr;
 		ctx->objdata = 0;
 		ctx->object = out;
@@ -9695,7 +9695,7 @@ parse_ia_destroy(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || out->command == INDIRECT_ACTION) {
+	if (!out->command || (enum index)out->command == INDIRECT_ACTION) {
 		if (ctx->curr != INDIRECT_ACTION_DESTROY)
 			return -1;
 		if (sizeof(*out) > size)
@@ -9744,15 +9744,15 @@ parse_qia(struct context *ctx, const struct token *token,
 	switch (ctx->curr) {
 	case QUEUE_INDIRECT_ACTION:
 		return len;
-	case QUEUE_INDIRECT_ACTION_CREATE:
-	case QUEUE_INDIRECT_ACTION_UPDATE:
-	case QUEUE_INDIRECT_ACTION_QUERY_UPDATE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_CREATE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_UPDATE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QUERY_UPDATE:
 		out->args.vc.actions =
 			(void *)RTE_ALIGN_CEIL((uintptr_t)(out + 1),
 					       sizeof(double));
 		out->args.vc.attr.group = UINT32_MAX;
 		/* fallthrough */
-	case QUEUE_INDIRECT_ACTION_QUERY:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QUERY:
 		out->command = ctx->curr;
 		ctx->objdata = 0;
 		ctx->object = out;
@@ -9794,7 +9794,7 @@ parse_qia_destroy(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || out->command == QUEUE) {
+	if (!out->command || (enum index)out->command == QUEUE) {
 		if (ctx->curr != QUEUE_INDIRECT_ACTION_DESTROY)
 			return -1;
 		if (sizeof(*out) > size)
@@ -9858,7 +9858,7 @@ parse_mp(struct context *ctx, const struct token *token,
 		return len;
 	}
 	switch (ctx->curr) {
-	case ACTION_POL_G:
+	case RTE_FLOW_PARSER_CMD_METER_POLICY_ADD:
 		out->args.vc.actions =
 			(void *)RTE_ALIGN_CEIL((uintptr_t)(out + 1),
 					sizeof(double));
@@ -9951,10 +9951,10 @@ parse_vc(struct context *ctx, const struct token *token,
 		ctx->objmask = NULL;
 		return len;
 	case ITEM_END:
-		if ((out->command == VALIDATE || out->command == CREATE) &&
+		if (((enum index)out->command == VALIDATE || (enum index)out->command == CREATE) &&
 		    ctx->last)
 			return -1;
-		if (out->command == PATTERN_TEMPLATE_CREATE &&
+		if ((enum index)out->command == PATTERN_TEMPLATE_CREATE &&
 		    !ctx->last)
 			return -1;
 		break;
@@ -12121,7 +12121,7 @@ parse_aged(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || out->command == QUEUE) {
+	if (!out->command || (enum index)out->command == QUEUE) {
 		if (ctx->curr != AGED && ctx->curr != QUEUE_AGED)
 			return -1;
 		if (sizeof(*out) > size)
@@ -12218,7 +12218,7 @@ parse_template(struct context *ctx, const struct token *token,
 		return len;
 	}
 	switch (ctx->curr) {
-	case PATTERN_TEMPLATE_CREATE:
+	case RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_CREATE:
 		out->args.vc.pattern =
 			(void *)RTE_ALIGN_CEIL((uintptr_t)(out + 1),
 					       sizeof(double));
@@ -12237,7 +12237,7 @@ parse_template(struct context *ctx, const struct token *token,
 	case PATTERN_TEMPLATE_TRANSFER:
 		out->args.vc.attr.transfer = 1;
 		return len;
-	case ACTIONS_TEMPLATE_CREATE:
+	case RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_CREATE:
 		out->args.vc.act_templ_id = UINT32_MAX;
 		out->command = ctx->curr;
 		ctx->objdata = 0;
@@ -12290,8 +12290,8 @@ parse_template_destroy(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command ||
-		out->command == PATTERN_TEMPLATE ||
-		out->command == ACTIONS_TEMPLATE) {
+		(enum index)out->command == PATTERN_TEMPLATE ||
+		(enum index)out->command == ACTIONS_TEMPLATE) {
 		if (ctx->curr != PATTERN_TEMPLATE_DESTROY &&
 			ctx->curr != ACTIONS_TEMPLATE_DESTROY)
 			return -1;
@@ -12343,8 +12343,8 @@ parse_table(struct context *ctx, const struct token *token,
 		return len;
 	}
 	switch (ctx->curr) {
-	case TABLE_CREATE:
-	case TABLE_RESIZE:
+	case RTE_FLOW_PARSER_CMD_TABLE_CREATE:
+	case RTE_FLOW_PARSER_CMD_TABLE_RESIZE:
 		out->command = ctx->curr;
 		ctx->objdata = 0;
 		ctx->object = out;
@@ -12428,7 +12428,7 @@ parse_table_destroy(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || out->command == TABLE) {
+	if (!out->command || (enum index)out->command == TABLE) {
 		if (ctx->curr != TABLE_DESTROY &&
 		    ctx->curr != TABLE_RESIZE_COMPLETE)
 			return -1;
@@ -12518,8 +12518,8 @@ parse_qo(struct context *ctx, const struct token *token,
 		return len;
 	}
 	switch (ctx->curr) {
-	case QUEUE_CREATE:
-	case QUEUE_UPDATE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_CREATE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_UPDATE:
 		out->command = ctx->curr;
 		ctx->objdata = 0;
 		ctx->object = out;
@@ -12569,7 +12569,7 @@ parse_qo_destroy(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || out->command == QUEUE) {
+	if (!out->command || (enum index)out->command == QUEUE) {
 		if (ctx->curr != QUEUE_DESTROY &&
 		    ctx->curr != QUEUE_FLOW_UPDATE_RESIZED)
 			return -1;
@@ -12743,7 +12743,7 @@ parse_group(struct context *ctx, const struct token *token,
 	case GROUP_TRANSFER:
 		out->args.vc.attr.transfer = 1;
 		return len;
-	case GROUP_SET_MISS_ACTIONS:
+	case RTE_FLOW_PARSER_CMD_GROUP_SET_MISS_ACTIONS:
 		out->command = ctx->curr;
 		ctx->objdata = 0;
 		ctx->object = out;
@@ -12769,7 +12769,7 @@ parse_flex(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (out->command == ZERO) {
+	if ((enum index)out->command == ZERO) {
 		if (ctx->curr != FLEX)
 			return -1;
 		if (sizeof(*out) > size)
@@ -12782,8 +12782,8 @@ parse_flex(struct context *ctx, const struct token *token,
 		switch (ctx->curr) {
 		default:
 			break;
-		case FLEX_ITEM_CREATE:
-		case FLEX_ITEM_DESTROY:
+		case RTE_FLOW_PARSER_CMD_FLEX_ITEM_CREATE:
+		case RTE_FLOW_PARSER_CMD_FLEX_ITEM_DESTROY:
 			out->command = ctx->curr;
 			break;
 		}
@@ -12818,9 +12818,9 @@ parse_tunnel(struct context *ctx, const struct token *token,
 		switch (ctx->curr) {
 		default:
 			break;
-		case TUNNEL_CREATE:
-		case TUNNEL_DESTROY:
-		case TUNNEL_LIST:
+		case RTE_FLOW_PARSER_CMD_TUNNEL_CREATE:
+		case RTE_FLOW_PARSER_CMD_TUNNEL_DESTROY:
+		case RTE_FLOW_PARSER_CMD_TUNNEL_LIST:
 			out->command = ctx->curr;
 			break;
 		case TUNNEL_CREATE_TYPE:
@@ -14466,16 +14466,16 @@ static void
 cmd_flow_parsed(struct buffer *in)
 {
 	switch (in->command) {
-	case INFO:
+	case RTE_FLOW_PARSER_CMD_INFO:
 		parser_command_flow_get_info(in->port);
 		break;
-	case CONFIGURE:
+	case RTE_FLOW_PARSER_CMD_CONFIGURE:
 		parser_command_flow_configure(in->port,
 					      &in->args.configure.port_attr,
 					      in->args.configure.nb_queue,
 					      &in->args.configure.queue_attr);
 		break;
-	case PATTERN_TEMPLATE_CREATE:
+	case RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_CREATE:
 		parser_command_flow_pattern_template_create(in->port,
 				in->args.vc.pat_templ_id,
 				&((const struct rte_flow_pattern_template_attr) {
@@ -14486,12 +14486,12 @@ cmd_flow_parsed(struct buffer *in)
 				}),
 				in->args.vc.pattern);
 		break;
-	case PATTERN_TEMPLATE_DESTROY:
+	case RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_DESTROY:
 		parser_command_flow_pattern_template_destroy(in->port,
 				in->args.templ_destroy.template_id_n,
 				in->args.templ_destroy.template_id);
 		break;
-	case ACTIONS_TEMPLATE_CREATE:
+	case RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_CREATE:
 		parser_command_flow_actions_template_create(in->port,
 				in->args.vc.act_templ_id,
 				&((const struct rte_flow_actions_template_attr) {
@@ -14502,12 +14502,12 @@ cmd_flow_parsed(struct buffer *in)
 				in->args.vc.actions,
 				in->args.vc.masks);
 		break;
-	case ACTIONS_TEMPLATE_DESTROY:
+	case RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_DESTROY:
 		parser_command_flow_actions_template_destroy(in->port,
 				in->args.templ_destroy.template_id_n,
 				in->args.templ_destroy.template_id);
 		break;
-	case TABLE_CREATE:
+	case RTE_FLOW_PARSER_CMD_TABLE_CREATE:
 		parser_command_flow_template_table_create(in->port,
 			in->args.table.id, &in->args.table.attr,
 			in->args.table.pat_templ_id_n,
@@ -14515,54 +14515,54 @@ cmd_flow_parsed(struct buffer *in)
 			in->args.table.act_templ_id_n,
 			in->args.table.act_templ_id);
 		break;
-	case TABLE_DESTROY:
+	case RTE_FLOW_PARSER_CMD_TABLE_DESTROY:
 		parser_command_flow_template_table_destroy(in->port,
 					in->args.table_destroy.table_id_n,
 					in->args.table_destroy.table_id);
 		break;
-	case TABLE_RESIZE_COMPLETE:
+	case RTE_FLOW_PARSER_CMD_TABLE_RESIZE_COMPLETE:
 		parser_command_flow_template_table_resize_complete
 			(in->port, in->args.table_destroy.table_id[0]);
 		break;
-	case GROUP_SET_MISS_ACTIONS:
+	case RTE_FLOW_PARSER_CMD_GROUP_SET_MISS_ACTIONS:
 		parser_command_queue_group_set_miss_actions(in->port,
 							    &in->args.vc.attr,
 							    in->args.vc.actions);
 		break;
-	case TABLE_RESIZE:
+	case RTE_FLOW_PARSER_CMD_TABLE_RESIZE:
 		parser_command_flow_template_table_resize(in->port,
 				in->args.table.id,
 				in->args.table.attr.nb_flows);
 		break;
-	case QUEUE_CREATE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_CREATE:
 		parser_command_queue_flow_create(in->port, in->queue,
 			in->postpone, in->args.vc.table_id, in->args.vc.rule_id,
 			in->args.vc.pat_templ_id, in->args.vc.act_templ_id,
 			in->args.vc.pattern, in->args.vc.actions);
 		break;
-	case QUEUE_DESTROY:
+	case RTE_FLOW_PARSER_CMD_QUEUE_DESTROY:
 		parser_command_queue_flow_destroy(in->port, in->queue,
 				in->postpone, in->args.destroy.rule_n,
 				in->args.destroy.rule,
 				in->args.destroy.is_user_id);
 		break;
-	case QUEUE_FLOW_UPDATE_RESIZED:
+	case RTE_FLOW_PARSER_CMD_QUEUE_FLOW_UPDATE_RESIZED:
 		parser_command_queue_flow_update_resized(in->port, in->queue,
 					       in->postpone,
 					       in->args.destroy.rule[0]);
 		break;
-	case QUEUE_UPDATE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_UPDATE:
 		parser_command_queue_flow_update(in->port, in->queue,
 				in->postpone, in->args.vc.rule_id,
 				in->args.vc.act_templ_id, in->args.vc.actions);
 		break;
-	case PUSH:
+	case RTE_FLOW_PARSER_CMD_PUSH:
 		parser_command_queue_flow_push(in->port, in->queue);
 		break;
-	case PULL:
+	case RTE_FLOW_PARSER_CMD_PULL:
 		parser_command_queue_flow_pull(in->port, in->queue);
 		break;
-	case HASH:
+	case RTE_FLOW_PARSER_CMD_HASH:
 		if (!in->args.vc.encap_hash)
 			parser_command_flow_hash_calc(in->port,
 					in->args.vc.table_id,
@@ -14573,16 +14573,16 @@ cmd_flow_parsed(struct buffer *in)
 					in->args.vc.field,
 					in->args.vc.pattern);
 		break;
-	case QUEUE_AGED:
+	case RTE_FLOW_PARSER_CMD_QUEUE_AGED:
 		parser_command_queue_flow_aged(in->port, in->queue,
 					       in->args.aged.destroy);
 		break;
-	case QUEUE_INDIRECT_ACTION_CREATE:
-	case QUEUE_INDIRECT_ACTION_LIST_CREATE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_CREATE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_LIST_CREATE:
 		parser_command_queue_action_handle_create(
 				in->port, in->queue, in->postpone,
 				in->args.vc.attr.group,
-				in->command == QUEUE_INDIRECT_ACTION_LIST_CREATE,
+				in->command == RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_LIST_CREATE,
 				&((const struct rte_flow_indir_action_conf) {
 					.ingress = in->args.vc.attr.ingress,
 					.egress = in->args.vc.attr.egress,
@@ -14590,35 +14590,35 @@ cmd_flow_parsed(struct buffer *in)
 				}),
 				in->args.vc.actions);
 		break;
-	case QUEUE_INDIRECT_ACTION_DESTROY:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_DESTROY:
 		parser_command_queue_action_handle_destroy(in->port,
 				in->queue, in->postpone,
 				in->args.ia_destroy.action_id_n,
 				in->args.ia_destroy.action_id);
 		break;
-	case QUEUE_INDIRECT_ACTION_UPDATE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_UPDATE:
 		parser_command_queue_action_handle_update(in->port,
 				in->queue, in->postpone,
 				in->args.vc.attr.group,
 				in->args.vc.actions);
 		break;
-	case QUEUE_INDIRECT_ACTION_QUERY:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QUERY:
 		parser_command_queue_action_handle_query(in->port,
 				in->queue, in->postpone,
 				in->args.ia.action_id);
 		break;
-	case QUEUE_INDIRECT_ACTION_QUERY_UPDATE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QUERY_UPDATE:
 		parser_command_queue_action_handle_query_update(in->port,
 				in->queue, in->postpone,
 				in->args.ia.action_id,
 				in->args.ia.qu_mode,
 				in->args.vc.actions);
 		break;
-	case INDIRECT_ACTION_CREATE:
-	case INDIRECT_ACTION_LIST_CREATE:
+	case RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_CREATE:
+	case RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_LIST_CREATE:
 		parser_command_action_handle_create(
 				in->port, in->args.vc.attr.group,
-				in->command == INDIRECT_ACTION_LIST_CREATE,
+				in->command == RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_LIST_CREATE,
 				&((const struct rte_flow_indir_action_conf) {
 					.ingress = in->args.vc.attr.ingress,
 					.egress = in->args.vc.attr.egress,
@@ -14626,95 +14626,95 @@ cmd_flow_parsed(struct buffer *in)
 				}),
 				in->args.vc.actions);
 		break;
-	case INDIRECT_ACTION_FLOW_CONF_CREATE:
+	case RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_FLOW_CONF_CREATE:
 		indirect_action_flow_conf_create(in);
 		break;
-	case INDIRECT_ACTION_DESTROY:
+	case RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_DESTROY:
 		parser_command_action_handle_destroy(in->port,
 				in->args.ia_destroy.action_id_n,
 				in->args.ia_destroy.action_id);
 		break;
-	case INDIRECT_ACTION_UPDATE:
+	case RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_UPDATE:
 		parser_command_action_handle_update(in->port,
 				in->args.vc.attr.group, in->args.vc.actions);
 		break;
-	case INDIRECT_ACTION_QUERY:
+	case RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QUERY:
 		parser_command_action_handle_query(in->port,
 				in->args.ia.action_id);
 		break;
-	case INDIRECT_ACTION_QUERY_UPDATE:
+	case RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QUERY_UPDATE:
 		parser_command_action_handle_query_update(in->port,
 				in->args.ia.action_id, in->args.ia.qu_mode,
 				in->args.vc.actions);
 		break;
-	case VALIDATE:
+	case RTE_FLOW_PARSER_CMD_VALIDATE:
 		parser_command_flow_validate(in->port, &in->args.vc.attr,
 				in->args.vc.pattern, in->args.vc.actions,
 				(const struct rte_flow_parser_tunnel_ops *)
 				&in->args.vc.tunnel_ops);
 		break;
-	case CREATE:
+	case RTE_FLOW_PARSER_CMD_CREATE:
 		parser_command_flow_create(in->port, &in->args.vc.attr,
 				in->args.vc.pattern, in->args.vc.actions,
 				(const struct rte_flow_parser_tunnel_ops *)
 				&in->args.vc.tunnel_ops, in->args.vc.user_id);
 		break;
-	case DESTROY:
+	case RTE_FLOW_PARSER_CMD_DESTROY:
 		parser_command_flow_destroy(in->port,
 				in->args.destroy.rule_n,
 				in->args.destroy.rule,
 				in->args.destroy.is_user_id);
 		break;
-	case UPDATE:
+	case RTE_FLOW_PARSER_CMD_UPDATE:
 		parser_command_flow_update(in->port, in->args.vc.rule_id,
 				in->args.vc.actions, in->args.vc.user_id);
 		break;
-	case FLUSH:
+	case RTE_FLOW_PARSER_CMD_FLUSH:
 		parser_command_flow_flush(in->port);
 		break;
-	case DUMP_ONE:
-	case DUMP_ALL:
+	case RTE_FLOW_PARSER_CMD_DUMP_ONE:
+	case RTE_FLOW_PARSER_CMD_DUMP_ALL:
 		parser_command_flow_dump(in->port, in->args.dump.mode,
 				in->args.dump.rule, in->args.dump.file,
 				in->args.dump.is_user_id);
 		break;
-	case QUERY:
+	case RTE_FLOW_PARSER_CMD_QUERY:
 		parser_command_flow_query(in->port, in->args.query.rule,
 				&in->args.query.action,
 				in->args.query.is_user_id);
 		break;
-	case LIST:
+	case RTE_FLOW_PARSER_CMD_LIST:
 		parser_command_flow_list(in->port, in->args.list.group_n,
 					 in->args.list.group);
 		break;
-	case ISOLATE:
+	case RTE_FLOW_PARSER_CMD_ISOLATE:
 		parser_command_flow_isolate(in->port, in->args.isolate.set);
 		break;
-	case AGED:
+	case RTE_FLOW_PARSER_CMD_AGED:
 		parser_command_flow_aged(in->port, in->args.aged.destroy);
 		break;
-	case TUNNEL_CREATE:
+	case RTE_FLOW_PARSER_CMD_TUNNEL_CREATE:
 		parser_command_flow_tunnel_create(in->port,
 				(const struct rte_flow_parser_tunnel_ops *)
 				&in->args.vc.tunnel_ops);
 		break;
-	case TUNNEL_DESTROY:
+	case RTE_FLOW_PARSER_CMD_TUNNEL_DESTROY:
 		parser_command_flow_tunnel_destroy(in->port,
 				in->args.vc.tunnel_ops.id);
 		break;
-	case TUNNEL_LIST:
+	case RTE_FLOW_PARSER_CMD_TUNNEL_LIST:
 		parser_command_flow_tunnel_list(in->port);
 		break;
-	case ACTION_POL_G:
+	case RTE_FLOW_PARSER_CMD_METER_POLICY_ADD:
 		parser_command_meter_policy_add(in->port,
 				in->args.policy.policy_id,
 				in->args.vc.actions);
 		break;
-	case FLEX_ITEM_CREATE:
+	case RTE_FLOW_PARSER_CMD_FLEX_ITEM_CREATE:
 		parser_command_flex_item_create(in->port,
 				in->args.flex.token, in->args.flex.filename);
 		break;
-	case FLEX_ITEM_DESTROY:
+	case RTE_FLOW_PARSER_CMD_FLEX_ITEM_DESTROY:
 		parser_command_flex_item_destroy(in->port,
 				in->args.flex.token);
 		break;
@@ -14731,23 +14731,23 @@ cmd_set_raw_parsed(const struct buffer *in)
 	uint16_t idx = in->port; /* We borrow port field as index */
 
 	switch (in->command) {
-	case SET_SAMPLE_ACTIONS:
+	case RTE_FLOW_PARSER_CMD_SET_SAMPLE_ACTIONS:
 		parser_command_set_sample_actions(idx, in->args.vc.actions,
 						  in->args.vc.actions_n);
 		break;
-	case SET_IPV6_EXT_PUSH:
+	case RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_PUSH:
 		parser_command_set_ipv6_ext_push(idx, in->args.vc.pattern,
 						 in->args.vc.pattern_n);
 		break;
-	case SET_IPV6_EXT_REMOVE:
+	case RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_REMOVE:
 		parser_command_set_ipv6_ext_remove(idx, in->args.vc.pattern,
 						   in->args.vc.pattern_n);
 		break;
-	case SET_RAW_ENCAP:
+	case RTE_FLOW_PARSER_CMD_SET_RAW_ENCAP:
 		parser_command_set_raw_encap(idx, in->args.vc.pattern,
 					     in->args.vc.pattern_n);
 		break;
-	case SET_RAW_DECAP:
+	case RTE_FLOW_PARSER_CMD_SET_RAW_DECAP:
 		parser_command_set_raw_decap(idx, in->args.vc.pattern,
 					     in->args.vc.pattern_n);
 		break;
@@ -14756,7 +14756,350 @@ cmd_set_raw_parsed(const struct buffer *in)
 	}
 }
 
-/* cmdline bindings removed; parsing is driven directly by rte_flow_parser_run(). */
+extern cmdline_parse_inst_t cmd_flow;
+extern cmdline_parse_inst_t cmd_set_raw;
+
+/** Return number of completion entries (cmdline API). */
+static int
+cmd_flow_complete_get_nb(cmdline_parse_token_hdr_t *hdr)
+{
+	struct context *ctx = parser_cmd_context();
+	const struct token *token = &token_list[ctx->curr];
+	const enum index *list;
+	int i;
+
+	RTE_SET_USED(hdr);
+	/* Count number of tokens in current list. */
+	if (ctx->next_num)
+		list = ctx->next[ctx->next_num - 1];
+	else if (token->next)
+		list = token->next[0];
+	else
+		return 0;
+	for (i = 0; list[i]; ++i)
+		;
+	if (!i)
+		return 0;
+	/*
+	 * If there is a single token, use its completion callback, otherwise
+	 * return the number of entries.
+	 */
+	token = &token_list[list[0]];
+	if (i == 1 && token->comp) {
+		/* Save index for cmd_flow_get_help(). */
+		ctx->prev = list[0];
+		return token->comp(ctx, token, 0, NULL, 0);
+	}
+	return i;
+}
+
+/** Return a completion entry (cmdline API). */
+static int
+cmd_flow_complete_get_elt(cmdline_parse_token_hdr_t *hdr, int index,
+			  char *dst, unsigned int size)
+{
+	struct context *ctx = parser_cmd_context();
+	const struct token *token = &token_list[ctx->curr];
+	const enum index *list;
+	int i;
+
+	RTE_SET_USED(hdr);
+	/* Count number of tokens in current list. */
+	if (ctx->next_num)
+		list = ctx->next[ctx->next_num - 1];
+	else if (token->next)
+		list = token->next[0];
+	else
+		return -1;
+	for (i = 0; list[i]; ++i)
+		;
+	if (!i)
+		return -1;
+	/* If there is a single token, use its completion callback. */
+	token = &token_list[list[0]];
+	if (i == 1 && token->comp) {
+		/* Save index for cmd_flow_get_help(). */
+		ctx->prev = list[0];
+		return token->comp(ctx, token, (unsigned int)index, dst, size) <
+		       0 ? -1 : 0;
+	}
+	/* Otherwise make sure the index is valid and use defaults. */
+	if (index >= i)
+		return -1;
+	token = &token_list[list[index]];
+	strlcpy(dst, token->name, size);
+	/* Save index for cmd_flow_get_help(). */
+	ctx->prev = list[index];
+	return 0;
+}
+
+/** Populate help strings for current token (cmdline API). */
+static int
+cmd_flow_get_help(cmdline_parse_token_hdr_t *hdr, char *dst, unsigned int size)
+{
+	struct context *ctx = parser_cmd_context();
+	const struct token *token = &token_list[ctx->prev];
+
+	RTE_SET_USED(hdr);
+	if (!size)
+		return -1;
+	/* Set token type and update global help with details. */
+	strlcpy(dst, (token->type ? token->type : "TOKEN"), size);
+	if (token->help)
+		cmd_flow.help_str = token->help;
+	else
+		cmd_flow.help_str = token->name;
+	return 0;
+}
+
+/** Token definition template (cmdline API). */
+static struct cmdline_token_hdr cmd_flow_token_hdr = {
+	.ops = &(struct cmdline_token_ops){
+		.parse = cmd_flow_parse,
+		.complete_get_nb = cmd_flow_complete_get_nb,
+		.complete_get_elt = cmd_flow_complete_get_elt,
+		.get_help = cmd_flow_get_help,
+	},
+	.offset = 0,
+};
+
+/** Populate the next dynamic token. */
+static void
+cmd_flow_tok(cmdline_parse_token_hdr_t **hdr,
+	     cmdline_parse_token_hdr_t **hdr_inst)
+{
+	struct context *ctx = parser_cmd_context();
+
+	/* Always reinitialize context before requesting the first token. */
+	if (!(hdr_inst - cmd_flow.tokens))
+		cmd_flow_context_init(ctx);
+	/* Return NULL when no more tokens are expected. */
+	if (!ctx->next_num && ctx->curr) {
+		*hdr = NULL;
+		return;
+	}
+	/* Determine if command should end here. */
+	if (ctx->eol && ctx->last && ctx->next_num) {
+		const enum index *list = ctx->next[ctx->next_num - 1];
+		int i;
+
+		for (i = 0; list[i]; ++i) {
+			if (list[i] != END)
+				continue;
+			*hdr = NULL;
+			return;
+		}
+	}
+	*hdr = &cmd_flow_token_hdr;
+}
+
+/** Token generator and output processing callback (cmdline API). */
+static void
+cmd_flow_cb(void *arg0, struct cmdline *cl, void *arg2)
+{
+	if (cl == NULL)
+		cmd_flow_tok(arg0, arg2);
+	else {
+		struct buffer *out = arg0;
+
+		out->command = parser_public_command((enum index)out->command);
+		cmd_flow_parsed(out);
+	}
+}
+
+/** Populate help strings for current set command token (cmdline API). */
+static int
+cmd_set_raw_get_help(cmdline_parse_token_hdr_t *hdr, char *dst,
+		     unsigned int size)
+{
+	struct context *ctx = parser_cmd_context();
+	const struct token *token = &token_list[ctx->prev];
+
+	RTE_SET_USED(hdr);
+	if (!size)
+		return -1;
+	/* Set token type and update global help with details. */
+	snprintf(dst, size, "%s", (token->type ? token->type : "TOKEN"));
+	if (token->help)
+		cmd_set_raw.help_str = token->help;
+	else
+		cmd_set_raw.help_str = token->name;
+	return 0;
+}
+
+/** Token definition template for set command (cmdline API). */
+static struct cmdline_token_hdr cmd_set_raw_token_hdr = {
+	.ops = &(struct cmdline_token_ops){
+		.parse = cmd_flow_parse,
+		.complete_get_nb = cmd_flow_complete_get_nb,
+		.complete_get_elt = cmd_flow_complete_get_elt,
+		.get_help = cmd_set_raw_get_help,
+	},
+	.offset = 0,
+};
+
+/** Populate the next dynamic token for set command. */
+static void
+cmd_set_raw_tok(cmdline_parse_token_hdr_t **hdr,
+		cmdline_parse_token_hdr_t **hdr_inst)
+{
+	struct context *ctx = parser_cmd_context();
+
+	/* Always reinitialize context before requesting the first token. */
+	if (!(hdr_inst - cmd_set_raw.tokens)) {
+		cmd_flow_context_init(ctx);
+		ctx->curr = START_SET;
+	}
+	/* Return NULL when no more tokens are expected. */
+	if (!ctx->next_num && (ctx->curr != START_SET)) {
+		*hdr = NULL;
+		return;
+	}
+	/* Determine if command should end here. */
+	if (ctx->eol && ctx->last && ctx->next_num) {
+		const enum index *list = ctx->next[ctx->next_num - 1];
+		int i;
+
+		for (i = 0; list[i]; ++i) {
+			if (list[i] != END_SET)
+				continue;
+			*hdr = NULL;
+			return;
+		}
+	}
+	*hdr = &cmd_set_raw_token_hdr;
+}
+
+/** Token generator and output processing callback (cmdline API). */
+static void
+cmd_set_raw_cb(void *arg0, struct cmdline *cl, void *arg2)
+{
+	if (cl == NULL)
+		cmd_set_raw_tok(arg0, arg2);
+	else {
+		struct buffer *out = arg0;
+
+		out->command = parser_public_command((enum index)out->command);
+		cmd_set_raw_parsed(out);
+	}
+}
+
+/* *** display raw_encap/raw_decap buf */
+struct cmd_show_set_raw_result {
+	cmdline_fixed_string_t cmd_show;
+	cmdline_fixed_string_t cmd_what;
+	cmdline_fixed_string_t cmd_all;
+	uint16_t cmd_index;
+};
+
+static void
+cmd_show_set_raw_parsed(void *parsed_result, struct cmdline *cl, void *data)
+{
+	struct cmd_show_set_raw_result *res = parsed_result;
+	uint16_t index = res->cmd_index;
+	const uint8_t *raw_data = NULL;
+	size_t raw_size = 0;
+	char title[16] = { 0 };
+	int all = 0;
+
+	RTE_SET_USED(cl);
+	RTE_SET_USED(data);
+	if (!strcmp(res->cmd_all, "all")) {
+		all = 1;
+		index = 0;
+	} else if (index >= RAW_ENCAP_CONFS_MAX_NUM) {
+		fprintf(stderr, "index should be 0-%u\n",
+			RAW_ENCAP_CONFS_MAX_NUM - 1);
+		return;
+	}
+	do {
+		if (!strcmp(res->cmd_what, "raw_encap")) {
+			const struct rte_flow_action_raw_encap *conf =
+				parser_raw_encap_conf_get(index);
+
+			if (!conf || !conf->data || !conf->size) {
+				fprintf(stderr,
+					"raw_encap %u not configured\n",
+					index);
+				goto next;
+			}
+			raw_data = conf->data;
+			raw_size = conf->size;
+		} else {
+			const struct rte_flow_action_raw_decap *conf =
+				parser_raw_decap_conf_get(index);
+
+			if (!conf || !conf->data || !conf->size) {
+				fprintf(stderr,
+					"raw_decap %u not configured\n",
+					index);
+				goto next;
+			}
+			raw_data = conf->data;
+			raw_size = conf->size;
+		}
+		snprintf(title, sizeof(title), "\nindex: %u", index);
+		rte_hexdump(stdout, title, raw_data, raw_size);
+next:
+		raw_data = NULL;
+		raw_size = 0;
+	} while (all && ++index < RAW_ENCAP_CONFS_MAX_NUM);
+}
+
+static cmdline_parse_token_string_t cmd_show_set_raw_cmd_show =
+	TOKEN_STRING_INITIALIZER(struct cmd_show_set_raw_result,
+			cmd_show, "show");
+static cmdline_parse_token_string_t cmd_show_set_raw_cmd_what =
+	TOKEN_STRING_INITIALIZER(struct cmd_show_set_raw_result,
+			cmd_what, "raw_encap#raw_decap");
+static cmdline_parse_token_num_t cmd_show_set_raw_cmd_index =
+	TOKEN_NUM_INITIALIZER(struct cmd_show_set_raw_result,
+			cmd_index, RTE_UINT16);
+static cmdline_parse_token_string_t cmd_show_set_raw_cmd_all =
+	TOKEN_STRING_INITIALIZER(struct cmd_show_set_raw_result,
+			cmd_all, "all");
+
+cmdline_parse_inst_t cmd_flow = {
+	.f = cmd_flow_cb,
+	.data = NULL, /**< Unused. */
+	.help_str = NULL, /**< Updated by cmd_flow_get_help(). */
+	.tokens = {
+		NULL,
+	}, /**< Tokens are returned by cmd_flow_tok(). */
+};
+
+cmdline_parse_inst_t cmd_set_raw = {
+	.f = cmd_set_raw_cb,
+	.data = NULL, /**< Unused. */
+	.help_str = NULL, /**< Updated by cmd_set_raw_get_help(). */
+	.tokens = {
+		NULL,
+	}, /**< Tokens are returned by cmd_set_raw_tok(). */
+};
+
+cmdline_parse_inst_t cmd_show_set_raw = {
+	.f = cmd_show_set_raw_parsed,
+	.data = NULL,
+	.help_str = "show <raw_encap|raw_decap> <index>",
+	.tokens = {
+		(void *)&cmd_show_set_raw_cmd_show,
+		(void *)&cmd_show_set_raw_cmd_what,
+		(void *)&cmd_show_set_raw_cmd_index,
+		NULL,
+	},
+};
+
+cmdline_parse_inst_t cmd_show_set_raw_all = {
+	.f = cmd_show_set_raw_parsed,
+	.data = NULL,
+	.help_str = "show <raw_encap|raw_decap> all",
+	.tokens = {
+		(void *)&cmd_show_set_raw_cmd_show,
+		(void *)&cmd_show_set_raw_cmd_what,
+		(void *)&cmd_show_set_raw_cmd_all,
+		NULL,
+	},
+};
 
 struct rte_flow_parser *
 rte_flow_parser_create(const struct rte_flow_parser_ops *ops, void *userdata)
@@ -14841,11 +15184,11 @@ rte_flow_parser_run(struct rte_flow_parser *parser, const char *src)
 	if (ret < 0)
 		return ret;
 	switch (out->command) {
-	case SET_SAMPLE_ACTIONS:
-	case SET_IPV6_EXT_PUSH:
-	case SET_IPV6_EXT_REMOVE:
-	case SET_RAW_ENCAP:
-	case SET_RAW_DECAP:
+	case RTE_FLOW_PARSER_CMD_SET_SAMPLE_ACTIONS:
+	case RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_PUSH:
+	case RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_REMOVE:
+	case RTE_FLOW_PARSER_CMD_SET_RAW_ENCAP:
+	case RTE_FLOW_PARSER_CMD_SET_RAW_DECAP:
 		cmd_set_raw_parsed(out);
 		break;
 	default:
