@@ -17,6 +17,7 @@ extern "C" {
 #endif
 
 struct rte_flow_parser;
+struct rte_flow_parser_ctx;
 struct rte_flow_parser_rss_type_info {
 	const char *str;
 	uint64_t rss_type;
@@ -131,6 +132,66 @@ extern const struct rte_flow_parser_mplsoudp_encap_conf
 	rte_flow_parser_default_mplsoudp_encap_conf;
 extern const struct rte_flow_parser_mplsoudp_decap_conf
 	rte_flow_parser_default_mplsoudp_decap_conf;
+
+/* Parser context lifecycle and shared state helpers. */
+__rte_experimental struct rte_flow_parser_ctx *
+rte_flow_parser_ctx_create(void);
+__rte_experimental void rte_flow_parser_ctx_destroy(
+	struct rte_flow_parser_ctx *ctx);
+__rte_experimental void rte_flow_parser_ctx_reset_defaults(
+	struct rte_flow_parser_ctx *ctx);
+
+/* Accessors for mutable encap/decap configurations. */
+__rte_experimental struct rte_flow_parser_vxlan_encap_conf *
+rte_flow_parser_ctx_vxlan_encap_conf(struct rte_flow_parser_ctx *ctx);
+__rte_experimental struct rte_flow_parser_nvgre_encap_conf *
+rte_flow_parser_ctx_nvgre_encap_conf(struct rte_flow_parser_ctx *ctx);
+__rte_experimental struct rte_flow_parser_l2_encap_conf *
+rte_flow_parser_ctx_l2_encap_conf(struct rte_flow_parser_ctx *ctx);
+__rte_experimental struct rte_flow_parser_l2_decap_conf *
+rte_flow_parser_ctx_l2_decap_conf(struct rte_flow_parser_ctx *ctx);
+__rte_experimental struct rte_flow_parser_mplsogre_encap_conf *
+rte_flow_parser_ctx_mplsogre_encap_conf(struct rte_flow_parser_ctx *ctx);
+__rte_experimental struct rte_flow_parser_mplsogre_decap_conf *
+rte_flow_parser_ctx_mplsogre_decap_conf(struct rte_flow_parser_ctx *ctx);
+__rte_experimental struct rte_flow_parser_mplsoudp_encap_conf *
+rte_flow_parser_ctx_mplsoudp_encap_conf(struct rte_flow_parser_ctx *ctx);
+__rte_experimental struct rte_flow_parser_mplsoudp_decap_conf *
+rte_flow_parser_ctx_mplsoudp_decap_conf(struct rte_flow_parser_ctx *ctx);
+
+/* Raw encap/decap and extension state management. */
+__rte_experimental int rte_flow_parser_ctx_set_raw_encap(
+	struct rte_flow_parser_ctx *ctx, uint16_t index,
+	const struct rte_flow_item pattern[], uint32_t pattern_n);
+__rte_experimental int rte_flow_parser_ctx_set_raw_decap(
+	struct rte_flow_parser_ctx *ctx, uint16_t index,
+	const struct rte_flow_item pattern[], uint32_t pattern_n);
+__rte_experimental const struct rte_flow_action_raw_encap *
+rte_flow_parser_ctx_raw_encap_conf_get(struct rte_flow_parser_ctx *ctx,
+	uint16_t index);
+__rte_experimental const struct rte_flow_action_raw_decap *
+rte_flow_parser_ctx_raw_decap_conf_get(struct rte_flow_parser_ctx *ctx,
+	uint16_t index);
+
+__rte_experimental int rte_flow_parser_ctx_set_ipv6_ext_push(
+	struct rte_flow_parser_ctx *ctx, uint16_t index,
+	const struct rte_flow_item pattern[], uint32_t pattern_n);
+__rte_experimental int rte_flow_parser_ctx_set_ipv6_ext_remove(
+	struct rte_flow_parser_ctx *ctx, uint16_t index,
+	const struct rte_flow_item pattern[], uint32_t pattern_n);
+__rte_experimental const struct rte_flow_action_ipv6_ext_push *
+rte_flow_parser_ctx_ipv6_ext_push_conf_get(struct rte_flow_parser_ctx *ctx,
+	uint16_t index);
+__rte_experimental const struct rte_flow_action_ipv6_ext_remove *
+rte_flow_parser_ctx_ipv6_ext_remove_conf_get(struct rte_flow_parser_ctx *ctx,
+	uint16_t index);
+
+__rte_experimental int rte_flow_parser_ctx_set_sample_actions(
+	struct rte_flow_parser_ctx *ctx, uint16_t index,
+	const struct rte_flow_action actions[], uint32_t actions_n);
+__rte_experimental const struct rte_flow_action *
+rte_flow_parser_ctx_sample_actions_get(struct rte_flow_parser_ctx *ctx,
+	uint16_t index);
 
 /* Maximum number of patterns supported by the parser. */
 #define RTE_FLOW_PARSER_MAX_PATTERNS   64
@@ -556,6 +617,37 @@ void rte_flow_parser_destroy(struct rte_flow_parser *parser);
 __rte_experimental
 int rte_flow_parser_set_default_ops(const struct rte_flow_parser_ops *ops,
 				    void *userdata);
+
+/**
+ * Register cmdline instances so the parser can drive dynamic tokens and
+ * update help strings. Applications should pass their cmdline instances for
+ * the flow and set commands.
+ */
+__rte_experimental
+void rte_flow_parser_cmdline_register(cmdline_parse_inst_t *flow,
+				      cmdline_parse_inst_t *set_raw);
+
+__rte_experimental
+void rte_flow_parser_cmd_flow_tok(cmdline_parse_token_hdr_t **hdr,
+				  cmdline_parse_token_hdr_t **hdr_inst);
+
+__rte_experimental
+void rte_flow_parser_cmd_set_raw_tok(cmdline_parse_token_hdr_t **hdr,
+				     cmdline_parse_token_hdr_t **hdr_inst);
+
+__rte_experimental
+void rte_flow_parser_cmd_flow_dispatch(struct rte_flow_parser_output *out);
+
+__rte_experimental
+void rte_flow_parser_cmd_set_raw_dispatch(struct rte_flow_parser_output *out);
+
+__rte_experimental
+const struct rte_flow_action_raw_encap *
+rte_flow_parser_raw_encap_conf_get(uint16_t index);
+
+__rte_experimental
+const struct rte_flow_action_raw_decap *
+rte_flow_parser_raw_decap_conf_get(uint16_t index);
 
 /**
  * Parse a flow CLI string.

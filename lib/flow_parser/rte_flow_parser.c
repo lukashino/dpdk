@@ -49,17 +49,6 @@ enum print_warning {
 
 struct context;
 
-static const char *const compare_ops[] = {
-	"eq", "ne", "lt", "le", "gt", "ge", NULL
-};
-
-/** Storage for struct rte_flow_action_rss including external data. */
-struct action_rss_data {
-	struct rte_flow_action_rss conf;
-	uint8_t key[RSS_HASH_KEY_LENGTH];
-	uint16_t queue[ACTION_RSS_QUEUE_NUM];
-};
-
 /** Storage for struct rte_flow_action_raw_encap. */
 struct action_raw_encap_data {
 	struct rte_flow_action_raw_encap conf;
@@ -73,13 +62,6 @@ struct action_raw_decap_data {
 	struct rte_flow_action_raw_decap conf;
 	uint8_t data[ACTION_RAW_ENCAP_MAX_DATA];
 	uint16_t idx;
-};
-
-/** Storage for struct rte_flow_action_ipv6_ext_push. */
-struct ipv6_ext_push_conf {
-	uint8_t data[ACTION_IPV6_EXT_PUSH_MAX_DATA];
-	size_t size;
-	uint8_t type;
 };
 
 /** Storage for struct rte_flow_action_ipv6_ext_push including external data. */
@@ -156,6 +138,1016 @@ struct action_nvgre_encap_data {
 	};
 	struct rte_flow_item_nvgre item_nvgre;
 };
+
+struct raw_encap_conf {
+	uint8_t data[ACTION_RAW_ENCAP_MAX_DATA];
+	uint8_t preserve[ACTION_RAW_ENCAP_MAX_DATA];
+	size_t size;
+};
+
+struct raw_decap_conf {
+	uint8_t data[ACTION_RAW_ENCAP_MAX_DATA];
+	size_t size;
+};
+
+struct ipv6_ext_push_conf {
+	uint8_t data[ACTION_IPV6_EXT_PUSH_MAX_DATA];
+	size_t size;
+	uint8_t type;
+};
+
+struct ipv6_ext_remove_conf {
+	uint8_t type;
+};
+
+struct raw_sample_conf {
+	struct rte_flow_action data[ACTION_SAMPLE_ACTIONS_NUM];
+};
+
+struct action_rss_data {
+	struct rte_flow_action_rss conf;
+	uint8_t key[RSS_HASH_KEY_LENGTH];
+	uint16_t queue[ACTION_RSS_QUEUE_NUM];
+};
+
+struct rte_flow_parser_ctx {
+	struct rte_flow_parser_vxlan_encap_conf vxlan_encap_conf;
+	struct rte_flow_parser_nvgre_encap_conf nvgre_encap_conf;
+	struct rte_flow_parser_l2_encap_conf l2_encap_conf;
+	struct rte_flow_parser_l2_decap_conf l2_decap_conf;
+	struct rte_flow_parser_mplsogre_encap_conf mplsogre_encap_conf;
+	struct rte_flow_parser_mplsogre_decap_conf mplsogre_decap_conf;
+	struct rte_flow_parser_mplsoudp_encap_conf mplsoudp_encap_conf;
+	struct rte_flow_parser_mplsoudp_decap_conf mplsoudp_decap_conf;
+	struct raw_encap_conf raw_encap_confs[RAW_ENCAP_CONFS_MAX_NUM];
+	struct raw_decap_conf raw_decap_confs[RAW_ENCAP_CONFS_MAX_NUM];
+	struct ipv6_ext_push_conf ipv6_ext_push_confs[IPV6_EXT_PUSH_CONFS_MAX_NUM];
+	struct ipv6_ext_remove_conf ipv6_ext_remove_confs[IPV6_EXT_PUSH_CONFS_MAX_NUM];
+	struct rte_flow_action_raw_encap raw_encap_conf_cache[RAW_ENCAP_CONFS_MAX_NUM];
+	struct rte_flow_action_raw_decap raw_decap_conf_cache[RAW_ENCAP_CONFS_MAX_NUM];
+	struct rte_flow_action_ipv6_ext_push
+		ipv6_ext_push_action_cache[IPV6_EXT_PUSH_CONFS_MAX_NUM];
+	struct rte_flow_action_ipv6_ext_remove
+		ipv6_ext_remove_action_cache[IPV6_EXT_PUSH_CONFS_MAX_NUM];
+	struct raw_sample_conf raw_sample_confs[RAW_SAMPLE_CONFS_MAX_NUM];
+	struct rte_flow_action_mark sample_mark[RAW_SAMPLE_CONFS_MAX_NUM];
+	struct rte_flow_action_queue sample_queue[RAW_SAMPLE_CONFS_MAX_NUM];
+	struct rte_flow_action_count sample_count[RAW_SAMPLE_CONFS_MAX_NUM];
+	struct rte_flow_action_port_id sample_port_id[RAW_SAMPLE_CONFS_MAX_NUM];
+	struct rte_flow_action_raw_encap sample_encap[RAW_SAMPLE_CONFS_MAX_NUM];
+	struct action_vxlan_encap_data sample_vxlan_encap[RAW_SAMPLE_CONFS_MAX_NUM];
+	struct action_nvgre_encap_data sample_nvgre_encap[RAW_SAMPLE_CONFS_MAX_NUM];
+	struct action_rss_data sample_rss_data[RAW_SAMPLE_CONFS_MAX_NUM];
+	struct rte_flow_action_vf sample_vf[RAW_SAMPLE_CONFS_MAX_NUM];
+	struct rte_flow_action_ethdev sample_port_representor[RAW_SAMPLE_CONFS_MAX_NUM];
+	struct rte_flow_action_ethdev sample_represented_port[RAW_SAMPLE_CONFS_MAX_NUM];
+};
+
+static inline void
+parser_ctx_reset_defaults(struct rte_flow_parser_ctx *ctx)
+{
+	if (!ctx)
+		return;
+	ctx->vxlan_encap_conf = rte_flow_parser_default_vxlan_encap_conf;
+	ctx->nvgre_encap_conf = rte_flow_parser_default_nvgre_encap_conf;
+	ctx->l2_encap_conf = rte_flow_parser_default_l2_encap_conf;
+	ctx->l2_decap_conf = rte_flow_parser_default_l2_decap_conf;
+	ctx->mplsogre_encap_conf = rte_flow_parser_default_mplsogre_encap_conf;
+	ctx->mplsogre_decap_conf = rte_flow_parser_default_mplsogre_decap_conf;
+	ctx->mplsoudp_encap_conf = rte_flow_parser_default_mplsoudp_encap_conf;
+	ctx->mplsoudp_decap_conf = rte_flow_parser_default_mplsoudp_decap_conf;
+}
+
+__rte_experimental struct rte_flow_parser_ctx *
+rte_flow_parser_ctx_create(void)
+{
+	struct rte_flow_parser_ctx *ctx = calloc(1, sizeof(*ctx));
+
+	if (!ctx)
+		return NULL;
+	parser_ctx_reset_defaults(ctx);
+	return ctx;
+}
+
+__rte_experimental void
+rte_flow_parser_ctx_destroy(struct rte_flow_parser_ctx *ctx)
+{
+	free(ctx);
+}
+
+__rte_experimental void
+rte_flow_parser_ctx_reset_defaults(struct rte_flow_parser_ctx *ctx)
+{
+	parser_ctx_reset_defaults(ctx);
+}
+
+__rte_experimental struct rte_flow_parser_vxlan_encap_conf *
+rte_flow_parser_ctx_vxlan_encap_conf(struct rte_flow_parser_ctx *ctx)
+{
+	return ctx ? &ctx->vxlan_encap_conf : NULL;
+}
+
+__rte_experimental struct rte_flow_parser_nvgre_encap_conf *
+rte_flow_parser_ctx_nvgre_encap_conf(struct rte_flow_parser_ctx *ctx)
+{
+	return ctx ? &ctx->nvgre_encap_conf : NULL;
+}
+
+__rte_experimental struct rte_flow_parser_l2_encap_conf *
+rte_flow_parser_ctx_l2_encap_conf(struct rte_flow_parser_ctx *ctx)
+{
+	return ctx ? &ctx->l2_encap_conf : NULL;
+}
+
+__rte_experimental struct rte_flow_parser_l2_decap_conf *
+rte_flow_parser_ctx_l2_decap_conf(struct rte_flow_parser_ctx *ctx)
+{
+	return ctx ? &ctx->l2_decap_conf : NULL;
+}
+
+__rte_experimental struct rte_flow_parser_mplsogre_encap_conf *
+rte_flow_parser_ctx_mplsogre_encap_conf(struct rte_flow_parser_ctx *ctx)
+{
+	return ctx ? &ctx->mplsogre_encap_conf : NULL;
+}
+
+__rte_experimental struct rte_flow_parser_mplsogre_decap_conf *
+rte_flow_parser_ctx_mplsogre_decap_conf(struct rte_flow_parser_ctx *ctx)
+{
+	return ctx ? &ctx->mplsogre_decap_conf : NULL;
+}
+
+__rte_experimental struct rte_flow_parser_mplsoudp_encap_conf *
+rte_flow_parser_ctx_mplsoudp_encap_conf(struct rte_flow_parser_ctx *ctx)
+{
+	return ctx ? &ctx->mplsoudp_encap_conf : NULL;
+}
+
+__rte_experimental struct rte_flow_parser_mplsoudp_decap_conf *
+rte_flow_parser_ctx_mplsoudp_decap_conf(struct rte_flow_parser_ctx *ctx)
+{
+	return ctx ? &ctx->mplsoudp_decap_conf : NULL;
+}
+
+static void
+parser_ctx_update_fields(uint8_t *buf, struct rte_flow_item *item,
+			   uint16_t next_proto)
+{
+	struct rte_ipv4_hdr *ipv4;
+	struct rte_ether_hdr *eth;
+	struct rte_ipv6_hdr *ipv6;
+	struct rte_vxlan_hdr *vxlan;
+	struct rte_vxlan_gpe_hdr *gpe;
+	struct rte_flow_item_nvgre *nvgre;
+	uint32_t ipv6_vtc_flow;
+
+	switch (item->type) {
+	case RTE_FLOW_ITEM_TYPE_ETH:
+		eth = (struct rte_ether_hdr *)buf;
+		if (next_proto)
+			eth->ether_type = rte_cpu_to_be_16(next_proto);
+		break;
+	case RTE_FLOW_ITEM_TYPE_IPV4:
+		ipv4 = (struct rte_ipv4_hdr *)buf;
+		if (!ipv4->version_ihl)
+			ipv4->version_ihl = RTE_IPV4_VHL_DEF;
+		if (next_proto && ipv4->next_proto_id == 0)
+			ipv4->next_proto_id = (uint8_t)next_proto;
+		break;
+	case RTE_FLOW_ITEM_TYPE_IPV6:
+		ipv6 = (struct rte_ipv6_hdr *)buf;
+		if (next_proto && ipv6->proto == 0)
+			ipv6->proto = (uint8_t)next_proto;
+		ipv6_vtc_flow = rte_be_to_cpu_32(ipv6->vtc_flow);
+		ipv6_vtc_flow &= 0x0FFFFFFF;
+		ipv6_vtc_flow |= 0x60000000;
+		ipv6->vtc_flow = rte_cpu_to_be_32(ipv6_vtc_flow);
+		break;
+	case RTE_FLOW_ITEM_TYPE_VXLAN:
+		vxlan = (struct rte_vxlan_hdr *)buf;
+		if (!vxlan->flags)
+			vxlan->flags = 0x08;
+		break;
+	case RTE_FLOW_ITEM_TYPE_VXLAN_GPE:
+		gpe = (struct rte_vxlan_gpe_hdr *)buf;
+		gpe->vx_flags = 0x0C;
+		break;
+	case RTE_FLOW_ITEM_TYPE_NVGRE:
+		nvgre = (struct rte_flow_item_nvgre *)buf;
+		nvgre->protocol = rte_cpu_to_be_16(0x6558);
+		nvgre->c_k_s_rsvd0_ver = rte_cpu_to_be_16(0x2000);
+		break;
+	default:
+		break;
+	}
+}
+
+static const void *
+parser_ctx_item_default_mask(const struct rte_flow_item *item)
+{
+	const void *mask = NULL;
+	static rte_be32_t gre_key_default_mask = RTE_BE32(UINT32_MAX);
+	static struct rte_flow_item_ipv6_routing_ext ipv6_routing_ext_default_mask = {
+		.hdr = {
+			.next_hdr = 0xff,
+			.type = 0xff,
+			.segments_left = 0xff,
+		},
+	};
+
+	switch (item->type) {
+	case RTE_FLOW_ITEM_TYPE_ANY:
+		mask = &rte_flow_item_any_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_PORT_ID:
+		mask = &rte_flow_item_port_id_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_RAW:
+		mask = &rte_flow_item_raw_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_ETH:
+		mask = &rte_flow_item_eth_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_VLAN:
+		mask = &rte_flow_item_vlan_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_IPV4:
+		mask = &rte_flow_item_ipv4_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_IPV6:
+		mask = &rte_flow_item_ipv6_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_ICMP:
+		mask = &rte_flow_item_icmp_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_UDP:
+		mask = &rte_flow_item_udp_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_TCP:
+		mask = &rte_flow_item_tcp_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_SCTP:
+		mask = &rte_flow_item_sctp_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_VXLAN:
+		mask = &rte_flow_item_vxlan_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_VXLAN_GPE:
+		mask = &rte_flow_item_vxlan_gpe_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_E_TAG:
+		mask = &rte_flow_item_e_tag_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_NVGRE:
+		mask = &rte_flow_item_nvgre_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_MPLS:
+		mask = &rte_flow_item_mpls_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_GRE:
+		mask = &rte_flow_item_gre_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_GRE_KEY:
+		mask = &gre_key_default_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_META:
+		mask = &rte_flow_item_meta_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_RANDOM:
+		mask = &rte_flow_item_random_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_FUZZY:
+		mask = &rte_flow_item_fuzzy_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_GTP:
+		mask = &rte_flow_item_gtp_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_GTP_PSC:
+		mask = &rte_flow_item_gtp_psc_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_GENEVE:
+		mask = &rte_flow_item_geneve_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_GENEVE_OPT:
+		mask = &rte_flow_item_geneve_opt_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_PPPOE_PROTO_ID:
+		mask = &rte_flow_item_pppoe_proto_id_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_L2TPV3OIP:
+		mask = &rte_flow_item_l2tpv3oip_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_ESP:
+		mask = &rte_flow_item_esp_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_AH:
+		mask = &rte_flow_item_ah_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_PFCP:
+		mask = &rte_flow_item_pfcp_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_PORT_REPRESENTOR:
+	case RTE_FLOW_ITEM_TYPE_REPRESENTED_PORT:
+		mask = &rte_flow_item_ethdev_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_L2TPV2:
+		mask = &rte_flow_item_l2tpv2_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_PPP:
+		mask = &rte_flow_item_ppp_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_METER_COLOR:
+		mask = &rte_flow_item_meter_color_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_IPV6_ROUTING_EXT:
+		mask = &ipv6_routing_ext_default_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_AGGR_AFFINITY:
+		mask = &rte_flow_item_aggr_affinity_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_TX_QUEUE:
+		mask = &rte_flow_item_tx_queue_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_IB_BTH:
+		mask = &rte_flow_item_ib_bth_mask;
+		break;
+	case RTE_FLOW_ITEM_TYPE_PTYPE:
+		mask = &rte_flow_item_ptype_mask;
+		break;
+	default:
+		break;
+	}
+	return mask;
+}
+
+static int
+parser_ctx_setup_vxlan_encap_data(struct rte_flow_parser_ctx *ctx,
+				       struct action_vxlan_encap_data *data)
+{
+	struct rte_flow_parser_vxlan_encap_conf *conf;
+
+	if (!ctx || !data)
+		return -EINVAL;
+	conf = &ctx->vxlan_encap_conf;
+	*data = (struct action_vxlan_encap_data){
+		.conf = (struct rte_flow_action_vxlan_encap){
+			.definition = data->items,
+		},
+		.items = {
+			{
+				.type = RTE_FLOW_ITEM_TYPE_ETH,
+				.spec = &data->item_eth,
+				.mask = &rte_flow_item_eth_mask,
+			},
+			{
+				.type = RTE_FLOW_ITEM_TYPE_VLAN,
+				.spec = &data->item_vlan,
+				.mask = &rte_flow_item_vlan_mask,
+			},
+			{
+				.type = RTE_FLOW_ITEM_TYPE_IPV4,
+				.spec = &data->item_ipv4,
+				.mask = &rte_flow_item_ipv4_mask,
+			},
+			{
+				.type = RTE_FLOW_ITEM_TYPE_UDP,
+				.spec = &data->item_udp,
+				.mask = &rte_flow_item_udp_mask,
+			},
+			{
+				.type = RTE_FLOW_ITEM_TYPE_VXLAN,
+				.spec = &data->item_vxlan,
+				.mask = &rte_flow_item_vxlan_mask,
+			},
+			{
+				.type = RTE_FLOW_ITEM_TYPE_END,
+			},
+		},
+		.item_eth.hdr.ether_type = 0,
+		.item_vlan = {
+			.hdr.vlan_tci = conf->vlan_tci,
+			.hdr.eth_proto = 0,
+		},
+		.item_ipv4.hdr = {
+			.src_addr = conf->ipv4_src,
+			.dst_addr = conf->ipv4_dst,
+		},
+		.item_udp.hdr = {
+			.src_port = conf->udp_src,
+			.dst_port = conf->udp_dst,
+		},
+		.item_vxlan.hdr.flags = 0,
+	};
+	memcpy(data->item_eth.hdr.dst_addr.addr_bytes,
+	       conf->eth_dst, RTE_ETHER_ADDR_LEN);
+	memcpy(data->item_eth.hdr.src_addr.addr_bytes,
+	       conf->eth_src, RTE_ETHER_ADDR_LEN);
+	if (!conf->select_ipv4) {
+		memcpy(&data->item_ipv6.hdr.src_addr,
+		       &conf->ipv6_src,
+		       sizeof(conf->ipv6_src));
+		memcpy(&data->item_ipv6.hdr.dst_addr,
+		       &conf->ipv6_dst,
+		       sizeof(conf->ipv6_dst));
+		data->items[2] = (struct rte_flow_item){
+			.type = RTE_FLOW_ITEM_TYPE_IPV6,
+			.spec = &data->item_ipv6,
+			.mask = &rte_flow_item_ipv6_mask,
+		};
+	}
+	if (!conf->select_vlan)
+		data->items[1].type = RTE_FLOW_ITEM_TYPE_VOID;
+	if (conf->select_tos_ttl) {
+		if (conf->select_ipv4) {
+			static struct rte_flow_item_ipv4 ipv4_mask_tos;
+
+			memcpy(&ipv4_mask_tos, &rte_flow_item_ipv4_mask,
+			       sizeof(ipv4_mask_tos));
+			ipv4_mask_tos.hdr.type_of_service = 0xff;
+			ipv4_mask_tos.hdr.time_to_live = 0xff;
+			data->item_ipv4.hdr.type_of_service =
+					conf->ip_tos;
+			data->item_ipv4.hdr.time_to_live =
+					conf->ip_ttl;
+			data->items[2].mask = &ipv4_mask_tos;
+		} else {
+			static struct rte_flow_item_ipv6 ipv6_mask_tos;
+
+			memcpy(&ipv6_mask_tos, &rte_flow_item_ipv6_mask,
+			       sizeof(ipv6_mask_tos));
+			ipv6_mask_tos.hdr.vtc_flow |=
+				RTE_BE32(0xfful << RTE_IPV6_HDR_TC_SHIFT);
+			ipv6_mask_tos.hdr.hop_limits = 0xff;
+			data->item_ipv6.hdr.vtc_flow |=
+				rte_cpu_to_be_32((uint32_t)conf->ip_tos <<
+					RTE_IPV6_HDR_TC_SHIFT);
+			data->item_ipv6.hdr.hop_limits =
+					conf->ip_ttl;
+			data->items[2].mask = &ipv6_mask_tos;
+		}
+	}
+	memcpy(data->item_vxlan.hdr.vni, conf->vni,
+	       RTE_DIM(conf->vni));
+	return 0;
+}
+
+static int
+parser_ctx_setup_nvgre_encap_data(struct rte_flow_parser_ctx *ctx,
+				        struct action_nvgre_encap_data *data)
+{
+	struct rte_flow_parser_nvgre_encap_conf *conf;
+
+	if (!ctx || !data)
+		return -EINVAL;
+	conf = &ctx->nvgre_encap_conf;
+	memset(data, 0, sizeof(*data));
+	data->conf.definition = data->items;
+	data->items[0] = (struct rte_flow_item){
+		.type = RTE_FLOW_ITEM_TYPE_ETH,
+		.spec = &data->item_eth,
+		.mask = &rte_flow_item_eth_mask,
+	};
+	data->items[1] = (struct rte_flow_item){
+		.type = RTE_FLOW_ITEM_TYPE_VLAN,
+		.spec = &data->item_vlan,
+		.mask = &rte_flow_item_vlan_mask,
+	};
+	data->items[2] = (struct rte_flow_item){
+		.type = RTE_FLOW_ITEM_TYPE_IPV4,
+		.spec = &data->item_ipv4,
+		.mask = &rte_flow_item_ipv4_mask,
+	};
+	data->items[3] = (struct rte_flow_item){
+		.type = RTE_FLOW_ITEM_TYPE_NVGRE,
+		.spec = &data->item_nvgre,
+		.mask = &rte_flow_item_nvgre_mask,
+	};
+	data->items[4] = (struct rte_flow_item){
+		.type = RTE_FLOW_ITEM_TYPE_END,
+	};
+	data->item_eth.hdr.ether_type = 0;
+	data->item_vlan.hdr.vlan_tci = conf->vlan_tci;
+	data->item_vlan.hdr.eth_proto = 0;
+	data->item_ipv4.hdr.src_addr = conf->ipv4_src;
+	data->item_ipv4.hdr.dst_addr = conf->ipv4_dst;
+	memset(&data->item_nvgre, 0, sizeof(data->item_nvgre));
+	memcpy(data->item_eth.hdr.dst_addr.addr_bytes,
+	       conf->eth_dst, RTE_ETHER_ADDR_LEN);
+	memcpy(data->item_eth.hdr.src_addr.addr_bytes,
+	       conf->eth_src, RTE_ETHER_ADDR_LEN);
+	if (!conf->select_ipv4) {
+		memcpy(&data->item_ipv6.hdr.src_addr,
+		       &conf->ipv6_src,
+		       sizeof(conf->ipv6_src));
+		memcpy(&data->item_ipv6.hdr.dst_addr,
+		       &conf->ipv6_dst,
+		       sizeof(conf->ipv6_dst));
+		data->items[2] = (struct rte_flow_item){
+			.type = RTE_FLOW_ITEM_TYPE_IPV6,
+			.spec = &data->item_ipv6,
+			.mask = &rte_flow_item_ipv6_mask,
+		};
+	}
+	if (!conf->select_vlan)
+		data->items[1].type = RTE_FLOW_ITEM_TYPE_VOID;
+	memcpy(data->item_nvgre.tni, conf->tni, RTE_DIM(conf->tni));
+	return 0;
+}
+
+static int
+parser_ctx_set_raw_common(struct rte_flow_parser_ctx *ctx, bool encap,
+			    uint16_t idx, const struct rte_flow_item pattern[],
+			    uint32_t pattern_n)
+{
+	uint32_t n = pattern_n;
+	int i = 0;
+	struct rte_flow_item *item = NULL;
+	size_t size = 0;
+	uint8_t *data = NULL;
+	uint8_t *data_tail = NULL;
+	size_t *total_size = NULL;
+	uint16_t upper_layer = 0;
+	uint16_t proto = 0;
+	int gtp_psc = -1;
+	const void *src_spec;
+	struct rte_flow_item *items = (struct rte_flow_item *)(uintptr_t)pattern;
+
+	if (!ctx || idx >= RAW_ENCAP_CONFS_MAX_NUM)
+		return -EINVAL;
+	if (encap) {
+		total_size = &ctx->raw_encap_confs[idx].size;
+		data = (uint8_t *)&ctx->raw_encap_confs[idx].data;
+	} else {
+		total_size = &ctx->raw_decap_confs[idx].size;
+		data = (uint8_t *)&ctx->raw_decap_confs[idx].data;
+	}
+	*total_size = 0;
+	memset(data, 0x00, ACTION_RAW_ENCAP_MAX_DATA);
+	data_tail = data + ACTION_RAW_ENCAP_MAX_DATA;
+	for (i = n - 1; i >= 0; --i) {
+		const struct rte_flow_item_gtp *gtp;
+		const struct rte_flow_item_geneve_opt *opt;
+		struct rte_flow_item_ipv6_routing_ext *ext;
+
+		item = items + i;
+		if (item->spec == NULL)
+			item->spec = parser_ctx_item_default_mask(item);
+		src_spec = item->spec;
+		switch (item->type) {
+		case RTE_FLOW_ITEM_TYPE_ETH:
+			size = sizeof(struct rte_ether_hdr);
+			break;
+		case RTE_FLOW_ITEM_TYPE_VLAN:
+			size = sizeof(struct rte_vlan_hdr);
+			proto = RTE_ETHER_TYPE_VLAN;
+			break;
+		case RTE_FLOW_ITEM_TYPE_IPV4:
+			size = sizeof(struct rte_ipv4_hdr);
+			proto = RTE_ETHER_TYPE_IPV4;
+			break;
+		case RTE_FLOW_ITEM_TYPE_IPV6:
+			size = sizeof(struct rte_ipv6_hdr);
+			proto = RTE_ETHER_TYPE_IPV6;
+			break;
+		case RTE_FLOW_ITEM_TYPE_IPV6_ROUTING_EXT:
+			ext = (struct rte_flow_item_ipv6_routing_ext *)(uintptr_t)item->spec;
+			if (!ext->hdr.hdr_len) {
+				size = sizeof(struct rte_ipv6_routing_ext) +
+					(ext->hdr.segments_left << 4);
+				ext->hdr.hdr_len = ext->hdr.segments_left << 1;
+				if (ext->hdr.type == RTE_IPV6_SRCRT_TYPE_4)
+					ext->hdr.last_entry =
+						ext->hdr.segments_left - 1;
+			} else {
+				size = sizeof(struct rte_ipv6_routing_ext) +
+					(ext->hdr.hdr_len << 3);
+			}
+			proto = IPPROTO_ROUTING;
+			break;
+		case RTE_FLOW_ITEM_TYPE_UDP:
+			size = sizeof(struct rte_udp_hdr);
+			proto = 0x11;
+			break;
+		case RTE_FLOW_ITEM_TYPE_TCP:
+			size = sizeof(struct rte_tcp_hdr);
+			proto = 0x06;
+			break;
+		case RTE_FLOW_ITEM_TYPE_VXLAN:
+			size = sizeof(struct rte_vxlan_hdr);
+			break;
+		case RTE_FLOW_ITEM_TYPE_VXLAN_GPE:
+			size = sizeof(struct rte_vxlan_gpe_hdr);
+			break;
+		case RTE_FLOW_ITEM_TYPE_GRE:
+			size = sizeof(struct rte_gre_hdr);
+			proto = 0x2F;
+			break;
+		case RTE_FLOW_ITEM_TYPE_GRE_KEY:
+			size = sizeof(rte_be32_t);
+			proto = 0x0;
+			break;
+		case RTE_FLOW_ITEM_TYPE_MPLS:
+			size = sizeof(struct rte_mpls_hdr);
+			proto = 0x0;
+			break;
+		case RTE_FLOW_ITEM_TYPE_NVGRE:
+			size = sizeof(struct rte_flow_item_nvgre);
+			proto = 0x2F;
+			break;
+		case RTE_FLOW_ITEM_TYPE_GENEVE:
+			size = sizeof(struct rte_geneve_hdr);
+			break;
+		case RTE_FLOW_ITEM_TYPE_GENEVE_OPT:
+			opt = (const struct rte_flow_item_geneve_opt *)item->spec;
+			size = offsetof(struct rte_flow_item_geneve_opt, option_len) +
+				sizeof(uint8_t);
+			if (opt->option_len && opt->data) {
+				*total_size += opt->option_len * sizeof(uint32_t);
+				rte_memcpy(data_tail - (*total_size),
+					   opt->data,
+					   opt->option_len * sizeof(uint32_t));
+			}
+			break;
+		case RTE_FLOW_ITEM_TYPE_L2TPV3OIP:
+			size = sizeof(rte_be32_t);
+			proto = 0x73;
+			break;
+		case RTE_FLOW_ITEM_TYPE_ESP:
+			size = sizeof(struct rte_esp_hdr);
+			proto = 0x32;
+			break;
+		case RTE_FLOW_ITEM_TYPE_AH:
+			size = sizeof(struct rte_flow_item_ah);
+			proto = 0x33;
+			break;
+		case RTE_FLOW_ITEM_TYPE_GTP:
+			if (gtp_psc < 0) {
+				size = sizeof(struct rte_gtp_hdr);
+				break;
+			}
+			if (gtp_psc != i + 1)
+				goto error;
+			gtp = item->spec;
+			if (gtp->hdr.s == 1 || gtp->hdr.pn == 1)
+				goto error;
+			else {
+				struct rte_gtp_hdr_ext_word ext_word = {
+					.next_ext = 0x85
+				};
+				*total_size += sizeof(ext_word);
+				rte_memcpy(data_tail - (*total_size),
+					   &ext_word, sizeof(ext_word));
+			}
+			size = sizeof(struct rte_gtp_hdr);
+			break;
+		case RTE_FLOW_ITEM_TYPE_GTP_PSC:
+			if (gtp_psc >= 0)
+				goto error;
+			else {
+				const struct rte_flow_item_gtp_psc *opt = item->spec;
+				struct rte_gtp_psc_generic_hdr *hdr;
+				size_t hdr_size = RTE_ALIGN(sizeof(*hdr),
+						 sizeof(int32_t));
+
+				*total_size += hdr_size;
+				hdr = (typeof(hdr))(data_tail - (*total_size));
+				memset(hdr, 0, hdr_size);
+				if (opt)
+					*hdr = opt->hdr;
+				hdr->ext_hdr_len = 1;
+				gtp_psc = i;
+				size = 0;
+			}
+			break;
+		case RTE_FLOW_ITEM_TYPE_PFCP:
+			size = sizeof(struct rte_flow_item_pfcp);
+			break;
+		case RTE_FLOW_ITEM_TYPE_FLEX:
+			if (item->spec != NULL) {
+				size = ((const struct rte_flow_item_flex *)item->spec)->length;
+				src_spec = ((const struct rte_flow_item_flex *)item->spec)->pattern;
+			} else {
+				size = 0;
+				src_spec = NULL;
+			}
+			break;
+		case RTE_FLOW_ITEM_TYPE_GRE_OPTION:
+			size = 0;
+			if (item->spec) {
+				const struct rte_flow_item_gre_opt *opt = item->spec;
+				if (opt->checksum_rsvd.checksum) {
+					*total_size += sizeof(opt->checksum_rsvd);
+					rte_memcpy(data_tail - (*total_size),
+						   &opt->checksum_rsvd,
+						   sizeof(opt->checksum_rsvd));
+				}
+				if (opt->key.key) {
+					*total_size += sizeof(opt->key.key);
+					rte_memcpy(data_tail - (*total_size),
+						   &opt->key.key,
+						   sizeof(opt->key.key));
+				}
+				if (opt->sequence.sequence) {
+					*total_size += sizeof(opt->sequence.sequence);
+					rte_memcpy(data_tail - (*total_size),
+						   &opt->sequence.sequence,
+						   sizeof(opt->sequence.sequence));
+				}
+			}
+			proto = 0x2F;
+			break;
+		default:
+			goto error;
+		}
+		if (size) {
+			*total_size += size;
+			rte_memcpy(data_tail - (*total_size), src_spec, size);
+			parser_ctx_update_fields((data_tail - (*total_size)), item,
+					      upper_layer);
+			upper_layer = proto;
+		}
+	}
+	RTE_ASSERT((*total_size) <= ACTION_RAW_ENCAP_MAX_DATA);
+	memmove(data, (data_tail - (*total_size)), *total_size);
+	return 0;
+
+error:
+	*total_size = 0;
+	memset(data, 0x00, ACTION_RAW_ENCAP_MAX_DATA);
+	return -EINVAL;
+}
+
+__rte_experimental int
+rte_flow_parser_ctx_set_raw_encap(struct rte_flow_parser_ctx *ctx,
+				 uint16_t index,
+				 const struct rte_flow_item pattern[],
+				 uint32_t pattern_n)
+{
+	return parser_ctx_set_raw_common(ctx, true, index, pattern, pattern_n);
+}
+
+__rte_experimental int
+rte_flow_parser_ctx_set_raw_decap(struct rte_flow_parser_ctx *ctx,
+				 uint16_t index,
+				 const struct rte_flow_item pattern[],
+				 uint32_t pattern_n)
+{
+	return parser_ctx_set_raw_common(ctx, false, index, pattern, pattern_n);
+}
+
+__rte_experimental const struct rte_flow_action_raw_encap *
+rte_flow_parser_ctx_raw_encap_conf_get(struct rte_flow_parser_ctx *ctx,
+					      uint16_t index)
+{
+	if (!ctx || index >= RAW_ENCAP_CONFS_MAX_NUM)
+		return NULL;
+	ctx->raw_encap_conf_cache[index] = (struct rte_flow_action_raw_encap){
+		.data = ctx->raw_encap_confs[index].data,
+		.size = ctx->raw_encap_confs[index].size,
+		.preserve = ctx->raw_encap_confs[index].preserve,
+	};
+	return &ctx->raw_encap_conf_cache[index];
+}
+
+__rte_experimental const struct rte_flow_action_raw_decap *
+rte_flow_parser_ctx_raw_decap_conf_get(struct rte_flow_parser_ctx *ctx,
+					      uint16_t index)
+{
+	if (!ctx || index >= RAW_ENCAP_CONFS_MAX_NUM)
+		return NULL;
+	ctx->raw_decap_conf_cache[index] = (struct rte_flow_action_raw_decap){
+		.data = ctx->raw_decap_confs[index].data,
+		.size = ctx->raw_decap_confs[index].size,
+	};
+	return &ctx->raw_decap_conf_cache[index];
+}
+
+__rte_experimental int
+rte_flow_parser_ctx_set_ipv6_ext_push(struct rte_flow_parser_ctx *ctx,
+				    uint16_t idx,
+				    const struct rte_flow_item pattern[],
+				    uint32_t pattern_n)
+{
+	uint32_t i = 0;
+	const struct rte_flow_item *item;
+	size_t size = 0;
+	uint8_t *data;
+	uint8_t *type;
+	size_t *total_size;
+
+	if (!ctx || idx >= IPV6_EXT_PUSH_CONFS_MAX_NUM)
+		return -EINVAL;
+	data = (uint8_t *)&ctx->ipv6_ext_push_confs[idx].data;
+	type = (uint8_t *)&ctx->ipv6_ext_push_confs[idx].type;
+	total_size = &ctx->ipv6_ext_push_confs[idx].size;
+	*total_size = 0;
+	memset(data, 0x00, ACTION_IPV6_EXT_PUSH_MAX_DATA);
+	for (i = pattern_n; i > 0; --i) {
+		item = &pattern[i - 1];
+		switch (item->type) {
+		case RTE_FLOW_ITEM_TYPE_IPV6_EXT:
+			if (!item->spec)
+				goto error;
+			*type = ((const struct rte_flow_item_ipv6_ext *)item->spec)->next_hdr;
+			break;
+		case RTE_FLOW_ITEM_TYPE_IPV6_ROUTING_EXT:
+		{
+			struct rte_flow_item_ipv6_routing_ext ext;
+			const struct rte_flow_item_ipv6_routing_ext *spec = item->spec;
+
+			if (!spec)
+				goto error;
+			rte_memcpy(&ext, spec, sizeof(ext));
+			if (!ext.hdr.hdr_len) {
+				size = sizeof(struct rte_ipv6_routing_ext) +
+					(ext.hdr.segments_left << 4);
+				ext.hdr.hdr_len = ext.hdr.segments_left << 1;
+				if (ext.hdr.type == 4)
+					ext.hdr.last_entry =
+						ext.hdr.segments_left - 1;
+			} else {
+				size = sizeof(struct rte_ipv6_routing_ext) +
+					(ext.hdr.hdr_len << 3);
+			}
+			*total_size += size;
+			memcpy(data, &ext, size);
+			break;
+		}
+		default:
+			goto error;
+		}
+	}
+	RTE_ASSERT((*total_size) <= ACTION_IPV6_EXT_PUSH_MAX_DATA);
+	return 0;
+error:
+	*total_size = 0;
+	memset(data, 0x00, ACTION_IPV6_EXT_PUSH_MAX_DATA);
+	return -EINVAL;
+}
+
+__rte_experimental int
+rte_flow_parser_ctx_set_ipv6_ext_remove(struct rte_flow_parser_ctx *ctx,
+				      uint16_t idx,
+				      const struct rte_flow_item pattern[],
+				      uint32_t pattern_n)
+{
+	const struct rte_flow_item_ipv6_ext *ipv6_ext;
+
+	if (!ctx || pattern_n != 1 ||
+	    pattern[0].type != RTE_FLOW_ITEM_TYPE_IPV6_EXT ||
+	    pattern[0].spec == NULL || idx >= IPV6_EXT_PUSH_CONFS_MAX_NUM)
+		return -EINVAL;
+	ipv6_ext = pattern[0].spec;
+	ctx->ipv6_ext_remove_confs[idx].type = ipv6_ext->next_hdr;
+	return 0;
+}
+
+__rte_experimental const struct rte_flow_action_ipv6_ext_push *
+rte_flow_parser_ctx_ipv6_ext_push_conf_get(struct rte_flow_parser_ctx *ctx,
+					       uint16_t index)
+{
+	if (!ctx || index >= IPV6_EXT_PUSH_CONFS_MAX_NUM)
+		return NULL;
+	ctx->ipv6_ext_push_action_cache[index] =
+		(struct rte_flow_action_ipv6_ext_push){
+			.data = ctx->ipv6_ext_push_confs[index].data,
+			.size = ctx->ipv6_ext_push_confs[index].size,
+			.type = ctx->ipv6_ext_push_confs[index].type,
+		};
+	return &ctx->ipv6_ext_push_action_cache[index];
+}
+
+__rte_experimental const struct rte_flow_action_ipv6_ext_remove *
+rte_flow_parser_ctx_ipv6_ext_remove_conf_get(struct rte_flow_parser_ctx *ctx,
+					         uint16_t index)
+{
+	if (!ctx || index >= IPV6_EXT_PUSH_CONFS_MAX_NUM)
+		return NULL;
+	ctx->ipv6_ext_remove_action_cache[index] =
+		(struct rte_flow_action_ipv6_ext_remove){
+			.type = ctx->ipv6_ext_remove_confs[index].type,
+		};
+	return &ctx->ipv6_ext_remove_action_cache[index];
+}
+
+__rte_experimental int
+rte_flow_parser_ctx_set_sample_actions(struct rte_flow_parser_ctx *ctx,
+				     uint16_t idx,
+				     const struct rte_flow_action actions[],
+				     uint32_t actions_n)
+{
+	uint32_t i;
+	struct rte_flow_action *data;
+	size_t size;
+	uint32_t max_size = sizeof(struct rte_flow_action) *
+		ACTION_SAMPLE_ACTIONS_NUM;
+
+	if (!ctx || idx >= RAW_SAMPLE_CONFS_MAX_NUM)
+		return -EINVAL;
+	data = (struct rte_flow_action *)&ctx->raw_sample_confs[idx].data;
+	memset(data, 0x00, max_size);
+	for (i = 0; i < actions_n; i++) {
+		struct rte_flow_action action = actions[i];
+		const struct rte_flow_action_rss *rss;
+
+		if (action.type == RTE_FLOW_ACTION_TYPE_END)
+			break;
+		switch (action.type) {
+		case RTE_FLOW_ACTION_TYPE_MARK:
+			size = sizeof(struct rte_flow_action_mark);
+			rte_memcpy(&ctx->sample_mark[idx], action.conf, size);
+			action.conf = &ctx->sample_mark[idx];
+			break;
+		case RTE_FLOW_ACTION_TYPE_COUNT:
+			size = sizeof(struct rte_flow_action_count);
+			rte_memcpy(&ctx->sample_count[idx], action.conf, size);
+			action.conf = &ctx->sample_count[idx];
+			break;
+		case RTE_FLOW_ACTION_TYPE_QUEUE:
+			size = sizeof(struct rte_flow_action_queue);
+			rte_memcpy(&ctx->sample_queue[idx], action.conf, size);
+			action.conf = &ctx->sample_queue[idx];
+			break;
+		case RTE_FLOW_ACTION_TYPE_RSS:
+			size = sizeof(struct rte_flow_action_rss);
+			rss = action.conf;
+			rte_memcpy(&ctx->sample_rss_data[idx].conf, rss, size);
+			if (rss->key_len && rss->key) {
+				ctx->sample_rss_data[idx].conf.key =
+					ctx->sample_rss_data[idx].key;
+				rte_memcpy((void *)(uintptr_t)
+					 ctx->sample_rss_data[idx].conf.key,
+					   rss->key,
+					   sizeof(uint8_t) * rss->key_len);
+			}
+			if (rss->queue_num && rss->queue) {
+				ctx->sample_rss_data[idx].conf.queue =
+					ctx->sample_rss_data[idx].queue;
+				rte_memcpy((void *)(uintptr_t)
+					 ctx->sample_rss_data[idx].conf.queue,
+					   rss->queue,
+					   sizeof(uint16_t) * rss->queue_num);
+			}
+			action.conf = &ctx->sample_rss_data[idx].conf;
+			break;
+		case RTE_FLOW_ACTION_TYPE_RAW_ENCAP:
+			size = sizeof(struct rte_flow_action_raw_encap);
+			rte_memcpy(&ctx->sample_encap[idx], action.conf, size);
+			action.conf = &ctx->sample_encap[idx];
+			break;
+		case RTE_FLOW_ACTION_TYPE_PORT_ID:
+			size = sizeof(struct rte_flow_action_port_id);
+			rte_memcpy(&ctx->sample_port_id[idx], action.conf, size);
+			action.conf = &ctx->sample_port_id[idx];
+			break;
+		case RTE_FLOW_ACTION_TYPE_PF:
+			break;
+		case RTE_FLOW_ACTION_TYPE_VF:
+			size = sizeof(struct rte_flow_action_vf);
+			rte_memcpy(&ctx->sample_vf[idx], action.conf, size);
+			action.conf = &ctx->sample_vf[idx];
+			break;
+		case RTE_FLOW_ACTION_TYPE_VXLAN_ENCAP:
+			size = sizeof(struct rte_flow_action_vxlan_encap);
+			parser_ctx_setup_vxlan_encap_data(ctx,
+						    &ctx->sample_vxlan_encap[idx]);
+			action.conf = &ctx->sample_vxlan_encap[idx].conf;
+			break;
+		case RTE_FLOW_ACTION_TYPE_NVGRE_ENCAP:
+			size = sizeof(struct rte_flow_action_nvgre_encap);
+			parser_ctx_setup_nvgre_encap_data(ctx,
+						    &ctx->sample_nvgre_encap[idx]);
+			action.conf = &ctx->sample_nvgre_encap[idx];
+			break;
+		case RTE_FLOW_ACTION_TYPE_PORT_REPRESENTOR:
+			size = sizeof(struct rte_flow_action_ethdev);
+			rte_memcpy(&ctx->sample_port_representor[idx],
+				   action.conf, size);
+			action.conf = &ctx->sample_port_representor[idx];
+			break;
+		case RTE_FLOW_ACTION_TYPE_REPRESENTED_PORT:
+			size = sizeof(struct rte_flow_action_ethdev);
+			rte_memcpy(&ctx->sample_represented_port[idx],
+				   action.conf, size);
+			action.conf = &ctx->sample_represented_port[idx];
+			break;
+		default:
+			return -EINVAL;
+		}
+		*data = action;
+		data++;
+	}
+	return 0;
+}
+
+__rte_experimental const struct rte_flow_action *
+rte_flow_parser_ctx_sample_actions_get(struct rte_flow_parser_ctx *ctx,
+				       uint16_t index)
+{
+	if (!ctx || index >= RAW_SAMPLE_CONFS_MAX_NUM)
+		return NULL;
+	return ctx->raw_sample_confs[index].data;
+}
 
 const struct rte_flow_parser_l2_encap_conf
 rte_flow_parser_default_l2_encap_conf = { 0 };
@@ -255,13 +1247,6 @@ static const struct rte_flow_parser_rss_type_info parser_default_rss_type_table[
 	{ NULL, 0 },
 };
 
-static uint64_t rss_hf = RTE_ETH_RSS_IP;
-
-/** Storage for struct rte_flow_action_sample. */
-struct raw_sample_conf {
-	struct rte_flow_action data[ACTION_SAMPLE_ACTIONS_NUM];
-};
-
 static inline struct rte_flow_parser *
 parser_push_current(struct rte_flow_parser *parser)
 {
@@ -313,7 +1298,7 @@ parser_rss_default_hf(void)
 
 	if (ops && ops->rss_hf_get)
 		return ops->rss_hf_get(parser_userdata());
-	return rss_hf;
+	return RTE_ETH_RSS_IP;
 }
 
 static inline const struct rte_flow_parser_vxlan_encap_conf *
@@ -1239,6 +2224,42 @@ parser_raw_decap_conf_get(uint16_t index)
 	return NULL;
 }
 
+const struct rte_flow_action_raw_encap *
+rte_flow_parser_raw_encap_conf_get(uint16_t index)
+{
+	return parser_raw_encap_conf_get(index);
+}
+
+const struct rte_flow_action_raw_decap *
+rte_flow_parser_raw_decap_conf_get(uint16_t index)
+{
+	return parser_raw_decap_conf_get(index);
+}
+
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_raw_encap_conf_get, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_raw_decap_conf_get, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_create, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_destroy, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_reset_defaults, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_vxlan_encap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_nvgre_encap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_l2_encap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_l2_decap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_mplsogre_encap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_mplsogre_decap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_mplsoudp_encap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_mplsoudp_decap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_set_raw_encap, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_set_raw_decap, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_raw_encap_conf_get, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_raw_decap_conf_get, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_set_ipv6_ext_push, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_set_ipv6_ext_remove, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_ipv6_ext_push_conf_get, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_ipv6_ext_remove_conf_get, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_set_sample_actions, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_sample_actions_get, 26.0);
+
 static const struct rte_flow_action *
 parser_sample_actions_get(uint16_t index)
 {
@@ -2158,6 +3179,11 @@ parser_public_command(enum index idx)
 #define ITEM_RAW_SIZE \
 	(sizeof(struct rte_flow_item_raw) + ITEM_RAW_PATTERN_SIZE)
 
+
+static const char *const compare_ops[] = {
+	"eq", "ne", "lt", "le", "gt", "ge", NULL
+};
+
 /** Maximum size for external pattern in struct rte_flow_field_data. */
 #define FLOW_FIELD_PATTERN_SIZE 32
 
@@ -2483,6 +3509,18 @@ struct buffer {
 
 _Static_assert(sizeof(struct rte_flow_parser_output) == sizeof(struct buffer),
 	       "rte_flow_parser_output_mismatch");
+
+static inline enum index
+buffer_cmd(const struct buffer *out)
+{
+	return (enum index)out->command;
+}
+
+static inline void
+buffer_cmd_set(struct buffer *out, enum index idx)
+{
+	out->command = (enum rte_flow_parser_command)idx;
+}
 
 /** Private data for pattern items. */
 struct parse_item_priv {
@@ -9695,12 +10733,12 @@ parse_ia_destroy(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || (enum index)out->command == INDIRECT_ACTION) {
+	if (!out->command || buffer_cmd(out) == INDIRECT_ACTION) {
 		if (ctx->curr != INDIRECT_ACTION_DESTROY)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
-		out->command = ctx->curr;
+		buffer_cmd_set(out, ctx->curr);
 		ctx->objdata = 0;
 		ctx->object = out;
 		ctx->objmask = NULL;
@@ -9794,12 +10832,12 @@ parse_qia_destroy(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || (enum index)out->command == QUEUE) {
+	if (!out->command || buffer_cmd(out) == QUEUE) {
 		if (ctx->curr != QUEUE_INDIRECT_ACTION_DESTROY)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
-		out->command = ctx->curr;
+		buffer_cmd_set(out, ctx->curr);
 		ctx->objdata = 0;
 		ctx->object = out;
 		ctx->objmask = NULL;
@@ -9951,10 +10989,10 @@ parse_vc(struct context *ctx, const struct token *token,
 		ctx->objmask = NULL;
 		return len;
 	case ITEM_END:
-		if (((enum index)out->command == VALIDATE || (enum index)out->command == CREATE) &&
+		if ((buffer_cmd(out) == VALIDATE || buffer_cmd(out) == CREATE) &&
 		    ctx->last)
 			return -1;
-		if ((enum index)out->command == PATTERN_TEMPLATE_CREATE &&
+		if (buffer_cmd(out) == PATTERN_TEMPLATE_CREATE &&
 		    !ctx->last)
 			return -1;
 		break;
@@ -12121,12 +13159,12 @@ parse_aged(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || (enum index)out->command == QUEUE) {
+	if (!out->command || buffer_cmd(out) == QUEUE) {
 		if (ctx->curr != AGED && ctx->curr != QUEUE_AGED)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
-		out->command = ctx->curr;
+		buffer_cmd_set(out, ctx->curr);
 		ctx->objdata = 0;
 		ctx->object = out;
 		ctx->objmask = NULL;
@@ -12290,8 +13328,8 @@ parse_template_destroy(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command ||
-		(enum index)out->command == PATTERN_TEMPLATE ||
-		(enum index)out->command == ACTIONS_TEMPLATE) {
+		buffer_cmd(out) == PATTERN_TEMPLATE ||
+		buffer_cmd(out) == ACTIONS_TEMPLATE) {
 		if (ctx->curr != PATTERN_TEMPLATE_DESTROY &&
 			ctx->curr != ACTIONS_TEMPLATE_DESTROY)
 			return -1;
@@ -12428,13 +13466,13 @@ parse_table_destroy(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || (enum index)out->command == TABLE) {
+	if (!out->command || buffer_cmd(out) == TABLE) {
 		if (ctx->curr != TABLE_DESTROY &&
 		    ctx->curr != TABLE_RESIZE_COMPLETE)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
-		out->command = ctx->curr;
+		buffer_cmd_set(out, ctx->curr);
 		ctx->objdata = 0;
 		ctx->object = out;
 		ctx->objmask = NULL;
@@ -12569,13 +13607,13 @@ parse_qo_destroy(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || (enum index)out->command == QUEUE) {
+	if (!out->command || buffer_cmd(out) == QUEUE) {
 		if (ctx->curr != QUEUE_DESTROY &&
 		    ctx->curr != QUEUE_FLOW_UPDATE_RESIZED)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
-		out->command = ctx->curr;
+		buffer_cmd_set(out, ctx->curr);
 		ctx->objdata = 0;
 		ctx->object = out;
 		ctx->objmask = NULL;
@@ -12769,12 +13807,12 @@ parse_flex(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if ((enum index)out->command == ZERO) {
+	if (buffer_cmd(out) == ZERO) {
 		if (ctx->curr != FLEX)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
-		out->command = ctx->curr;
+		buffer_cmd_set(out, ctx->curr);
 		ctx->objdata = 0;
 		ctx->object = out;
 		ctx->objmask = NULL;
@@ -14756,8 +15794,9 @@ cmd_set_raw_parsed(const struct buffer *in)
 	}
 }
 
-extern cmdline_parse_inst_t cmd_flow;
-extern cmdline_parse_inst_t cmd_set_raw;
+/* Cmdline instances are owned by applications; keep weak references for help. */
+static cmdline_parse_inst_t *cmd_flow_inst;
+static cmdline_parse_inst_t *cmd_set_raw_inst;
 
 /** Return number of completion entries (cmdline API). */
 static int
@@ -14845,10 +15884,12 @@ cmd_flow_get_help(cmdline_parse_token_hdr_t *hdr, char *dst, unsigned int size)
 		return -1;
 	/* Set token type and update global help with details. */
 	strlcpy(dst, (token->type ? token->type : "TOKEN"), size);
-	if (token->help)
-		cmd_flow.help_str = token->help;
-	else
-		cmd_flow.help_str = token->name;
+	if (cmd_flow_inst) {
+		if (token->help)
+			cmd_flow_inst->help_str = token->help;
+		else
+			cmd_flow_inst->help_str = token->name;
+	}
 	return 0;
 }
 
@@ -14869,9 +15910,15 @@ cmd_flow_tok(cmdline_parse_token_hdr_t **hdr,
 	     cmdline_parse_token_hdr_t **hdr_inst)
 {
 	struct context *ctx = parser_cmd_context();
+	cmdline_parse_token_hdr_t **tokens;
 
+	tokens = cmd_flow_inst ? cmd_flow_inst->tokens : NULL;
+	if (!tokens) {
+		*hdr = NULL;
+		return;
+	}
 	/* Always reinitialize context before requesting the first token. */
-	if (!(hdr_inst - cmd_flow.tokens))
+	if (!(hdr_inst - tokens))
 		cmd_flow_context_init(ctx);
 	/* Return NULL when no more tokens are expected. */
 	if (!ctx->next_num && ctx->curr) {
@@ -14893,21 +15940,6 @@ cmd_flow_tok(cmdline_parse_token_hdr_t **hdr,
 	*hdr = &cmd_flow_token_hdr;
 }
 
-/** Token generator and output processing callback (cmdline API). */
-static void
-cmd_flow_cb(void *arg0, struct cmdline *cl, void *arg2)
-{
-	if (cl == NULL)
-		cmd_flow_tok(arg0, arg2);
-	else {
-		struct buffer *out = arg0;
-
-		out->command = parser_public_command((enum index)out->command);
-		cmd_flow_parsed(out);
-	}
-}
-
-/** Populate help strings for current set command token (cmdline API). */
 static int
 cmd_set_raw_get_help(cmdline_parse_token_hdr_t *hdr, char *dst,
 		     unsigned int size)
@@ -14920,10 +15952,12 @@ cmd_set_raw_get_help(cmdline_parse_token_hdr_t *hdr, char *dst,
 		return -1;
 	/* Set token type and update global help with details. */
 	snprintf(dst, size, "%s", (token->type ? token->type : "TOKEN"));
-	if (token->help)
-		cmd_set_raw.help_str = token->help;
-	else
-		cmd_set_raw.help_str = token->name;
+	if (cmd_set_raw_inst) {
+		if (token->help)
+			cmd_set_raw_inst->help_str = token->help;
+		else
+			cmd_set_raw_inst->help_str = token->name;
+	}
 	return 0;
 }
 
@@ -14944,9 +15978,15 @@ cmd_set_raw_tok(cmdline_parse_token_hdr_t **hdr,
 		cmdline_parse_token_hdr_t **hdr_inst)
 {
 	struct context *ctx = parser_cmd_context();
+	cmdline_parse_token_hdr_t **tokens;
 
+	tokens = cmd_set_raw_inst ? cmd_set_raw_inst->tokens : NULL;
+	if (!tokens) {
+		*hdr = NULL;
+		return;
+	}
 	/* Always reinitialize context before requesting the first token. */
-	if (!(hdr_inst - cmd_set_raw.tokens)) {
+	if (!(hdr_inst - tokens)) {
 		cmd_flow_context_init(ctx);
 		ctx->curr = START_SET;
 	}
@@ -14970,136 +16010,51 @@ cmd_set_raw_tok(cmdline_parse_token_hdr_t **hdr,
 	*hdr = &cmd_set_raw_token_hdr;
 }
 
-/** Token generator and output processing callback (cmdline API). */
-static void
-cmd_set_raw_cb(void *arg0, struct cmdline *cl, void *arg2)
+void
+rte_flow_parser_cmdline_register(cmdline_parse_inst_t *flow,
+				 cmdline_parse_inst_t *set_raw)
 {
-	if (cl == NULL)
-		cmd_set_raw_tok(arg0, arg2);
-	else {
-		struct buffer *out = arg0;
-
-		out->command = parser_public_command((enum index)out->command);
-		cmd_set_raw_parsed(out);
-	}
+	cmd_flow_inst = flow;
+	cmd_set_raw_inst = set_raw;
 }
 
-/* *** display raw_encap/raw_decap buf */
-struct cmd_show_set_raw_result {
-	cmdline_fixed_string_t cmd_show;
-	cmdline_fixed_string_t cmd_what;
-	cmdline_fixed_string_t cmd_all;
-	uint16_t cmd_index;
-};
-
-static void
-cmd_show_set_raw_parsed(void *parsed_result, struct cmdline *cl, void *data)
+void
+rte_flow_parser_cmd_flow_tok(cmdline_parse_token_hdr_t **hdr,
+			     cmdline_parse_token_hdr_t **hdr_inst)
 {
-	struct cmd_show_set_raw_result *res = parsed_result;
-	uint16_t index = res->cmd_index;
-	const uint8_t *raw_data = NULL;
-	size_t raw_size = 0;
-	char title[16] = { 0 };
-	int all = 0;
+	cmd_flow_tok(hdr, hdr_inst);
+}
 
-	RTE_SET_USED(cl);
-	RTE_SET_USED(data);
-	if (!strcmp(res->cmd_all, "all")) {
-		all = 1;
-		index = 0;
-	} else if (index >= RAW_ENCAP_CONFS_MAX_NUM) {
-		fprintf(stderr, "index should be 0-%u\n",
-			RAW_ENCAP_CONFS_MAX_NUM - 1);
+void
+rte_flow_parser_cmd_set_raw_tok(cmdline_parse_token_hdr_t **hdr,
+				cmdline_parse_token_hdr_t **hdr_inst)
+{
+	cmd_set_raw_tok(hdr, hdr_inst);
+}
+
+void
+rte_flow_parser_cmd_flow_dispatch(struct rte_flow_parser_output *out)
+{
+	if (!out)
 		return;
-	}
-	do {
-		if (!strcmp(res->cmd_what, "raw_encap")) {
-			const struct rte_flow_action_raw_encap *conf =
-				parser_raw_encap_conf_get(index);
-
-			if (!conf || !conf->data || !conf->size) {
-				fprintf(stderr,
-					"raw_encap %u not configured\n",
-					index);
-				goto next;
-			}
-			raw_data = conf->data;
-			raw_size = conf->size;
-		} else {
-			const struct rte_flow_action_raw_decap *conf =
-				parser_raw_decap_conf_get(index);
-
-			if (!conf || !conf->data || !conf->size) {
-				fprintf(stderr,
-					"raw_decap %u not configured\n",
-					index);
-				goto next;
-			}
-			raw_data = conf->data;
-			raw_size = conf->size;
-		}
-		snprintf(title, sizeof(title), "\nindex: %u", index);
-		rte_hexdump(stdout, title, raw_data, raw_size);
-next:
-		raw_data = NULL;
-		raw_size = 0;
-	} while (all && ++index < RAW_ENCAP_CONFS_MAX_NUM);
+	out->command = parser_public_command(buffer_cmd((const struct buffer *)out));
+	cmd_flow_parsed((struct buffer *)out);
 }
 
-static cmdline_parse_token_string_t cmd_show_set_raw_cmd_show =
-	TOKEN_STRING_INITIALIZER(struct cmd_show_set_raw_result,
-			cmd_show, "show");
-static cmdline_parse_token_string_t cmd_show_set_raw_cmd_what =
-	TOKEN_STRING_INITIALIZER(struct cmd_show_set_raw_result,
-			cmd_what, "raw_encap#raw_decap");
-static cmdline_parse_token_num_t cmd_show_set_raw_cmd_index =
-	TOKEN_NUM_INITIALIZER(struct cmd_show_set_raw_result,
-			cmd_index, RTE_UINT16);
-static cmdline_parse_token_string_t cmd_show_set_raw_cmd_all =
-	TOKEN_STRING_INITIALIZER(struct cmd_show_set_raw_result,
-			cmd_all, "all");
+void
+rte_flow_parser_cmd_set_raw_dispatch(struct rte_flow_parser_output *out)
+{
+	if (!out)
+		return;
+	out->command = parser_public_command(buffer_cmd((const struct buffer *)out));
+	cmd_set_raw_parsed((struct buffer *)out);
+}
 
-cmdline_parse_inst_t cmd_flow = {
-	.f = cmd_flow_cb,
-	.data = NULL, /**< Unused. */
-	.help_str = NULL, /**< Updated by cmd_flow_get_help(). */
-	.tokens = {
-		NULL,
-	}, /**< Tokens are returned by cmd_flow_tok(). */
-};
-
-cmdline_parse_inst_t cmd_set_raw = {
-	.f = cmd_set_raw_cb,
-	.data = NULL, /**< Unused. */
-	.help_str = NULL, /**< Updated by cmd_set_raw_get_help(). */
-	.tokens = {
-		NULL,
-	}, /**< Tokens are returned by cmd_set_raw_tok(). */
-};
-
-cmdline_parse_inst_t cmd_show_set_raw = {
-	.f = cmd_show_set_raw_parsed,
-	.data = NULL,
-	.help_str = "show <raw_encap|raw_decap> <index>",
-	.tokens = {
-		(void *)&cmd_show_set_raw_cmd_show,
-		(void *)&cmd_show_set_raw_cmd_what,
-		(void *)&cmd_show_set_raw_cmd_index,
-		NULL,
-	},
-};
-
-cmdline_parse_inst_t cmd_show_set_raw_all = {
-	.f = cmd_show_set_raw_parsed,
-	.data = NULL,
-	.help_str = "show <raw_encap|raw_decap> all",
-	.tokens = {
-		(void *)&cmd_show_set_raw_cmd_show,
-		(void *)&cmd_show_set_raw_cmd_what,
-		(void *)&cmd_show_set_raw_cmd_all,
-		NULL,
-	},
-};
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmdline_register, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_flow_tok, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_set_raw_tok, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_flow_dispatch, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_set_raw_dispatch, 26.0);
 
 struct rte_flow_parser *
 rte_flow_parser_create(const struct rte_flow_parser_ops *ops, void *userdata)
@@ -15167,7 +16122,7 @@ rte_flow_parser_parse(struct rte_flow_parser *parser, const char *src,
 		return ret;
 	if (*pos)
 		return -EINVAL;
-	result->command = parser_public_command(((const struct buffer *)result)->command);
+	result->command = parser_public_command(buffer_cmd((const struct buffer *)result));
 	return 0;
 }
 

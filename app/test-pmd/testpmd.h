@@ -726,14 +726,24 @@ extern struct gso_status gso_ports[RTE_MAX_ETHPORTS];
 extern uint16_t gso_max_segment_size;
 #endif /* RTE_LIB_GSO */
 
-extern struct rte_flow_parser_vxlan_encap_conf vxlan_encap_conf;
-extern struct rte_flow_parser_nvgre_encap_conf nvgre_encap_conf;
-extern struct rte_flow_parser_l2_encap_conf l2_encap_conf;
-extern struct rte_flow_parser_l2_decap_conf l2_decap_conf;
-extern struct rte_flow_parser_mplsogre_encap_conf mplsogre_encap_conf;
-extern struct rte_flow_parser_mplsogre_decap_conf mplsogre_decap_conf;
-extern struct rte_flow_parser_mplsoudp_encap_conf mplsoudp_encap_conf;
-extern struct rte_flow_parser_mplsoudp_decap_conf mplsoudp_decap_conf;
+struct rte_flow_parser_ctx *testpmd_parser_ctx_get(void);
+
+#define vxlan_encap_conf \
+	(*rte_flow_parser_ctx_vxlan_encap_conf(testpmd_parser_ctx_get()))
+#define nvgre_encap_conf \
+	(*rte_flow_parser_ctx_nvgre_encap_conf(testpmd_parser_ctx_get()))
+#define l2_encap_conf \
+	(*rte_flow_parser_ctx_l2_encap_conf(testpmd_parser_ctx_get()))
+#define l2_decap_conf \
+	(*rte_flow_parser_ctx_l2_decap_conf(testpmd_parser_ctx_get()))
+#define mplsogre_encap_conf \
+	(*rte_flow_parser_ctx_mplsogre_encap_conf(testpmd_parser_ctx_get()))
+#define mplsogre_decap_conf \
+	(*rte_flow_parser_ctx_mplsogre_decap_conf(testpmd_parser_ctx_get()))
+#define mplsoudp_encap_conf \
+	(*rte_flow_parser_ctx_mplsoudp_encap_conf(testpmd_parser_ctx_get()))
+#define mplsoudp_decap_conf \
+	(*rte_flow_parser_ctx_mplsoudp_decap_conf(testpmd_parser_ctx_get()))
 
 extern enum rte_eth_rx_mq_mode rx_mq_mode;
 
