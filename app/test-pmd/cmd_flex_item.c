@@ -142,27 +142,27 @@ flex_link_item_parse(const char *src, struct rte_flow_item *item)
 	if (out->command != RTE_FLOW_PARSER_CMD_CREATE)
 		return -EINVAL;
 
-	if (!out->args.flow.pattern || out->args.flow.pattern_n == 0)
+	if (!out->args.vc.pattern || out->args.vc.pattern_n == 0)
 		return -EINVAL;
 
-	item->type = out->args.flow.pattern[0].type;
-	if (out->args.flow.pattern[0].spec) {
+	item->type = out->args.vc.pattern[0].type;
+	if (out->args.vc.pattern[0].spec) {
 		ptr = (void *)(uintptr_t)item->spec;
-		memcpy(ptr, out->args.flow.pattern[0].spec,
+		memcpy(ptr, out->args.vc.pattern[0].spec,
 		       FLEX_MAX_FLOW_PATTERN_LENGTH);
 	} else {
 		item->spec = NULL;
 	}
-	if (out->args.flow.pattern[0].mask) {
+	if (out->args.vc.pattern[0].mask) {
 		ptr = (void *)(uintptr_t)item->mask;
-		memcpy(ptr, out->args.flow.pattern[0].mask,
+		memcpy(ptr, out->args.vc.pattern[0].mask,
 		       FLEX_MAX_FLOW_PATTERN_LENGTH);
 	} else {
 		item->mask = NULL;
 	}
-	if (out->args.flow.pattern[0].last) {
+	if (out->args.vc.pattern[0].last) {
 		ptr = (void *)(uintptr_t)item->last;
-		memcpy(ptr, out->args.flow.pattern[0].last,
+		memcpy(ptr, out->args.vc.pattern[0].last,
 		       FLEX_MAX_FLOW_PATTERN_LENGTH);
 	} else {
 		item->last = NULL;

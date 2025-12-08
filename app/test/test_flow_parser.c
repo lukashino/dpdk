@@ -28,8 +28,8 @@ test_flow_parser_command_mapping(void)
 	if (ret != 0 ||
 	    out->command != RTE_FLOW_PARSER_CMD_CREATE ||
 	    out->port != 0 ||
-	    out->args.flow.pattern_n == 0 ||
-	    out->args.flow.actions_n == 0) {
+	    out->args.vc.pattern_n == 0 ||
+	    out->args.vc.actions_n == 0) {
 		rte_flow_parser_destroy(parser);
 		return TEST_FAILED;
 	}

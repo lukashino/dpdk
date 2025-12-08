@@ -971,25 +971,22 @@ enum rte_flow_parser_command_index {
 	RTE_FLOW_PARSER_CMD_ACTION_JUMP_TO_TABLE_INDEX_INDEX,
 };
 
-/**
- * Unified output buffer produced by the parser. Users must provide a buffer
- * of at least sizeof(struct rte_flow_parser_output) to rte_flow_parser_parse().
- */
+/** Parser output buffer layout expected by rte_flow_parser_parse(). */
 struct rte_flow_parser_output {
-	enum rte_flow_parser_command_index command;
-	uint16_t port;
-	uint16_t queue;
-	bool postpone;
+	enum rte_flow_parser_command_index command; /**< Flow command. */
+	uint16_t port; /**< Affected port ID. */
+	uint16_t queue; /** Async queue ID. */
+	bool postpone; /** Postpone async operation */
 	union {
 		struct {
 			struct rte_flow_port_attr port_attr;
 			uint32_t nb_queue;
 			struct rte_flow_queue_attr queue_attr;
-		} configure;
+		} configure; /**< Configuration arguments. */
 		struct {
 			uint32_t *template_id;
 			uint32_t template_id_n;
-		} templ_destroy;
+		} templ_destroy; /**< Template destroy arguments. */
 		struct {
 			uint32_t id;
 			struct rte_flow_template_table_attr attr;
@@ -997,19 +994,19 @@ struct rte_flow_parser_output {
 			uint32_t pat_templ_id_n;
 			uint32_t *act_templ_id;
 			uint32_t act_templ_id_n;
-		} table;
+		} table; /**< Table arguments. */
 		struct {
 			uint32_t *table_id;
 			uint32_t table_id_n;
-		} table_destroy;
+		} table_destroy; /**< Template destroy arguments. */
 		struct {
 			uint32_t *action_id;
 			uint32_t action_id_n;
-		} ia_destroy;
+		} ia_destroy; /**< Indirect action destroy arguments. */
 		struct {
 			uint32_t action_id;
 			enum rte_flow_query_update_mode qu_mode;
-		} ia;
+		} ia; /* Indirect action query arguments */
 		struct {
 			uint32_t table_id;
 			uint32_t pat_templ_id;
@@ -1026,42 +1023,42 @@ struct rte_flow_parser_output {
 			uint8_t *data;
 			enum rte_flow_encap_hash_field field;
 			uint8_t encap_hash;
-		} flow;
+		} vc; /**< Validate/create arguments. */
 		struct {
 			uint64_t *rule;
 			uint64_t rule_n;
 			bool is_user_id;
-		} destroy;
+		} destroy; /**< Destroy arguments. */
 		struct {
 			char file[128];
 			bool mode;
 			uint64_t rule;
 			bool is_user_id;
-		} dump;
+		} dump; /**< Dump arguments. */
 		struct {
 			uint64_t rule;
 			struct rte_flow_action action;
 			bool is_user_id;
-		} query;
+		} query; /**< Query arguments. */
 		struct {
 			uint32_t *group;
 			uint32_t group_n;
-		} list;
+		} list; /**< List arguments. */
 		struct {
 			int set;
-		} isolate;
+		} isolate; /**< Isolated mode arguments. */
 		struct {
 			int destroy;
-		} aged;
+		} aged; /**< Aged arguments. */
 		struct {
 			uint32_t policy_id;
-		} policy;
+		} policy;/**< Policy arguments. */
 		struct {
 			uint16_t token;
 			uintptr_t uintptr;
 			char filename[128];
-		} flex;
-	} args;
+		} flex; /**< Flex arguments*/
+	} args; /**< Command arguments. */
 };
 
 /**

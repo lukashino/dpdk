@@ -2535,111 +2535,6 @@ parser_cmd_context(void)
 		.size = sizeof(s), \
 	})
 
-/** Parser output buffer layout expected by cmd_flow_parsed(). */
-struct buffer {
-	enum rte_flow_parser_command_index command; /**< Flow command. */
-	rte_port_id_t port; /**< Affected port ID. */
-	rte_queue_id_t queue; /** Async queue ID. */
-	bool postpone; /** Postpone async operation */
-	union {
-		struct {
-			struct rte_flow_port_attr port_attr;
-			uint32_t nb_queue;
-			struct rte_flow_queue_attr queue_attr;
-		} configure; /**< Configuration arguments. */
-		struct {
-			uint32_t *template_id;
-			uint32_t template_id_n;
-		} templ_destroy; /**< Template destroy arguments. */
-		struct {
-			uint32_t id;
-			struct rte_flow_template_table_attr attr;
-			uint32_t *pat_templ_id;
-			uint32_t pat_templ_id_n;
-			uint32_t *act_templ_id;
-			uint32_t act_templ_id_n;
-		} table; /**< Table arguments. */
-		struct {
-			uint32_t *table_id;
-			uint32_t table_id_n;
-		} table_destroy; /**< Template destroy arguments. */
-		struct {
-			uint32_t *action_id;
-			uint32_t action_id_n;
-		} ia_destroy; /**< Indirect action destroy arguments. */
-		struct {
-			uint32_t action_id;
-			enum rte_flow_query_update_mode qu_mode;
-		} ia; /* Indirect action query arguments */
-		struct {
-			uint32_t table_id;
-			uint32_t pat_templ_id;
-			uint32_t rule_id;
-			uint32_t act_templ_id;
-			struct rte_flow_attr attr;
-			struct rte_flow_parser_tunnel_ops tunnel_ops;
-			uintptr_t user_id;
-			struct rte_flow_item *pattern;
-			struct rte_flow_action *actions;
-			struct rte_flow_action *masks;
-			uint32_t pattern_n;
-			uint32_t actions_n;
-			uint8_t *data;
-			enum rte_flow_encap_hash_field field;
-			uint8_t encap_hash;
-		} vc; /**< Validate/create arguments. */
-		struct {
-			uint64_t *rule;
-			uint64_t rule_n;
-			bool is_user_id;
-		} destroy; /**< Destroy arguments. */
-		struct {
-			char file[128];
-			bool mode;
-			uint64_t rule;
-			bool is_user_id;
-		} dump; /**< Dump arguments. */
-		struct {
-			uint64_t rule;
-			struct rte_flow_action action;
-			bool is_user_id;
-		} query; /**< Query arguments. */
-		struct {
-			uint32_t *group;
-			uint32_t group_n;
-		} list; /**< List arguments. */
-		struct {
-			int set;
-		} isolate; /**< Isolated mode arguments. */
-		struct {
-			int destroy;
-		} aged; /**< Aged arguments. */
-		struct {
-			uint32_t policy_id;
-		} policy;/**< Policy arguments. */
-		struct {
-			uint16_t token;
-			uintptr_t uintptr;
-			char filename[128];
-		} flex; /**< Flex arguments*/
-	} args; /**< Command arguments. */
-};
-
-_Static_assert(sizeof(struct rte_flow_parser_output) == sizeof(struct buffer),
-	       "rte_flow_parser_output_mismatch");
-
-static inline enum rte_flow_parser_command_index
-buffer_cmd(const struct buffer *out)
-{
-	return (enum rte_flow_parser_command_index)out->command;
-}
-
-static inline void
-buffer_cmd_set(struct buffer *out, enum rte_flow_parser_command_index idx)
-{
-	out->command = (enum rte_flow_parser_command_index)idx;
-}
-
 /** Private data for pattern items. */
 struct parse_item_priv {
 	enum rte_flow_item_type type; /**< Item type. */
@@ -4632,7 +4527,7 @@ static const struct token token_list[] = {
 		.help = "get information about flow engine",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_END),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_configure,
 	},
 	/* Top-level command. */
@@ -4641,7 +4536,7 @@ static const struct token token_list[] = {
 		.help = "configure flow engine",
 		.next = NEXT(next_config_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_configure,
 	},
 	/* Configure arguments. */
@@ -4650,7 +4545,7 @@ static const struct token token_list[] = {
 		.help = "number of queues",
 		.next = NEXT(next_config_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.configure.nb_queue)),
 	},
 	[RTE_FLOW_PARSER_CMD_CONFIG_QUEUES_SIZE] = {
@@ -4658,7 +4553,7 @@ static const struct token token_list[] = {
 		.help = "number of elements in queues",
 		.next = NEXT(next_config_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.configure.queue_attr.size)),
 	},
 	[RTE_FLOW_PARSER_CMD_CONFIG_COUNTERS_NUMBER] = {
@@ -4666,7 +4561,7 @@ static const struct token token_list[] = {
 		.help = "number of counters",
 		.next = NEXT(next_config_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.configure.port_attr.nb_counters)),
 	},
 	[RTE_FLOW_PARSER_CMD_CONFIG_AGING_OBJECTS_NUMBER] = {
@@ -4674,7 +4569,7 @@ static const struct token token_list[] = {
 		.help = "number of aging objects",
 		.next = NEXT(next_config_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.configure.port_attr.nb_aging_objects)),
 	},
 	[RTE_FLOW_PARSER_CMD_CONFIG_QUOTAS_NUMBER] = {
@@ -4682,7 +4577,7 @@ static const struct token token_list[] = {
 		.help = "number of quotas",
 		.next = NEXT(next_config_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 				     args.configure.port_attr.nb_quotas)),
 	},
 	[RTE_FLOW_PARSER_CMD_CONFIG_METERS_NUMBER] = {
@@ -4690,7 +4585,7 @@ static const struct token token_list[] = {
 		.help = "number of meters",
 		.next = NEXT(next_config_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.configure.port_attr.nb_meters)),
 	},
 	[RTE_FLOW_PARSER_CMD_CONFIG_CONN_TRACK_NUMBER] = {
@@ -4698,7 +4593,7 @@ static const struct token token_list[] = {
 		.help = "number of connection trackings",
 		.next = NEXT(next_config_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.configure.port_attr.nb_conn_tracks)),
 	},
 	[RTE_FLOW_PARSER_CMD_CONFIG_FLAGS] = {
@@ -4706,7 +4601,7 @@ static const struct token token_list[] = {
 		.help = "configuration flags",
 		.next = NEXT(next_config_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.configure.port_attr.flags)),
 	},
 	[RTE_FLOW_PARSER_CMD_CONFIG_HOST_PORT] = {
@@ -4714,7 +4609,7 @@ static const struct token token_list[] = {
 		.help = "host port for shared objects",
 		.next = NEXT(next_config_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.configure.port_attr.host_port_id)),
 	},
 	/* Top-level command. */
@@ -4723,7 +4618,7 @@ static const struct token token_list[] = {
 		.type = "{command} {port_id} [{arg} [...]]",
 		.help = "manage pattern templates",
 		.next = NEXT(next_pt_subcmd, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_template,
 	},
 	/* Sub-level commands. */
@@ -4737,7 +4632,7 @@ static const struct token token_list[] = {
 		.name = "destroy",
 		.help = "destroy pattern template",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_DESTROY_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_template_destroy,
 	},
 	/* Pattern template arguments. */
@@ -4746,14 +4641,14 @@ static const struct token token_list[] = {
 		.help = "specify a pattern template id to create",
 		.next = NEXT(next_pt_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PATTERN_TEMPLATE_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.vc.pat_templ_id)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.vc.pat_templ_id)),
 	},
 	[RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_DESTROY_ID] = {
 		.name = "pattern_template",
 		.help = "specify a pattern template id to destroy",
 		.next = NEXT(next_pt_destroy_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PATTERN_TEMPLATE_ID)),
-		.args = ARGS(ARGS_ENTRY_PTR(struct buffer,
+		.args = ARGS(ARGS_ENTRY_PTR(struct rte_flow_parser_output,
 					    args.templ_destroy.template_id)),
 		.call = parse_template_destroy,
 	},
@@ -4762,7 +4657,7 @@ static const struct token token_list[] = {
 		.help = "is matching relaxed",
 		.next = NEXT(next_pt_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN)),
-		.args = ARGS(ARGS_ENTRY_BF(struct buffer,
+		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_parser_output,
 			     args.vc.attr.reserved, 1)),
 	},
 	[RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_INGRESS] = {
@@ -4794,7 +4689,7 @@ static const struct token token_list[] = {
 		.type = "{command} {port_id} [{arg} [...]]",
 		.help = "manage actions templates",
 		.next = NEXT(next_at_subcmd, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_template,
 	},
 	/* Sub-level commands. */
@@ -4808,7 +4703,7 @@ static const struct token token_list[] = {
 		.name = "destroy",
 		.help = "destroy actions template",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_DESTROY_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_template_destroy,
 	},
 	/* Actions template arguments. */
@@ -4818,14 +4713,14 @@ static const struct token token_list[] = {
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_MASK),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_SPEC),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_ACTIONS_TEMPLATE_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.vc.act_templ_id)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.vc.act_templ_id)),
 	},
 	[RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_DESTROY_ID] = {
 		.name = "actions_template",
 		.help = "specify an actions template id to destroy",
 		.next = NEXT(next_at_destroy_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_ACTIONS_TEMPLATE_ID)),
-		.args = ARGS(ARGS_ENTRY_PTR(struct buffer,
+		.args = ARGS(ARGS_ENTRY_PTR(struct rte_flow_parser_output,
 					    args.templ_destroy.template_id)),
 		.call = parse_template_destroy,
 	},
@@ -4865,7 +4760,7 @@ static const struct token token_list[] = {
 		.type = "{command} {port_id} [{arg} [...]]",
 		.help = "manage template tables",
 		.next = NEXT(next_table_subcmd, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_table,
 	},
 	/* Sub-level commands. */
@@ -4879,7 +4774,7 @@ static const struct token token_list[] = {
 		.name = "destroy",
 		.help = "destroy template table",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_TABLE_DESTROY_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_table_destroy,
 	},
 	[RTE_FLOW_PARSER_CMD_TABLE_RESIZE] = {
@@ -4892,7 +4787,7 @@ static const struct token token_list[] = {
 		.name = "resize_complete",
 		.help = "complete table resize",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_TABLE_DESTROY_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_table_destroy,
 	},
 	/* Table  arguments. */
@@ -4901,14 +4796,14 @@ static const struct token token_list[] = {
 		.help = "specify table id to create",
 		.next = NEXT(next_table_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_TABLE_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.table.id)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.table.id)),
 	},
 	[RTE_FLOW_PARSER_CMD_TABLE_DESTROY_ID] = {
 		.name = "table",
 		.help = "table id",
 		.next = NEXT(next_table_destroy_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_TABLE_ID)),
-		.args = ARGS(ARGS_ENTRY_PTR(struct buffer,
+		.args = ARGS(ARGS_ENTRY_PTR(struct rte_flow_parser_output,
 					    args.table_destroy.table_id)),
 		.call = parse_table_destroy,
 	},
@@ -4917,14 +4812,14 @@ static const struct token token_list[] = {
 		.help = "table resize id",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_TABLE_RESIZE_RULES_NUMBER),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_TABLE_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.table.id)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.table.id)),
 		.call = parse_table
 	},
 	[RTE_FLOW_PARSER_CMD_TABLE_RESIZE_RULES_NUMBER] = {
 		.name = "table_resize_rules_num",
 		.help = "table resize rules number",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_END), NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.table.attr.nb_flows)),
 		.call = parse_table
 	},
@@ -4933,7 +4828,7 @@ static const struct token token_list[] = {
 		.help = "specify insertion type",
 		.next = NEXT(next_table_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_TABLE_INSERTION_TYPE_NAME)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.table.attr.insertion_type)),
 	},
 	[RTE_FLOW_PARSER_CMD_TABLE_INSERTION_TYPE_NAME] = {
@@ -4947,7 +4842,7 @@ static const struct token token_list[] = {
 		.help = "specify hash calculation function",
 		.next = NEXT(next_table_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_TABLE_HASH_FUNC_NAME)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.table.attr.hash_func)),
 	},
 	[RTE_FLOW_PARSER_CMD_TABLE_HASH_FUNC_NAME] = {
@@ -4960,14 +4855,14 @@ static const struct token token_list[] = {
 		.name = "group",
 		.help = "specify a group",
 		.next = NEXT(next_table_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_GROUP_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.table.attr.flow_attr.group)),
 	},
 	[RTE_FLOW_PARSER_CMD_TABLE_PRIORITY] = {
 		.name = "priority",
 		.help = "specify a priority level",
 		.next = NEXT(next_table_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PRIORITY_LEVEL)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.table.attr.flow_attr.priority)),
 	},
 	[RTE_FLOW_PARSER_CMD_TABLE_EGRESS] = {
@@ -5011,7 +4906,7 @@ static const struct token token_list[] = {
 		.help = "number of rules in table",
 		.next = NEXT(next_table_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.table.attr.nb_flows)),
 		.call = parse_table,
 	},
@@ -5020,7 +4915,7 @@ static const struct token token_list[] = {
 		.help = "specify pattern template id",
 		.next = NEXT(next_table_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PATTERN_TEMPLATE_ID)),
-		.args = ARGS(ARGS_ENTRY_PTR(struct buffer,
+		.args = ARGS(ARGS_ENTRY_PTR(struct rte_flow_parser_output,
 					    args.table.pat_templ_id)),
 		.call = parse_table,
 	},
@@ -5029,7 +4924,7 @@ static const struct token token_list[] = {
 		.help = "specify actions template id",
 		.next = NEXT(next_table_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_ACTIONS_TEMPLATE_ID)),
-		.args = ARGS(ARGS_ENTRY_PTR(struct buffer,
+		.args = ARGS(ARGS_ENTRY_PTR(struct rte_flow_parser_output,
 					    args.table.act_templ_id)),
 		.call = parse_table,
 	},
@@ -5038,7 +4933,7 @@ static const struct token token_list[] = {
 		.name = "group",
 		.help = "manage flow groups",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_GROUP_ID), NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_group,
 	},
 	/* Sub-level commands. */
@@ -5053,7 +4948,7 @@ static const struct token token_list[] = {
 		.name = "group_id",
 		.help = "group id",
 		.next = NEXT(next_group_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_GROUP_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.vc.attr.group)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.vc.attr.group)),
 	},
 	[RTE_FLOW_PARSER_CMD_GROUP_INGRESS] = {
 		.name = "ingress",
@@ -5078,7 +4973,7 @@ static const struct token token_list[] = {
 		.name = "queue",
 		.help = "queue a flow rule operation",
 		.next = NEXT(next_queue_subcmd, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_qo,
 	},
 	/* Sub-level commands. */
@@ -5087,7 +4982,7 @@ static const struct token token_list[] = {
 		.help = "create a flow rule",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_QUEUE_TEMPLATE_TABLE),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_QUEUE_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, queue)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, queue)),
 		.call = parse_qo,
 	},
 	[RTE_FLOW_PARSER_CMD_QUEUE_DESTROY] = {
@@ -5095,7 +4990,7 @@ static const struct token token_list[] = {
 		.help = "destroy a flow rule",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_QUEUE_DESTROY_POSTPONE),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_QUEUE_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, queue)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, queue)),
 		.call = parse_qo_destroy,
 	},
 	[RTE_FLOW_PARSER_CMD_QUEUE_FLOW_UPDATE_RESIZED] = {
@@ -5103,7 +4998,7 @@ static const struct token token_list[] = {
 		.help = "update a flow after table resize",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_QUEUE_DESTROY_ID),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_QUEUE_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, queue)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, queue)),
 		.call = parse_qo_destroy,
 	},
 	[RTE_FLOW_PARSER_CMD_QUEUE_UPDATE] = {
@@ -5111,21 +5006,21 @@ static const struct token token_list[] = {
 		.help = "update a flow rule",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_QUEUE_UPDATE_ID),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_QUEUE_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, queue)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, queue)),
 		.call = parse_qo,
 	},
 	[RTE_FLOW_PARSER_CMD_QUEUE_AGED] = {
 		.name = "aged",
 		.help = "list and destroy aged flows",
 		.next = NEXT(next_aged_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_QUEUE_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, queue)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, queue)),
 		.call = parse_aged,
 	},
 	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION] = {
 		.name = "indirect_action",
 		.help = "queue indirect actions",
 		.next = NEXT(next_qia_subcmd, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_QUEUE_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, queue)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, queue)),
 		.call = parse_qia,
 	},
 	/* Queue  arguments. */
@@ -5134,7 +5029,7 @@ static const struct token token_list[] = {
 		.help = "specify table id",
 		.next = NEXT(next_async_insert_subcmd,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_TABLE_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.vc.table_id)),
 		.call = parse_qo,
 	},
@@ -5143,7 +5038,7 @@ static const struct token token_list[] = {
 		.help = "specify pattern template index",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_QUEUE_ACTIONS_TEMPLATE),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.vc.pat_templ_id)),
 		.call = parse_qo,
 	},
@@ -5152,7 +5047,7 @@ static const struct token token_list[] = {
 		.help = "specify actions template index",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_QUEUE_CREATE_POSTPONE),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.vc.act_templ_id)),
 		.call = parse_qo,
 	},
@@ -5161,7 +5056,7 @@ static const struct token token_list[] = {
 		.help = "specify flow rule index",
 		.next = NEXT(next_async_pattern_subcmd,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.vc.rule_id)),
 		.call = parse_qo,
 	},
@@ -5170,7 +5065,7 @@ static const struct token token_list[] = {
 		.help = "postpone create operation",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_PATTERN),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, postpone)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, postpone)),
 		.call = parse_qo,
 	},
 	[RTE_FLOW_PARSER_CMD_QUEUE_DESTROY_POSTPONE] = {
@@ -5178,7 +5073,7 @@ static const struct token token_list[] = {
 		.help = "postpone destroy operation",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_QUEUE_DESTROY_ID),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, postpone)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, postpone)),
 		.call = parse_qo_destroy,
 	},
 	[RTE_FLOW_PARSER_CMD_QUEUE_DESTROY_ID] = {
@@ -5186,7 +5081,7 @@ static const struct token token_list[] = {
 		.help = "specify rule id to destroy",
 		.next = NEXT(next_queue_destroy_attr,
 			NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
-		.args = ARGS(ARGS_ENTRY_PTR(struct buffer,
+		.args = ARGS(ARGS_ENTRY_PTR(struct rte_flow_parser_output,
 					    args.destroy.rule)),
 		.call = parse_qo_destroy,
 	},
@@ -5195,7 +5090,7 @@ static const struct token token_list[] = {
 		.help = "specify rule id to update",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_QUEUE_ACTIONS_TEMPLATE),
 			NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 				     args.vc.rule_id)),
 		.call = parse_qo,
 	},
@@ -5211,7 +5106,7 @@ static const struct token token_list[] = {
 		.help = "update indirect action",
 		.next = NEXT(next_qia_update_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.vc.attr.group)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.vc.attr.group)),
 		.call = parse_qia,
 	},
 	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_DESTROY] = {
@@ -5225,7 +5120,7 @@ static const struct token token_list[] = {
 		.help = "query indirect action",
 		.next = NEXT(next_qia_query_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.ia.action_id)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.ia.action_id)),
 		.call = parse_qia,
 	},
 	/* Indirect action destroy arguments. */
@@ -5234,14 +5129,14 @@ static const struct token token_list[] = {
 		.help = "postpone destroy operation",
 		.next = NEXT(next_qia_destroy_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, postpone)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, postpone)),
 	},
 	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_DESTROY_ID] = {
 		.name = "action_id",
 		.help = "specify a indirect action id to destroy",
 		.next = NEXT(next_qia_destroy_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
-		.args = ARGS(ARGS_ENTRY_PTR(struct buffer,
+		.args = ARGS(ARGS_ENTRY_PTR(struct rte_flow_parser_output,
 					    args.ia_destroy.action_id)),
 		.call = parse_qia_destroy,
 	},
@@ -5249,7 +5144,7 @@ static const struct token token_list[] = {
 		.name = "query_update",
 		.help = "indirect query [and|or] update action",
 		.next = NEXT(next_qia_qu_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.ia.action_id)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.ia.action_id)),
 		.call = parse_qia
 	},
 	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QU_MODE] = {
@@ -5257,7 +5152,7 @@ static const struct token token_list[] = {
 		.help = "indirect query [and|or] update action",
 		.next = NEXT(next_qia_qu_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QU_MODE_NAME)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.ia.qu_mode)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.ia.qu_mode)),
 		.call = parse_qia
 	},
 	/* Indirect action update arguments. */
@@ -5266,7 +5161,7 @@ static const struct token token_list[] = {
 		.help = "postpone update operation",
 		.next = NEXT(next_qia_update_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, postpone)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, postpone)),
 	},
 	/* Indirect action update arguments. */
 	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QUERY_POSTPONE] = {
@@ -5274,7 +5169,7 @@ static const struct token token_list[] = {
 		.help = "postpone query operation",
 		.next = NEXT(next_qia_query_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, postpone)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, postpone)),
 	},
 	/* Indirect action create arguments. */
 	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_CREATE_ID] = {
@@ -5282,7 +5177,7 @@ static const struct token token_list[] = {
 		.help = "specify a indirect action id to create",
 		.next = NEXT(next_qia_create_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.vc.attr.group)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.vc.attr.group)),
 	},
 	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_INGRESS] = {
 		.name = "ingress",
@@ -5307,7 +5202,7 @@ static const struct token token_list[] = {
 		.help = "postpone create operation",
 		.next = NEXT(next_qia_create_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, postpone)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, postpone)),
 	},
 	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_SPEC] = {
 		.name = "action",
@@ -5325,7 +5220,7 @@ static const struct token token_list[] = {
 		.name = "push",
 		.help = "push enqueued operations",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_PUSH_QUEUE), NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_push,
 	},
 	/* Sub-level commands. */
@@ -5333,14 +5228,14 @@ static const struct token token_list[] = {
 		.name = "queue",
 		.help = "specify queue id",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_END), NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_QUEUE_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, queue)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, queue)),
 	},
 	/* Top-level command. */
 	[RTE_FLOW_PARSER_CMD_PULL] = {
 		.name = "pull",
 		.help = "pull flow operations results",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_PULL_QUEUE), NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_pull,
 	},
 	/* Sub-level commands. */
@@ -5348,14 +5243,14 @@ static const struct token token_list[] = {
 		.name = "queue",
 		.help = "specify queue id",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_END), NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_QUEUE_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, queue)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, queue)),
 	},
 	/* Top-level command. */
 	[RTE_FLOW_PARSER_CMD_HASH] = {
 		.name = "hash",
 		.help = "calculate hash for a given pattern in a given template table",
 		.next = NEXT(next_hash_subcmd, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_hash,
 	},
 	/* Sub-level commands. */
@@ -5364,7 +5259,7 @@ static const struct token token_list[] = {
 		.help = "specify table id",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_HASH_CALC_PATTERN_INDEX),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_TABLE_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.vc.table_id)),
 		.call = parse_hash,
 	},
@@ -5379,7 +5274,7 @@ static const struct token token_list[] = {
 		.help = "specify pattern template id",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_PATTERN),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
-		.args = ARGS(ARGS_ENTRY(struct buffer,
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output,
 					args.vc.pat_templ_id)),
 		.call = parse_hash,
 	},
@@ -5401,7 +5296,7 @@ static const struct token token_list[] = {
 		.type = "{command} {port_id} [{arg} [...]]",
 		.help = "manage indirect actions",
 		.next = NEXT(next_ia_subcmd, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_ia,
 	},
 	/* Sub-level commands. */
@@ -5416,14 +5311,14 @@ static const struct token token_list[] = {
 		.help = "update indirect action",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_SPEC),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.vc.attr.group)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.vc.attr.group)),
 		.call = parse_ia,
 	},
 	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_DESTROY] = {
 		.name = "destroy",
 		.help = "destroy indirect action",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_DESTROY_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_ia_destroy,
 	},
 	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QUERY] = {
@@ -5431,14 +5326,14 @@ static const struct token token_list[] = {
 		.help = "query indirect action",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_END),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.ia.action_id)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.ia.action_id)),
 		.call = parse_ia,
 	},
 	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QUERY_UPDATE] = {
 		.name = "query_update",
 		.help = "query [and|or] update",
 		.next = NEXT(next_ia_qu_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.ia.action_id)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.ia.action_id)),
 		.call = parse_ia
 	},
 	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QU_MODE] = {
@@ -5446,7 +5341,7 @@ static const struct token token_list[] = {
 		.help = "query_update mode",
 		.next = NEXT(next_ia_qu_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QU_MODE_NAME)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.ia.qu_mode)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.ia.qu_mode)),
 		.call = parse_ia,
 	},
 	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QU_MODE_NAME] = {
@@ -5459,14 +5354,14 @@ static const struct token token_list[] = {
 		.name = "validate",
 		.help = "check whether a flow rule can be created",
 		.next = NEXT(next_vc_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_vc,
 	},
 	[RTE_FLOW_PARSER_CMD_CREATE] = {
 		.name = "create",
 		.help = "create a flow rule",
 		.next = NEXT(next_vc_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_vc,
 	},
 	[RTE_FLOW_PARSER_CMD_DESTROY] = {
@@ -5474,7 +5369,7 @@ static const struct token token_list[] = {
 		.help = "destroy specific flow rules",
 		.next = NEXT(next_destroy_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_destroy,
 	},
 	[RTE_FLOW_PARSER_CMD_UPDATE] = {
@@ -5484,22 +5379,22 @@ static const struct token token_list[] = {
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTIONS),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_RULE_ID),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.vc.rule_id),
-			     ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.vc.rule_id),
+			     ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_vc,
 	},
 	[RTE_FLOW_PARSER_CMD_FLUSH] = {
 		.name = "flush",
 		.help = "destroy all flow rules",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_flush,
 	},
 	[RTE_FLOW_PARSER_CMD_DUMP] = {
 		.name = "dump",
 		.help = "dump single/all flow rules to file",
 		.next = NEXT(next_dump_subcmd, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_dump,
 	},
 	[RTE_FLOW_PARSER_CMD_QUERY] = {
@@ -5508,23 +5403,23 @@ static const struct token token_list[] = {
 		.next = NEXT(next_query_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_QUERY_ACTION),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_RULE_ID),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.query.action.type),
-			     ARGS_ENTRY(struct buffer, args.query.rule),
-			     ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.query.action.type),
+			     ARGS_ENTRY(struct rte_flow_parser_output, args.query.rule),
+			     ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_query,
 	},
 	[RTE_FLOW_PARSER_CMD_LIST] = {
 		.name = "list",
 		.help = "list existing flow rules",
 		.next = NEXT(next_list_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_list,
 	},
 	[RTE_FLOW_PARSER_CMD_AGED] = {
 		.name = "aged",
 		.help = "list and destroy aged flows",
 		.next = NEXT(next_aged_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_aged,
 	},
 	[RTE_FLOW_PARSER_CMD_ISOLATE] = {
@@ -5532,8 +5427,8 @@ static const struct token token_list[] = {
 		.help = "restrict ingress traffic to the defined flow rules",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.isolate.set),
-			     ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.isolate.set),
+			     ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_isolate,
 	},
 	[RTE_FLOW_PARSER_CMD_FLEX] = {
@@ -5545,9 +5440,9 @@ static const struct token token_list[] = {
 	[RTE_FLOW_PARSER_CMD_FLEX_ITEM_CREATE] = {
 		.name = "create",
 		.help = "flex item create",
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.flex.filename),
-			     ARGS_ENTRY(struct buffer, args.flex.token),
-			     ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.flex.filename),
+			     ARGS_ENTRY(struct rte_flow_parser_output, args.flex.token),
+			     ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_FILE_PATH),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_FLEX_TOKEN),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
@@ -5556,8 +5451,8 @@ static const struct token token_list[] = {
 	[RTE_FLOW_PARSER_CMD_FLEX_ITEM_DESTROY] = {
 		.name = "destroy",
 		.help = "flex item destroy",
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.flex.token),
-			     ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.flex.token),
+			     ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_FLEX_TOKEN),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.call = parse_flex
@@ -5575,7 +5470,7 @@ static const struct token token_list[] = {
 		.help = "create new tunnel object",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_TUNNEL_CREATE_TYPE),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_tunnel,
 	},
 	[RTE_FLOW_PARSER_CMD_TUNNEL_CREATE_TYPE] = {
@@ -5590,7 +5485,7 @@ static const struct token token_list[] = {
 		.help = "destroy tunnel",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_TUNNEL_DESTROY_ID),
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_tunnel,
 	},
 	[RTE_FLOW_PARSER_CMD_TUNNEL_DESTROY_ID] = {
@@ -5604,7 +5499,7 @@ static const struct token token_list[] = {
 		.name = "list",
 		.help = "list existing tunnels",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_tunnel,
 	},
 	/* Destroy arguments. */
@@ -5612,7 +5507,7 @@ static const struct token token_list[] = {
 		.name = "rule",
 		.help = "specify a rule identifier",
 		.next = NEXT(next_destroy_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_RULE_ID)),
-		.args = ARGS(ARGS_ENTRY_PTR(struct buffer, args.destroy.rule)),
+		.args = ARGS(ARGS_ENTRY_PTR(struct rte_flow_parser_output, args.destroy.rule)),
 		.call = parse_destroy,
 	},
 	[RTE_FLOW_PARSER_CMD_DESTROY_IS_USER_ID] = {
@@ -5626,15 +5521,15 @@ static const struct token token_list[] = {
 		.name = "all",
 		.help = "dump all",
 		.next = NEXT(next_dump_attr),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.dump.file)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.dump.file)),
 		.call = parse_dump,
 	},
 	[RTE_FLOW_PARSER_CMD_DUMP_ONE] = {
 		.name = "rule",
 		.help = "dump one rule",
 		.next = NEXT(next_dump_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_RULE_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.dump.file),
-				ARGS_ENTRY(struct buffer, args.dump.rule)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.dump.file),
+				ARGS_ENTRY(struct rte_flow_parser_output, args.dump.rule)),
 		.call = parse_dump,
 	},
 	[RTE_FLOW_PARSER_CMD_DUMP_IS_USER_ID] = {
@@ -5662,7 +5557,7 @@ static const struct token token_list[] = {
 		.name = "group",
 		.help = "specify a group",
 		.next = NEXT(next_list_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_GROUP_ID)),
-		.args = ARGS(ARGS_ENTRY_PTR(struct buffer, args.list.group)),
+		.args = ARGS(ARGS_ENTRY_PTR(struct rte_flow_parser_output, args.list.group)),
 		.call = parse_list,
 	},
 	[RTE_FLOW_PARSER_CMD_AGED_DESTROY] = {
@@ -5722,7 +5617,7 @@ static const struct token token_list[] = {
 		.name = "user_id",
 		.help = "specify a user id to create",
 		.next = NEXT(next_vc_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.vc.user_id)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.vc.user_id)),
 		.call = parse_vc,
 	},
 	[RTE_FLOW_PARSER_CMD_VC_IS_USER_ID] = {
@@ -9026,8 +8921,8 @@ static const struct token token_list[] = {
 		.help = "set raw encap data",
 		.next = NEXT(next_set_raw),
 		.args = ARGS(ARGS_ENTRY_ARB_BOUNDED
-				(offsetof(struct buffer, port),
-				 sizeof(((struct buffer *)0)->port),
+				(offsetof(struct rte_flow_parser_output, port),
+				 sizeof(((struct rte_flow_parser_output *)0)->port),
 				 0, RAW_ENCAP_CONFS_MAX_NUM - 1)),
 		.call = parse_set_raw_encap_decap,
 	},
@@ -9036,8 +8931,8 @@ static const struct token token_list[] = {
 		.help = "set raw decap data",
 		.next = NEXT(next_set_raw),
 		.args = ARGS(ARGS_ENTRY_ARB_BOUNDED
-				(offsetof(struct buffer, port),
-				 sizeof(((struct buffer *)0)->port),
+				(offsetof(struct rte_flow_parser_output, port),
+				 sizeof(((struct rte_flow_parser_output *)0)->port),
 				 0, RAW_ENCAP_CONFS_MAX_NUM - 1)),
 		.call = parse_set_raw_encap_decap,
 	},
@@ -9060,8 +8955,8 @@ static const struct token token_list[] = {
 		.help = "set sample actions list",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_SET_SAMPLE_INDEX)),
 		.args = ARGS(ARGS_ENTRY_ARB_BOUNDED
-				(offsetof(struct buffer, port),
-				 sizeof(((struct buffer *)0)->port),
+				(offsetof(struct rte_flow_parser_output, port),
+				 sizeof(((struct rte_flow_parser_output *)0)->port),
 				 0, RAW_SAMPLE_CONFS_MAX_NUM - 1)),
 		.call = parse_set_sample_action,
 	},
@@ -9070,8 +8965,8 @@ static const struct token token_list[] = {
 		.help = "set IPv6 extension header",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_INDEX)),
 		.args = ARGS(ARGS_ENTRY_ARB_BOUNDED
-				(offsetof(struct buffer, port),
-				 sizeof(((struct buffer *)0)->port),
+				(offsetof(struct rte_flow_parser_output, port),
+				 sizeof(((struct rte_flow_parser_output *)0)->port),
 				 0, IPV6_EXT_PUSH_CONFS_MAX_NUM - 1)),
 		.call = parse_set_ipv6_ext_action,
 	},
@@ -9080,8 +8975,8 @@ static const struct token token_list[] = {
 		.help = "set IPv6 extension header",
 		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_INDEX)),
 		.args = ARGS(ARGS_ENTRY_ARB_BOUNDED
-				(offsetof(struct buffer, port),
-				 sizeof(((struct buffer *)0)->port),
+				(offsetof(struct rte_flow_parser_output, port),
+				 sizeof(((struct rte_flow_parser_output *)0)->port),
 				 0, IPV6_EXT_PUSH_CONFS_MAX_NUM - 1)),
 		.call = parse_set_ipv6_ext_action,
 	},
@@ -9334,7 +9229,7 @@ static const struct token token_list[] = {
 		.help = "specify a indirect action id to destroy",
 		.next = NEXT(next_ia_destroy_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
-		.args = ARGS(ARGS_ENTRY_PTR(struct buffer,
+		.args = ARGS(ARGS_ENTRY_PTR(struct rte_flow_parser_output,
 					    args.ia_destroy.action_id)),
 		.call = parse_ia_destroy,
 	},
@@ -9344,7 +9239,7 @@ static const struct token token_list[] = {
 		.help = "specify a indirect action id to create",
 		.next = NEXT(next_ia_create_attr,
 			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.vc.attr.group)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.vc.attr.group)),
 	},
 	[RTE_FLOW_PARSER_CMD_ACTION_INDIRECT] = {
 		.name = "indirect",
@@ -9549,8 +9444,8 @@ static const struct token token_list[] = {
 				NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_POL_G),
 				NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_POLICY_ID),
 				NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
-		.args = ARGS(ARGS_ENTRY(struct buffer, args.policy.policy_id),
-				ARGS_ENTRY(struct buffer, port)),
+		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_output, args.policy.policy_id),
+				ARGS_ENTRY(struct rte_flow_parser_output, port)),
 		.call = parse_mp,
 	},
 	[RTE_FLOW_PARSER_CMD_ITEM_AGGR_AFFINITY] = {
@@ -9752,7 +9647,7 @@ parse_init(struct context *ctx, const struct token *token,
 	   const char *str, unsigned int len,
 	   void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -9778,7 +9673,7 @@ parse_ia(struct context *ctx, const struct token *token,
 	 const char *str, unsigned int len,
 	 void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -9842,7 +9737,7 @@ parse_ia_destroy(struct context *ctx, const struct token *token,
 		 const char *str, unsigned int len,
 		 void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	uint32_t *action_id;
 
 	/* Token name must match. */
@@ -9851,12 +9746,12 @@ parse_ia_destroy(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || buffer_cmd(out) == RTE_FLOW_PARSER_CMD_INDIRECT_ACTION) {
+	if (!out->command || out->command == RTE_FLOW_PARSER_CMD_INDIRECT_ACTION) {
 		if (ctx->curr != RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_DESTROY)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
-		buffer_cmd_set(out, ctx->curr);
+		out->command = ctx->curr;
 		ctx->objdata = 0;
 		ctx->object = out;
 		ctx->objmask = NULL;
@@ -9881,7 +9776,7 @@ parse_qia(struct context *ctx, const struct token *token,
 	  const char *str, unsigned int len,
 	  void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -9941,7 +9836,7 @@ parse_qia_destroy(struct context *ctx, const struct token *token,
 		  const char *str, unsigned int len,
 		  void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	uint32_t *action_id;
 
 	/* Token name must match. */
@@ -9950,12 +9845,12 @@ parse_qia_destroy(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || buffer_cmd(out) == RTE_FLOW_PARSER_CMD_QUEUE) {
+	if (!out->command || out->command == RTE_FLOW_PARSER_CMD_QUEUE) {
 		if (ctx->curr != RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_DESTROY)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
-		buffer_cmd_set(out, ctx->curr);
+		out->command = ctx->curr;
 		ctx->objdata = 0;
 		ctx->object = out;
 		ctx->objmask = NULL;
@@ -9993,7 +9888,7 @@ parse_mp(struct context *ctx, const struct token *token,
 	const char *str, unsigned int len,
 	void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -10034,7 +9929,7 @@ parse_vc(struct context *ctx, const struct token *token,
 	 const char *str, unsigned int len,
 	 void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	uint8_t *data;
 	uint32_t data_size;
 
@@ -10107,10 +10002,10 @@ parse_vc(struct context *ctx, const struct token *token,
 		ctx->objmask = NULL;
 		return len;
 	case RTE_FLOW_PARSER_CMD_ITEM_END:
-		if ((buffer_cmd(out) == RTE_FLOW_PARSER_CMD_VALIDATE || buffer_cmd(out) == RTE_FLOW_PARSER_CMD_CREATE) &&
+		if ((out->command == RTE_FLOW_PARSER_CMD_VALIDATE || out->command == RTE_FLOW_PARSER_CMD_CREATE) &&
 		    ctx->last)
 			return -1;
-		if (buffer_cmd(out) == RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_CREATE &&
+		if (out->command == RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_CREATE &&
 		    !ctx->last)
 			return -1;
 		break;
@@ -10181,7 +10076,7 @@ parse_vc_spec(struct context *ctx, const struct token *token,
 	      const char *str, unsigned int len,
 	      void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_item *item;
 	uint32_t data_size;
 	int index;
@@ -10241,7 +10136,7 @@ parse_vc_conf(struct context *ctx, const struct token *token,
 	      const char *str, unsigned int len,
 	      void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	(void)size;
 	/* Token name must match. */
@@ -10262,7 +10157,7 @@ parse_vc_conf_timeout(struct context *ctx, const struct token *token,
 		      const char *str, unsigned int len,
 		      void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_update_age *update;
 
 	(void)size;
@@ -10294,7 +10189,7 @@ parse_vc_item_ecpri_type(struct context *ctx, const struct token *token,
 	struct rte_flow_item *item;
 	uint32_t data_size;
 	uint8_t msg_type;
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	const struct arg *arg;
 
 	(void)size;
@@ -10347,7 +10242,7 @@ parse_vc_item_l2tpv2_type(struct context *ctx, const struct token *token,
 	struct rte_flow_item *item;
 	uint32_t data_size;
 	uint16_t msg_type = 0;
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	const struct arg *arg;
 
 	(void)size;
@@ -10464,7 +10359,7 @@ parse_vc_compare_field_level(struct context *ctx, const struct token *token,
 	struct rte_flow_item_compare *compare_item;
 	struct rte_flow_item_flex_handle *flex_handle = NULL;
 	uint32_t val;
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	char *end;
 
 	(void)token;
@@ -10555,7 +10450,7 @@ parse_vc_action_rss(struct context *ctx, const struct token *token,
 		    const char *str, unsigned int len,
 		    void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_action *action;
 	struct action_rss_data *action_rss_data;
 	unsigned int i;
@@ -10855,7 +10750,7 @@ parse_vc_action_vxlan_encap(struct context *ctx, const struct token *token,
 			    const char *str, unsigned int len,
 			    void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_action *action;
 	struct action_vxlan_encap_data *action_vxlan_encap_data;
 	int ret;
@@ -10958,7 +10853,7 @@ parse_vc_action_nvgre_encap(struct context *ctx, const struct token *token,
 			    const char *str, unsigned int len,
 			    void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_action *action;
 	struct action_nvgre_encap_data *action_nvgre_encap_data;
 	int ret;
@@ -10987,7 +10882,7 @@ parse_vc_action_l2_encap(struct context *ctx, const struct token *token,
 			 const char *str, unsigned int len,
 			 void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_action *action;
 	struct action_raw_encap_data *action_encap_data;
 	const struct rte_flow_parser_l2_encap_conf *conf = parser_l2_encap_conf_get();
@@ -11052,7 +10947,7 @@ parse_vc_action_l2_decap(struct context *ctx, const struct token *token,
 			 const char *str, unsigned int len,
 			 void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_action *action;
 	struct action_raw_decap_data *action_decap_data;
 	const struct rte_flow_parser_l2_decap_conf *conf = parser_l2_decap_conf_get();
@@ -11109,7 +11004,7 @@ parse_vc_action_mplsogre_encap(struct context *ctx, const struct token *token,
 			       const char *str, unsigned int len,
 			       void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_action *action;
 	struct action_raw_encap_data *action_encap_data;
 	const struct rte_flow_parser_mplsogre_encap_conf *conf =
@@ -11216,7 +11111,7 @@ parse_vc_action_mplsogre_decap(struct context *ctx, const struct token *token,
 			       const char *str, unsigned int len,
 			       void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_action *action;
 	struct action_raw_decap_data *action_decap_data;
 	const struct rte_flow_parser_mplsogre_decap_conf *conf =
@@ -11307,7 +11202,7 @@ parse_vc_action_mplsoudp_encap(struct context *ctx, const struct token *token,
 			       const char *str, unsigned int len,
 			       void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_action *action;
 	struct action_raw_encap_data *action_encap_data;
 	const struct rte_flow_parser_mplsoudp_encap_conf *conf =
@@ -11415,7 +11310,7 @@ parse_vc_action_mplsoudp_decap(struct context *ctx, const struct token *token,
 			       const char *str, unsigned int len,
 			       void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_action *action;
 	struct action_raw_decap_data *action_decap_data;
 	const struct rte_flow_parser_mplsoudp_decap_conf *conf =
@@ -11510,7 +11405,7 @@ parse_vc_action_raw_decap_index(struct context *ctx, const struct token *token,
 	struct action_raw_decap_data *action_raw_decap_data;
 	struct rte_flow_action *action;
 	const struct arg *arg;
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	int ret;
 	uint16_t idx;
 
@@ -11554,7 +11449,7 @@ parse_vc_action_raw_encap_index(struct context *ctx, const struct token *token,
 	struct action_raw_encap_data *action_raw_encap_data;
 	struct rte_flow_action *action;
 	const struct arg *arg;
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	int ret;
 	uint16_t idx;
 
@@ -11596,7 +11491,7 @@ parse_vc_action_raw_encap(struct context *ctx, const struct token *token,
 			  const char *str, unsigned int len, void *buf,
 			  unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	int ret;
 
 	ret = parse_vc(ctx, token, str, len, buf, size);
@@ -11618,7 +11513,7 @@ parse_vc_action_raw_decap(struct context *ctx, const struct token *token,
 			  const char *str, unsigned int len, void *buf,
 			  unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_action *action;
 	struct action_raw_decap_data *action_raw_decap_data = NULL;
 	int ret;
@@ -11654,7 +11549,7 @@ parse_vc_action_ipv6_ext_remove(struct context *ctx, const struct token *token,
 				const char *str, unsigned int len, void *buf,
 				unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_action *action;
 	struct action_ipv6_ext_remove_data *ipv6_ext_remove_data = NULL;
 	int ret;
@@ -11693,7 +11588,7 @@ parse_vc_action_ipv6_ext_remove_index(struct context *ctx, const struct token *t
 	struct action_ipv6_ext_remove_data *action_ipv6_ext_remove_data;
 	struct rte_flow_action *action;
 	const struct arg *arg;
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	int ret;
 	uint16_t idx;
 
@@ -11734,7 +11629,7 @@ parse_vc_action_ipv6_ext_push(struct context *ctx, const struct token *token,
 			      const char *str, unsigned int len, void *buf,
 			      unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_action *action;
 	struct action_ipv6_ext_push_data *ipv6_ext_push_data = NULL;
 	int ret;
@@ -11773,7 +11668,7 @@ parse_vc_action_ipv6_ext_push_index(struct context *ctx, const struct token *tok
 	struct action_ipv6_ext_push_data *action_ipv6_ext_push_data;
 	struct rte_flow_action *action;
 	const struct arg *arg;
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	int ret;
 	uint16_t idx;
 
@@ -11830,7 +11725,7 @@ parse_vc_action_sample(struct context *ctx, const struct token *token,
 			 const char *str, unsigned int len, void *buf,
 			 unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_action *action;
 	struct action_sample_data *action_sample_data = NULL;
 	static struct rte_flow_action end_action = {
@@ -11866,7 +11761,7 @@ parse_vc_action_sample_index(struct context *ctx, const struct token *token,
 	struct rte_flow_action *action;
 	const struct rte_flow_action *actions;
 	const struct arg *arg;
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	int ret;
 	uint16_t idx;
 
@@ -11967,7 +11862,7 @@ parse_vc_modify_field_level(struct context *ctx, const struct token *token,
 	struct rte_flow_action_modify_field *action;
 	struct rte_flow_item_flex_handle *flex_handle = NULL;
 	uint32_t val;
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	char *end;
 
 	(void)token;
@@ -12020,7 +11915,7 @@ parse_vc_action_conntrack_update(struct context *ctx, const struct token *token,
 			 const char *str, unsigned int len, void *buf,
 			 unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_modify_conntrack *ct_modify = NULL;
 
 	(void)size;
@@ -12056,7 +11951,7 @@ parse_destroy(struct context *ctx, const struct token *token,
 	      const char *str, unsigned int len,
 	      void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -12097,7 +11992,7 @@ parse_flush(struct context *ctx, const struct token *token,
 	    const char *str, unsigned int len,
 	    void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -12124,7 +12019,7 @@ parse_dump(struct context *ctx, const struct token *token,
 	    const char *str, unsigned int len,
 	    void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -12166,7 +12061,7 @@ parse_query(struct context *ctx, const struct token *token,
 	    const char *str, unsigned int len,
 	    void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -12197,7 +12092,7 @@ parse_action(struct context *ctx, const struct token *token,
 	     const char *str, unsigned int len,
 	     void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	const struct arg *arg = pop_args(ctx);
 	unsigned int i;
 
@@ -12232,7 +12127,7 @@ parse_list(struct context *ctx, const struct token *token,
 	   const char *str, unsigned int len,
 	   void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -12269,7 +12164,7 @@ parse_aged(struct context *ctx, const struct token *token,
 	   const char *str, unsigned int len,
 	   void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -12277,12 +12172,12 @@ parse_aged(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || buffer_cmd(out) == RTE_FLOW_PARSER_CMD_QUEUE) {
+	if (!out->command || out->command == RTE_FLOW_PARSER_CMD_QUEUE) {
 		if (ctx->curr != RTE_FLOW_PARSER_CMD_AGED && ctx->curr != RTE_FLOW_PARSER_CMD_QUEUE_AGED)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
-		buffer_cmd_set(out, ctx->curr);
+		out->command = ctx->curr;
 		ctx->objdata = 0;
 		ctx->object = out;
 		ctx->objmask = NULL;
@@ -12298,7 +12193,7 @@ parse_isolate(struct context *ctx, const struct token *token,
 	      const char *str, unsigned int len,
 	      void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -12325,7 +12220,7 @@ parse_configure(struct context *ctx, const struct token *token,
 		const char *str, unsigned int len,
 		void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -12352,7 +12247,7 @@ parse_template(struct context *ctx, const struct token *token,
 	       const char *str, unsigned int len,
 	       void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -12436,7 +12331,7 @@ parse_template_destroy(struct context *ctx, const struct token *token,
 		       const char *str, unsigned int len,
 		       void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	uint32_t *template_id;
 
 	/* Token name must match. */
@@ -12446,8 +12341,8 @@ parse_template_destroy(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command ||
-		buffer_cmd(out) == RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE ||
-		buffer_cmd(out) == RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE) {
+		out->command == RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE ||
+		out->command == RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE) {
 		if (ctx->curr != RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_DESTROY &&
 			ctx->curr != RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_DESTROY)
 			return -1;
@@ -12478,7 +12373,7 @@ parse_table(struct context *ctx, const struct token *token,
 	    const char *str, unsigned int len,
 	    void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	uint32_t *template_id;
 
 	/* Token name must match. */
@@ -12575,7 +12470,7 @@ parse_table_destroy(struct context *ctx, const struct token *token,
 		    const char *str, unsigned int len,
 		    void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	uint32_t *table_id;
 
 	/* Token name must match. */
@@ -12584,13 +12479,13 @@ parse_table_destroy(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || buffer_cmd(out) == RTE_FLOW_PARSER_CMD_TABLE) {
+	if (!out->command || out->command == RTE_FLOW_PARSER_CMD_TABLE) {
 		if (ctx->curr != RTE_FLOW_PARSER_CMD_TABLE_DESTROY &&
 		    ctx->curr != RTE_FLOW_PARSER_CMD_TABLE_RESIZE_COMPLETE)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
-		buffer_cmd_set(out, ctx->curr);
+		out->command = ctx->curr;		
 		ctx->objdata = 0;
 		ctx->object = out;
 		ctx->objmask = NULL;
@@ -12615,7 +12510,7 @@ parse_jump_table_id(struct context *ctx, const struct token *token,
 	    const char *str, unsigned int len,
 	    void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	uint32_t table_id;
 	const struct arg *arg;
 	void *entry_ptr;
@@ -12653,7 +12548,7 @@ parse_qo(struct context *ctx, const struct token *token,
 	 const char *str, unsigned int len,
 	 void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -12716,7 +12611,7 @@ parse_qo_destroy(struct context *ctx, const struct token *token,
 		 const char *str, unsigned int len,
 		 void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 	uint64_t *flow_id;
 
 	/* Token name must match. */
@@ -12725,13 +12620,13 @@ parse_qo_destroy(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || buffer_cmd(out) == RTE_FLOW_PARSER_CMD_QUEUE) {
+	if (!out->command || out->command == RTE_FLOW_PARSER_CMD_QUEUE) {
 		if (ctx->curr != RTE_FLOW_PARSER_CMD_QUEUE_DESTROY &&
 		    ctx->curr != RTE_FLOW_PARSER_CMD_QUEUE_FLOW_UPDATE_RESIZED)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
-		buffer_cmd_set(out, ctx->curr);
+		out->command = ctx->curr;
 		ctx->objdata = 0;
 		ctx->object = out;
 		ctx->objmask = NULL;
@@ -12763,7 +12658,7 @@ parse_push(struct context *ctx, const struct token *token,
 	   const char *str, unsigned int len,
 	   void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -12791,7 +12686,7 @@ parse_pull(struct context *ctx, const struct token *token,
 	   const char *str, unsigned int len,
 	   void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -12819,7 +12714,7 @@ parse_hash(struct context *ctx, const struct token *token,
 	 const char *str, unsigned int len,
 	 void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -12869,7 +12764,7 @@ parse_group(struct context *ctx, const struct token *token,
 	    const char *str, unsigned int len,
 	    void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -12917,7 +12812,7 @@ parse_flex(struct context *ctx, const struct token *token,
 	     const char *str, unsigned int len,
 	     void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -12925,12 +12820,12 @@ parse_flex(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (buffer_cmd(out) == RTE_FLOW_PARSER_CMD_ZERO) {
+	if (out->command == RTE_FLOW_PARSER_CMD_ZERO) {
 		if (ctx->curr != RTE_FLOW_PARSER_CMD_FLEX)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
-		buffer_cmd_set(out, ctx->curr);
+		out->command = ctx->curr;
 		ctx->objdata = 0;
 		ctx->object = out;
 		ctx->objmask = NULL;
@@ -12953,7 +12848,7 @@ parse_tunnel(struct context *ctx, const struct token *token,
 	     const char *str, unsigned int len,
 	     void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -13477,7 +13372,7 @@ parse_port(struct context *ctx, const struct token *token,
 	   const char *str, unsigned int len,
 	   void *buf, unsigned int size)
 {
-	struct buffer *out = &(struct buffer){ .port = 0 };
+	struct rte_flow_parser_output *out = &(struct rte_flow_parser_output){ .port = 0 };
 	int ret;
 
 	if (buf)
@@ -13663,7 +13558,7 @@ parse_set_raw_encap_decap(struct context *ctx, const struct token *token,
 			  const char *str, unsigned int len,
 			  void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -13692,7 +13587,7 @@ parse_set_sample_action(struct context *ctx, const struct token *token,
 			  const char *str, unsigned int len,
 			  void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -13721,7 +13616,7 @@ parse_set_ipv6_ext_action(struct context *ctx, const struct token *token,
 			  const char *str, unsigned int len,
 			  void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -13753,7 +13648,7 @@ parse_set_init(struct context *ctx, const struct token *token,
 	       const char *str, unsigned int len,
 	       void *buf, unsigned int size)
 {
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -13852,7 +13747,7 @@ parse_meter_color(struct context *ctx, const struct token *token,
 		  unsigned int size)
 {
 	unsigned int i;
-	struct buffer *out = buf;
+	struct rte_flow_parser_output *out = buf;
 
 	(void)token;
 	(void)buf;
@@ -14024,7 +13919,7 @@ parse_qu_mode_name(struct context *ctx, const struct token *token,
 		   const char *str, unsigned int len, void *buf,
 		   unsigned int size)
 {
-	struct buffer *out = ctx->object;
+	struct rte_flow_parser_output *out = ctx->object;
 
 	return parse_name_to_index(ctx, token, str, len, buf, size,
 				   query_update_mode_names,
@@ -14563,7 +14458,7 @@ static SLIST_HEAD(, indlst_conf) indlst_conf_head =
 	SLIST_HEAD_INITIALIZER();
 
 static void
-indirect_action_flow_conf_create(const struct buffer *in)
+indirect_action_flow_conf_create(const struct rte_flow_parser_output *in)
 {
 	int len, ret;
 	uint32_t i;
@@ -14619,7 +14514,7 @@ indirect_action_list_conf_get(uint32_t conf_id)
 
 /** Dispatch parsed buffer to function calls. */
 static void
-cmd_flow_parsed(struct buffer *in)
+cmd_flow_parsed(struct rte_flow_parser_output *in)
 {
 	switch (in->command) {
 	case RTE_FLOW_PARSER_CMD_INFO:
@@ -14882,7 +14777,7 @@ cmd_flow_parsed(struct buffer *in)
 
 /** Dispatch parsed buffer to function calls. */
 static void
-cmd_set_raw_parsed(const struct buffer *in)
+cmd_set_raw_parsed(const struct rte_flow_parser_output *in)
 {
 	uint16_t idx = in->port; /* We borrow port field as index */
 
@@ -15155,7 +15050,7 @@ rte_flow_parser_cmd_flow_dispatch(struct rte_flow_parser_output *out)
 {
 	if (!out)
 		return;
-	cmd_flow_parsed((struct buffer *)out);
+	cmd_flow_parsed((struct rte_flow_parser_output *)out);
 }
 
 void
@@ -15163,7 +15058,7 @@ rte_flow_parser_cmd_set_raw_dispatch(struct rte_flow_parser_output *out)
 {
 	if (!out)
 		return;
-	cmd_set_raw_parsed((struct buffer *)out);
+	cmd_set_raw_parsed((struct rte_flow_parser_output *)out);
 }
 
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmdline_register, 26.0);
@@ -15215,7 +15110,7 @@ rte_flow_parser_parse(struct rte_flow_parser *parser, const char *src,
 
 	if (!src || !result)
 		return -EINVAL;
-	if (result_size < sizeof(struct buffer))
+	if (result_size < sizeof(struct rte_flow_parser_output))
 		return -ENOBUFS;
 	prev = parser_push_current(parser);
 	ctx = parser_cmd_context();
@@ -15244,7 +15139,7 @@ int
 rte_flow_parser_run(struct rte_flow_parser *parser, const char *src)
 {
 	uint8_t buf[4096];
-	struct buffer *out = (struct buffer *)buf;
+	struct rte_flow_parser_output *out = (struct rte_flow_parser_output *)buf;
 	int ret;
 
 	ret = rte_flow_parser_parse(parser, src,
@@ -15339,7 +15234,7 @@ rte_flow_parser_parse_attr_str(const char *src, struct rte_flow_attr *attr)
 	free(cmd);
 	if (ret)
 		return ret;
-	*attr = out->args.flow.attr;
+	*attr = out->args.vc.attr;
 	return 0;
 }
 
@@ -15362,8 +15257,8 @@ rte_flow_parser_parse_pattern_str(const char *src,
 	free(cmd);
 	if (ret)
 		return ret;
-	*pattern = out->args.flow.pattern;
-	*pattern_n = out->args.flow.pattern_n;
+	*pattern = out->args.vc.pattern;
+	*pattern_n = out->args.vc.pattern_n;
 	return 0;
 }
 
@@ -15386,8 +15281,8 @@ rte_flow_parser_parse_actions_str(const char *src,
 	free(cmd);
 	if (ret)
 		return ret;
-	*actions = out->args.flow.actions;
-	*actions_n = out->args.flow.actions_n;
+	*actions = out->args.vc.actions;
+	*actions_n = out->args.vc.actions_n;
 	return 0;
 }
 

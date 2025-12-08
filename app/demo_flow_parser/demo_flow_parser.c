@@ -48,8 +48,8 @@ run_case(struct rte_flow_parser *p, const char *cmd)
 	if (ret == 0) {
 		printf("[OK]  %s\n", cmd);
 		printf("      port=%u patterns=%u actions=%u\n",
-		       out->port, out->args.flow.pattern_n,
-		       out->args.flow.actions_n);
+		       out->port, out->args.vc.pattern_n,
+		       out->args.vc.actions_n);
 	} else {
 		printf("[ERR %d] %s\n", ret, cmd);
 	}
