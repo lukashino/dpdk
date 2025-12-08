@@ -726,25 +726,6 @@ extern struct gso_status gso_ports[RTE_MAX_ETHPORTS];
 extern uint16_t gso_max_segment_size;
 #endif /* RTE_LIB_GSO */
 
-struct rte_flow_parser_ctx *testpmd_parser_ctx_get(void);
-
-#define vxlan_encap_conf \
-	(*rte_flow_parser_ctx_vxlan_encap_conf(testpmd_parser_ctx_get()))
-#define nvgre_encap_conf \
-	(*rte_flow_parser_ctx_nvgre_encap_conf(testpmd_parser_ctx_get()))
-#define l2_encap_conf \
-	(*rte_flow_parser_ctx_l2_encap_conf(testpmd_parser_ctx_get()))
-#define l2_decap_conf \
-	(*rte_flow_parser_ctx_l2_decap_conf(testpmd_parser_ctx_get()))
-#define mplsogre_encap_conf \
-	(*rte_flow_parser_ctx_mplsogre_encap_conf(testpmd_parser_ctx_get()))
-#define mplsogre_decap_conf \
-	(*rte_flow_parser_ctx_mplsogre_decap_conf(testpmd_parser_ctx_get()))
-#define mplsoudp_encap_conf \
-	(*rte_flow_parser_ctx_mplsoudp_encap_conf(testpmd_parser_ctx_get()))
-#define mplsoudp_decap_conf \
-	(*rte_flow_parser_ctx_mplsoudp_decap_conf(testpmd_parser_ctx_get()))
-
 extern enum rte_eth_rx_mq_mode rx_mq_mode;
 
 extern struct rte_flow_action_conntrack conntrack_context;

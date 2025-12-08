@@ -16,14 +16,9 @@
 #include <rte_flow_parser.h>
 
 #include "testpmd.h"
+#include "flow_parser.h"
 
 static struct rte_flow_parser_ctx *parser_ctx;
-
-struct rte_flow_parser_ctx *
-testpmd_parser_ctx_get(void)
-{
-	return parser_ctx;
-}
 
 static void
 flow_parser_reset_defaults(void)
@@ -1024,3 +1019,68 @@ testpmd_flow_parser_init(void)
 	flow_parser_reset_defaults();
 	return rte_flow_parser_set_default_ops(&parser_ops, parser_ctx);
 }
+
+struct rte_flow_parser_vxlan_encap_conf *
+testpmd_vxlan_encap_conf(void)
+{
+	if (parser_ctx == NULL)
+		return NULL;
+	return rte_flow_parser_ctx_vxlan_encap_conf(parser_ctx);
+}
+
+struct rte_flow_parser_nvgre_encap_conf *
+testpmd_nvgre_encap_conf(void)
+{
+	if (parser_ctx == NULL)
+		return NULL;
+	return rte_flow_parser_ctx_nvgre_encap_conf(parser_ctx);
+}
+
+struct rte_flow_parser_l2_encap_conf *
+testpmd_l2_encap_conf(void)
+{
+	if (parser_ctx == NULL)
+		return NULL;
+	return rte_flow_parser_ctx_l2_encap_conf(parser_ctx);
+}
+
+struct rte_flow_parser_l2_decap_conf *
+testpmd_l2_decap_conf(void)
+{
+	if (parser_ctx == NULL)
+		return NULL;
+	return rte_flow_parser_ctx_l2_decap_conf(parser_ctx);
+}
+
+struct rte_flow_parser_mplsogre_encap_conf *
+testpmd_mplsogre_encap_conf(void)
+{
+	if (parser_ctx == NULL)
+		return NULL;
+	return rte_flow_parser_ctx_mplsogre_encap_conf(parser_ctx);
+}
+
+struct rte_flow_parser_mplsogre_decap_conf *
+testpmd_mplsogre_decap_conf(void)
+{
+	if (parser_ctx == NULL)
+		return NULL;
+	return rte_flow_parser_ctx_mplsogre_decap_conf(parser_ctx);
+}
+
+struct rte_flow_parser_mplsoudp_encap_conf *
+testpmd_mplsoudp_encap_conf(void)
+{
+	if (parser_ctx == NULL)
+		return NULL;
+	return rte_flow_parser_ctx_mplsoudp_encap_conf(parser_ctx);
+}
+
+struct rte_flow_parser_mplsoudp_decap_conf *
+testpmd_mplsoudp_decap_conf(void)
+{
+	if (parser_ctx == NULL)
+		return NULL;
+	return rte_flow_parser_ctx_mplsoudp_decap_conf(parser_ctx);
+}
+
