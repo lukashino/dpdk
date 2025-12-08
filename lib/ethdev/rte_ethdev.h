@@ -168,6 +168,11 @@
 #include <rte_config.h>
 #include <rte_power_intrinsics.h>
 
+/** Ethernet device port identifier type. */
+typedef uint16_t rte_port_id_t;
+/** Ethernet device queue identifier type. */
+typedef uint16_t rte_queue_id_t;
+
 #include "rte_ethdev_trace_fp.h"
 #include "rte_dev_info.h"
 

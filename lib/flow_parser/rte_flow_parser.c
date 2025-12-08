@@ -35,9 +35,6 @@
 #define RTE_PORT_ALL (~(uint16_t)0x0)
 #endif
 
-typedef uint16_t portid_t;
-typedef uint16_t queueid_t;
-
 #ifndef RSS_HASH_KEY_LENGTH
 #define RSS_HASH_KEY_LENGTH 64
 #endif
@@ -1593,7 +1590,7 @@ parser_flex_pattern_get(uint16_t pattern_id,
 }
 
 static inline void
-parser_command_flow_get_info(portid_t port_id)
+parser_command_flow_get_info(rte_port_id_t port_id)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
 
@@ -1602,7 +1599,7 @@ parser_command_flow_get_info(portid_t port_id)
 }
 
 static inline void
-parser_command_flow_configure(portid_t port_id,
+parser_command_flow_configure(rte_port_id_t port_id,
 			      const struct rte_flow_port_attr *port_attr,
 			      uint32_t nb_queue,
 			      const struct rte_flow_queue_attr *queue_attr)
@@ -1615,7 +1612,7 @@ parser_command_flow_configure(portid_t port_id,
 }
 
 static inline void
-parser_command_flow_pattern_template_create(portid_t port_id, uint32_t id,
+parser_command_flow_pattern_template_create(rte_port_id_t port_id, uint32_t id,
 					    const struct rte_flow_pattern_template_attr *attr,
 					    const struct rte_flow_item pattern[])
 {
@@ -1627,7 +1624,7 @@ parser_command_flow_pattern_template_create(portid_t port_id, uint32_t id,
 }
 
 static inline void
-parser_command_flow_pattern_template_destroy(portid_t port_id,
+parser_command_flow_pattern_template_destroy(rte_port_id_t port_id,
 					     uint32_t nb_id,
 					     const uint32_t id[])
 {
@@ -1639,7 +1636,7 @@ parser_command_flow_pattern_template_destroy(portid_t port_id,
 }
 
 static inline void
-parser_command_flow_actions_template_create(portid_t port_id, uint32_t id,
+parser_command_flow_actions_template_create(rte_port_id_t port_id, uint32_t id,
 					    const struct rte_flow_actions_template_attr *attr,
 					    const struct rte_flow_action actions[],
 					    const struct rte_flow_action masks[])
@@ -1652,7 +1649,7 @@ parser_command_flow_actions_template_create(portid_t port_id, uint32_t id,
 }
 
 static inline void
-parser_command_flow_actions_template_destroy(portid_t port_id,
+parser_command_flow_actions_template_destroy(rte_port_id_t port_id,
 					     uint32_t nb_id,
 					     const uint32_t id[])
 {
@@ -1664,7 +1661,7 @@ parser_command_flow_actions_template_destroy(portid_t port_id,
 }
 
 static inline void
-parser_command_flow_template_table_create(portid_t port_id, uint32_t table_id,
+parser_command_flow_template_table_create(rte_port_id_t port_id, uint32_t table_id,
 					  const struct rte_flow_template_table_attr *attr,
 					  uint32_t nb_pattern,
 					  uint32_t pattern_id[],
@@ -1681,7 +1678,7 @@ parser_command_flow_template_table_create(portid_t port_id, uint32_t table_id,
 }
 
 static inline void
-parser_command_flow_template_table_destroy(portid_t port_id,
+parser_command_flow_template_table_destroy(rte_port_id_t port_id,
 					   uint32_t nb_id,
 					   const uint32_t id[])
 {
@@ -1693,7 +1690,7 @@ parser_command_flow_template_table_destroy(portid_t port_id,
 }
 
 static inline void
-parser_command_flow_template_table_resize_complete(portid_t port_id,
+parser_command_flow_template_table_resize_complete(rte_port_id_t port_id,
 						   uint32_t table_id)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
@@ -1704,7 +1701,7 @@ parser_command_flow_template_table_resize_complete(portid_t port_id,
 }
 
 static inline void
-parser_command_queue_group_set_miss_actions(portid_t port_id,
+parser_command_queue_group_set_miss_actions(rte_port_id_t port_id,
 					    const struct rte_flow_attr *attr,
 					    const struct rte_flow_action actions[])
 {
@@ -1716,7 +1713,7 @@ parser_command_queue_group_set_miss_actions(portid_t port_id,
 }
 
 static inline void
-parser_command_flow_template_table_resize(portid_t port_id, uint32_t table_id,
+parser_command_flow_template_table_resize(rte_port_id_t port_id, uint32_t table_id,
 					  uint32_t nb_rules)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
@@ -1727,7 +1724,7 @@ parser_command_flow_template_table_resize(portid_t port_id, uint32_t table_id,
 }
 
 static inline void
-parser_command_queue_flow_create(portid_t port_id, queueid_t queue,
+parser_command_queue_flow_create(rte_port_id_t port_id, rte_queue_id_t queue,
 				 bool postpone, uint32_t table_id,
 				 uint32_t rule_id, uint32_t pattern_templ_id,
 				 uint32_t actions_templ_id,
@@ -1744,7 +1741,7 @@ parser_command_queue_flow_create(portid_t port_id, queueid_t queue,
 }
 
 static inline void
-parser_command_queue_flow_destroy(portid_t port_id, queueid_t queue,
+parser_command_queue_flow_destroy(rte_port_id_t port_id, rte_queue_id_t queue,
 				  bool postpone, uint32_t rule_n,
 				  const uint64_t rule[], bool is_user_id)
 {
@@ -1756,7 +1753,7 @@ parser_command_queue_flow_destroy(portid_t port_id, queueid_t queue,
 }
 
 static inline void
-parser_command_queue_flow_update_resized(portid_t port_id, queueid_t queue,
+parser_command_queue_flow_update_resized(rte_port_id_t port_id, rte_queue_id_t queue,
 					 bool postpone, uint64_t rule_id)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
@@ -1767,7 +1764,7 @@ parser_command_queue_flow_update_resized(portid_t port_id, queueid_t queue,
 }
 
 static inline void
-parser_command_queue_flow_update(portid_t port_id, queueid_t queue,
+parser_command_queue_flow_update(rte_port_id_t port_id, rte_queue_id_t queue,
 				 bool postpone, uint32_t rule_id,
 				 uint32_t action_templ_id,
 				 const struct rte_flow_action actions[])
@@ -1781,7 +1778,7 @@ parser_command_queue_flow_update(portid_t port_id, queueid_t queue,
 }
 
 static inline void
-parser_command_queue_flow_push(portid_t port_id, queueid_t queue)
+parser_command_queue_flow_push(rte_port_id_t port_id, rte_queue_id_t queue)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
 
@@ -1790,7 +1787,7 @@ parser_command_queue_flow_push(portid_t port_id, queueid_t queue)
 }
 
 static inline void
-parser_command_queue_flow_pull(portid_t port_id, queueid_t queue)
+parser_command_queue_flow_pull(rte_port_id_t port_id, rte_queue_id_t queue)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
 
@@ -1799,7 +1796,7 @@ parser_command_queue_flow_pull(portid_t port_id, queueid_t queue)
 }
 
 static inline void
-parser_command_flow_hash_calc(portid_t port_id, uint32_t table_id,
+parser_command_flow_hash_calc(rte_port_id_t port_id, uint32_t table_id,
 			      uint32_t pattern_templ_id,
 			      const struct rte_flow_item pattern[])
 {
@@ -1811,7 +1808,7 @@ parser_command_flow_hash_calc(portid_t port_id, uint32_t table_id,
 }
 
 static inline void
-parser_command_flow_hash_calc_encap(portid_t port_id,
+parser_command_flow_hash_calc_encap(rte_port_id_t port_id,
 				    enum rte_flow_encap_hash_field field,
 				    const struct rte_flow_item pattern[])
 {
@@ -1823,7 +1820,7 @@ parser_command_flow_hash_calc_encap(portid_t port_id,
 }
 
 static inline void
-parser_command_queue_flow_aged(portid_t port_id, queueid_t queue, bool destroy)
+parser_command_queue_flow_aged(rte_port_id_t port_id, rte_queue_id_t queue, bool destroy)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
 
@@ -1833,7 +1830,7 @@ parser_command_queue_flow_aged(portid_t port_id, queueid_t queue, bool destroy)
 }
 
 static inline void
-parser_command_queue_action_handle_create(portid_t port_id, queueid_t queue,
+parser_command_queue_action_handle_create(rte_port_id_t port_id, rte_queue_id_t queue,
 					  bool postpone, uint32_t group,
 					  bool is_list,
 					  const struct rte_flow_indir_action_conf *conf,
@@ -1848,7 +1845,7 @@ parser_command_queue_action_handle_create(portid_t port_id, queueid_t queue,
 }
 
 static inline void
-parser_command_queue_action_handle_destroy(portid_t port_id, queueid_t queue,
+parser_command_queue_action_handle_destroy(rte_port_id_t port_id, rte_queue_id_t queue,
 					   bool postpone, uint32_t nb_id,
 					   const uint32_t id[])
 {
@@ -1861,7 +1858,7 @@ parser_command_queue_action_handle_destroy(portid_t port_id, queueid_t queue,
 }
 
 static inline void
-parser_command_queue_action_handle_update(portid_t port_id, queueid_t queue,
+parser_command_queue_action_handle_update(rte_port_id_t port_id, rte_queue_id_t queue,
 					  bool postpone, uint32_t group,
 					  const struct rte_flow_action actions[])
 {
@@ -1874,7 +1871,7 @@ parser_command_queue_action_handle_update(portid_t port_id, queueid_t queue,
 }
 
 static inline void
-parser_command_queue_action_handle_query(portid_t port_id, queueid_t queue,
+parser_command_queue_action_handle_query(rte_port_id_t port_id, rte_queue_id_t queue,
 					 bool postpone, uint32_t action_id)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
@@ -1885,8 +1882,8 @@ parser_command_queue_action_handle_query(portid_t port_id, queueid_t queue,
 }
 
 static inline void
-parser_command_queue_action_handle_query_update(portid_t port_id,
-						queueid_t queue, bool postpone,
+parser_command_queue_action_handle_query_update(rte_port_id_t port_id,
+						rte_queue_id_t queue, bool postpone,
 						uint32_t action_id,
 						enum rte_flow_query_update_mode qu_mode,
 						struct rte_flow_action actions[])
@@ -1901,7 +1898,7 @@ parser_command_queue_action_handle_query_update(portid_t port_id,
 }
 
 static inline void
-parser_command_action_handle_create(portid_t port_id, uint32_t group,
+parser_command_action_handle_create(rte_port_id_t port_id, uint32_t group,
 				    bool is_list,
 				    const struct rte_flow_indir_action_conf *conf,
 				    const struct rte_flow_action actions[])
@@ -1914,7 +1911,7 @@ parser_command_action_handle_create(portid_t port_id, uint32_t group,
 }
 
 static inline void
-parser_command_action_handle_destroy(portid_t port_id, uint32_t nb_id,
+parser_command_action_handle_destroy(rte_port_id_t port_id, uint32_t nb_id,
 				     const uint32_t id[])
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
@@ -1925,7 +1922,7 @@ parser_command_action_handle_destroy(portid_t port_id, uint32_t nb_id,
 }
 
 static inline void
-parser_command_action_handle_update(portid_t port_id, uint32_t group,
+parser_command_action_handle_update(rte_port_id_t port_id, uint32_t group,
 				    const struct rte_flow_action actions[])
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
@@ -1936,7 +1933,7 @@ parser_command_action_handle_update(portid_t port_id, uint32_t group,
 }
 
 static inline void
-parser_command_action_handle_query(portid_t port_id, uint32_t action_id)
+parser_command_action_handle_query(rte_port_id_t port_id, uint32_t action_id)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
 
@@ -1946,7 +1943,7 @@ parser_command_action_handle_query(portid_t port_id, uint32_t action_id)
 }
 
 static inline void
-parser_command_action_handle_query_update(portid_t port_id,
+parser_command_action_handle_query_update(rte_port_id_t port_id,
 					  uint32_t action_id,
 					  enum rte_flow_query_update_mode qu_mode,
 					  struct rte_flow_action actions[])
@@ -1959,7 +1956,7 @@ parser_command_action_handle_query_update(portid_t port_id,
 }
 
 static inline void
-parser_command_flow_validate(portid_t port_id,
+parser_command_flow_validate(rte_port_id_t port_id,
 			     const struct rte_flow_attr *attr,
 			     const struct rte_flow_item pattern[],
 			     const struct rte_flow_action actions[],
@@ -1973,7 +1970,7 @@ parser_command_flow_validate(portid_t port_id,
 }
 
 static inline void
-parser_command_flow_create(portid_t port_id,
+parser_command_flow_create(rte_port_id_t port_id,
 			   const struct rte_flow_attr *attr,
 			   const struct rte_flow_item pattern[],
 			   const struct rte_flow_action actions[],
@@ -1988,7 +1985,7 @@ parser_command_flow_create(portid_t port_id,
 }
 
 static inline void
-parser_command_flow_destroy(portid_t port_id, uint32_t nb_rule,
+parser_command_flow_destroy(rte_port_id_t port_id, uint32_t nb_rule,
 			    const uint64_t rule[], bool is_user_id)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
@@ -1999,7 +1996,7 @@ parser_command_flow_destroy(portid_t port_id, uint32_t nb_rule,
 }
 
 static inline void
-parser_command_flow_update(portid_t port_id, uint32_t rule_id,
+parser_command_flow_update(rte_port_id_t port_id, uint32_t rule_id,
 			   const struct rte_flow_action actions[],
 			   uintptr_t user_id)
 {
@@ -2011,7 +2008,7 @@ parser_command_flow_update(portid_t port_id, uint32_t rule_id,
 }
 
 static inline void
-parser_command_flow_flush(portid_t port_id)
+parser_command_flow_flush(rte_port_id_t port_id)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
 
@@ -2020,7 +2017,7 @@ parser_command_flow_flush(portid_t port_id)
 }
 
 static inline void
-parser_command_flow_dump(portid_t port_id, bool all, uint64_t rule,
+parser_command_flow_dump(rte_port_id_t port_id, bool all, uint64_t rule,
 			 const char *file, bool is_user_id)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
@@ -2031,7 +2028,7 @@ parser_command_flow_dump(portid_t port_id, bool all, uint64_t rule,
 }
 
 static inline void
-parser_command_flow_query(portid_t port_id, uint64_t rule,
+parser_command_flow_query(rte_port_id_t port_id, uint64_t rule,
 			  struct rte_flow_action *action, bool is_user_id)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
@@ -2042,7 +2039,7 @@ parser_command_flow_query(portid_t port_id, uint64_t rule,
 }
 
 static inline void
-parser_command_flow_list(portid_t port_id, uint32_t group_n,
+parser_command_flow_list(rte_port_id_t port_id, uint32_t group_n,
 			 const uint32_t group[])
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
@@ -2052,7 +2049,7 @@ parser_command_flow_list(portid_t port_id, uint32_t group_n,
 }
 
 static inline void
-parser_command_flow_isolate(portid_t port_id, int set)
+parser_command_flow_isolate(rte_port_id_t port_id, int set)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
 
@@ -2061,7 +2058,7 @@ parser_command_flow_isolate(portid_t port_id, int set)
 }
 
 static inline void
-parser_command_flow_aged(portid_t port_id, int destroy)
+parser_command_flow_aged(rte_port_id_t port_id, int destroy)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
 
@@ -2070,7 +2067,7 @@ parser_command_flow_aged(portid_t port_id, int destroy)
 }
 
 static inline void
-parser_command_flow_tunnel_create(portid_t port_id,
+parser_command_flow_tunnel_create(rte_port_id_t port_id,
 				  const struct rte_flow_parser_tunnel_ops *ops_conf)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
@@ -2081,7 +2078,7 @@ parser_command_flow_tunnel_create(portid_t port_id,
 }
 
 static inline void
-parser_command_flow_tunnel_destroy(portid_t port_id, uint32_t id)
+parser_command_flow_tunnel_destroy(rte_port_id_t port_id, uint32_t id)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
 
@@ -2090,7 +2087,7 @@ parser_command_flow_tunnel_destroy(portid_t port_id, uint32_t id)
 }
 
 static inline void
-parser_command_flow_tunnel_list(portid_t port_id)
+parser_command_flow_tunnel_list(rte_port_id_t port_id)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
 
@@ -2099,7 +2096,7 @@ parser_command_flow_tunnel_list(portid_t port_id)
 }
 
 static inline void
-parser_command_meter_policy_add(portid_t port_id, uint32_t policy_id,
+parser_command_meter_policy_add(rte_port_id_t port_id, uint32_t policy_id,
 				const struct rte_flow_action actions[])
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
@@ -2110,7 +2107,7 @@ parser_command_meter_policy_add(portid_t port_id, uint32_t policy_id,
 }
 
 static inline void
-parser_command_flex_item_create(portid_t port_id, uint16_t token,
+parser_command_flex_item_create(rte_port_id_t port_id, uint16_t token,
 				const char *filename)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
@@ -2121,7 +2118,7 @@ parser_command_flex_item_create(portid_t port_id, uint16_t token,
 }
 
 static inline void
-parser_command_flex_item_destroy(portid_t port_id, uint16_t token)
+parser_command_flex_item_destroy(rte_port_id_t port_id, uint16_t token)
 {
 	const struct rte_flow_parser_command_ops *ops = parser_command_ops();
 
@@ -2290,885 +2287,6 @@ parser_ipv6_ext_remove_conf_get(uint16_t index)
 	return NULL;
 }
 
-/** Parser token indices. */
-enum index {
-	/* Special tokens. */
-	ZERO = 0,
-	END,
-	START_SET,
-	END_SET,
-
-	/* Common tokens. */
-	COMMON_INTEGER,
-	COMMON_UNSIGNED,
-	COMMON_PREFIX,
-	COMMON_BOOLEAN,
-	COMMON_STRING,
-	COMMON_HEX,
-	COMMON_FILE_PATH,
-	COMMON_MAC_ADDR,
-	COMMON_IPV4_ADDR,
-	COMMON_IPV6_ADDR,
-	COMMON_RULE_ID,
-	COMMON_PORT_ID,
-	COMMON_GROUP_ID,
-	COMMON_PRIORITY_LEVEL,
-	COMMON_INDIRECT_ACTION_ID,
-	COMMON_PROFILE_ID,
-	COMMON_POLICY_ID,
-	COMMON_FLEX_HANDLE,
-	COMMON_FLEX_TOKEN,
-	COMMON_PATTERN_TEMPLATE_ID,
-	COMMON_ACTIONS_TEMPLATE_ID,
-	COMMON_TABLE_ID,
-	COMMON_QUEUE_ID,
-	COMMON_METER_COLOR_NAME,
-
-	/* TOP-level command. */
-	ADD,
-
-	/* Top-level command. */
-	SET,
-	/* Sub-leve commands. */
-	SET_RAW_ENCAP,
-	SET_RAW_DECAP,
-	SET_RAW_INDEX,
-	SET_SAMPLE_ACTIONS,
-	SET_SAMPLE_INDEX,
-	SET_IPV6_EXT_REMOVE,
-	SET_IPV6_EXT_PUSH,
-	SET_IPV6_EXT_INDEX,
-
-	/* Top-level command. */
-	FLOW,
-	/* Sub-level commands. */
-	INFO,
-	CONFIGURE,
-	PATTERN_TEMPLATE,
-	ACTIONS_TEMPLATE,
-	TABLE,
-	FLOW_GROUP,
-	INDIRECT_ACTION,
-	VALIDATE,
-	CREATE,
-	DESTROY,
-	UPDATE,
-	FLUSH,
-	DUMP,
-	QUERY,
-	LIST,
-	AGED,
-	ISOLATE,
-	TUNNEL,
-	FLEX,
-	QUEUE,
-	PUSH,
-	PULL,
-	HASH,
-
-	/* Flex arguments */
-	FLEX_ITEM_CREATE,
-	FLEX_ITEM_DESTROY,
-
-	/* Pattern template arguments. */
-	PATTERN_TEMPLATE_CREATE,
-	PATTERN_TEMPLATE_DESTROY,
-	PATTERN_TEMPLATE_CREATE_ID,
-	PATTERN_TEMPLATE_DESTROY_ID,
-	PATTERN_TEMPLATE_RELAXED_MATCHING,
-	PATTERN_TEMPLATE_INGRESS,
-	PATTERN_TEMPLATE_EGRESS,
-	PATTERN_TEMPLATE_TRANSFER,
-	PATTERN_TEMPLATE_SPEC,
-
-	/* Actions template arguments. */
-	ACTIONS_TEMPLATE_CREATE,
-	ACTIONS_TEMPLATE_DESTROY,
-	ACTIONS_TEMPLATE_CREATE_ID,
-	ACTIONS_TEMPLATE_DESTROY_ID,
-	ACTIONS_TEMPLATE_INGRESS,
-	ACTIONS_TEMPLATE_EGRESS,
-	ACTIONS_TEMPLATE_TRANSFER,
-	ACTIONS_TEMPLATE_SPEC,
-	ACTIONS_TEMPLATE_MASK,
-
-	/* Queue arguments. */
-	QUEUE_CREATE,
-	QUEUE_DESTROY,
-	QUEUE_FLOW_UPDATE_RESIZED,
-	QUEUE_UPDATE,
-	QUEUE_AGED,
-	QUEUE_INDIRECT_ACTION,
-
-	/* Queue create arguments. */
-	QUEUE_CREATE_POSTPONE,
-	QUEUE_TEMPLATE_TABLE,
-	QUEUE_PATTERN_TEMPLATE,
-	QUEUE_ACTIONS_TEMPLATE,
-	QUEUE_RULE_ID,
-
-	/* Queue destroy arguments. */
-	QUEUE_DESTROY_ID,
-	QUEUE_DESTROY_POSTPONE,
-
-	/* Queue update arguments. */
-	QUEUE_UPDATE_ID,
-
-	/* Queue indirect action arguments */
-	QUEUE_INDIRECT_ACTION_CREATE,
-	QUEUE_INDIRECT_ACTION_LIST_CREATE,
-	QUEUE_INDIRECT_ACTION_UPDATE,
-	QUEUE_INDIRECT_ACTION_DESTROY,
-	QUEUE_INDIRECT_ACTION_QUERY,
-	QUEUE_INDIRECT_ACTION_QUERY_UPDATE,
-
-	/* Queue indirect action create arguments */
-	QUEUE_INDIRECT_ACTION_CREATE_ID,
-	QUEUE_INDIRECT_ACTION_INGRESS,
-	QUEUE_INDIRECT_ACTION_EGRESS,
-	QUEUE_INDIRECT_ACTION_TRANSFER,
-	QUEUE_INDIRECT_ACTION_CREATE_POSTPONE,
-	QUEUE_INDIRECT_ACTION_SPEC,
-	QUEUE_INDIRECT_ACTION_LIST,
-
-	/* Queue indirect action update arguments */
-	QUEUE_INDIRECT_ACTION_UPDATE_POSTPONE,
-
-	/* Queue indirect action destroy arguments */
-	QUEUE_INDIRECT_ACTION_DESTROY_ID,
-	QUEUE_INDIRECT_ACTION_DESTROY_POSTPONE,
-
-	/* Queue indirect action query arguments */
-	QUEUE_INDIRECT_ACTION_QUERY_POSTPONE,
-
-	/* Queue indirect action query_update arguments */
-	QUEUE_INDIRECT_ACTION_QU_MODE,
-
-	/* Push arguments. */
-	PUSH_QUEUE,
-
-	/* Pull arguments. */
-	PULL_QUEUE,
-
-	/* Table arguments. */
-	TABLE_CREATE,
-	TABLE_DESTROY,
-	TABLE_RESIZE,
-	TABLE_RESIZE_COMPLETE,
-	TABLE_CREATE_ID,
-	TABLE_DESTROY_ID,
-	TABLE_RESIZE_ID,
-	TABLE_RESIZE_RULES_NUMBER,
-	TABLE_INSERTION_TYPE,
-	TABLE_INSERTION_TYPE_NAME,
-	TABLE_HASH_FUNC,
-	TABLE_HASH_FUNC_NAME,
-	TABLE_GROUP,
-	TABLE_PRIORITY,
-	TABLE_INGRESS,
-	TABLE_EGRESS,
-	TABLE_TRANSFER,
-	TABLE_TRANSFER_WIRE_ORIG,
-	TABLE_TRANSFER_VPORT_ORIG,
-	TABLE_RESIZABLE,
-	TABLE_RULES_NUMBER,
-	TABLE_PATTERN_TEMPLATE,
-	TABLE_ACTIONS_TEMPLATE,
-
-	/* Group arguments */
-	GROUP_ID,
-	GROUP_INGRESS,
-	GROUP_EGRESS,
-	GROUP_TRANSFER,
-	GROUP_SET_MISS_ACTIONS,
-
-	/* Hash calculation arguments. */
-	HASH_CALC_TABLE,
-	HASH_CALC_PATTERN_INDEX,
-	HASH_CALC_PATTERN,
-	HASH_CALC_ENCAP,
-	HASH_CALC_DEST,
-	ENCAP_HASH_FIELD_SRC_PORT,
-	ENCAP_HASH_FIELD_GRE_FLOW_ID,
-
-	/* Tunnel arguments. */
-	TUNNEL_CREATE,
-	TUNNEL_CREATE_TYPE,
-	TUNNEL_LIST,
-	TUNNEL_DESTROY,
-	TUNNEL_DESTROY_ID,
-
-	/* Destroy arguments. */
-	DESTROY_RULE,
-	DESTROY_IS_USER_ID,
-
-	/* Query arguments. */
-	QUERY_ACTION,
-	QUERY_IS_USER_ID,
-
-	/* List arguments. */
-	LIST_GROUP,
-
-	/* Destroy aged flow arguments. */
-	AGED_DESTROY,
-
-	/* Validate/create arguments. */
-	VC_GROUP,
-	VC_PRIORITY,
-	VC_INGRESS,
-	VC_EGRESS,
-	VC_TRANSFER,
-	VC_TUNNEL_SET,
-	VC_TUNNEL_MATCH,
-	VC_USER_ID,
-	VC_IS_USER_ID,
-
-	/* Dump arguments */
-	DUMP_ALL,
-	DUMP_ONE,
-	DUMP_IS_USER_ID,
-
-	/* Configure arguments */
-	CONFIG_QUEUES_NUMBER,
-	CONFIG_QUEUES_SIZE,
-	CONFIG_COUNTERS_NUMBER,
-	CONFIG_AGING_OBJECTS_NUMBER,
-	CONFIG_METERS_NUMBER,
-	CONFIG_CONN_TRACK_NUMBER,
-	CONFIG_QUOTAS_NUMBER,
-	CONFIG_FLAGS,
-	CONFIG_HOST_PORT,
-
-	/* Indirect action arguments */
-	INDIRECT_ACTION_CREATE,
-	INDIRECT_ACTION_LIST_CREATE,
-	INDIRECT_ACTION_FLOW_CONF_CREATE,
-	INDIRECT_ACTION_UPDATE,
-	INDIRECT_ACTION_DESTROY,
-	INDIRECT_ACTION_QUERY,
-	INDIRECT_ACTION_QUERY_UPDATE,
-
-	/* Indirect action create arguments */
-	INDIRECT_ACTION_CREATE_ID,
-	INDIRECT_ACTION_INGRESS,
-	INDIRECT_ACTION_EGRESS,
-	INDIRECT_ACTION_TRANSFER,
-	INDIRECT_ACTION_SPEC,
-	INDIRECT_ACTION_LIST,
-	INDIRECT_ACTION_FLOW_CONF,
-
-	/* Indirect action destroy arguments */
-	INDIRECT_ACTION_DESTROY_ID,
-
-	/* Indirect action query-and-update arguments */
-	INDIRECT_ACTION_QU_MODE,
-	INDIRECT_ACTION_QU_MODE_NAME,
-
-	/* Validate/create pattern. */
-	ITEM_PATTERN,
-	ITEM_PARAM_IS,
-	ITEM_PARAM_SPEC,
-	ITEM_PARAM_LAST,
-	ITEM_PARAM_MASK,
-	ITEM_PARAM_PREFIX,
-	ITEM_NEXT,
-	ITEM_END,
-	ITEM_VOID,
-	ITEM_INVERT,
-	ITEM_ANY,
-	ITEM_ANY_NUM,
-	ITEM_PORT_ID,
-	ITEM_PORT_ID_ID,
-	ITEM_MARK,
-	ITEM_MARK_ID,
-	ITEM_RAW,
-	ITEM_RAW_RELATIVE,
-	ITEM_RAW_SEARCH,
-	ITEM_RAW_OFFSET,
-	ITEM_RAW_LIMIT,
-	ITEM_RAW_PATTERN,
-	ITEM_RAW_PATTERN_HEX,
-	ITEM_ETH,
-	ITEM_ETH_DST,
-	ITEM_ETH_SRC,
-	ITEM_ETH_TYPE,
-	ITEM_ETH_HAS_VLAN,
-	ITEM_VLAN,
-	ITEM_VLAN_TCI,
-	ITEM_VLAN_PCP,
-	ITEM_VLAN_DEI,
-	ITEM_VLAN_VID,
-	ITEM_VLAN_INNER_TYPE,
-	ITEM_VLAN_HAS_MORE_VLAN,
-	ITEM_IPV4,
-	ITEM_IPV4_VER_IHL,
-	ITEM_IPV4_TOS,
-	ITEM_IPV4_LENGTH,
-	ITEM_IPV4_ID,
-	ITEM_IPV4_FRAGMENT_OFFSET,
-	ITEM_IPV4_TTL,
-	ITEM_IPV4_PROTO,
-	ITEM_IPV4_SRC,
-	ITEM_IPV4_DST,
-	ITEM_IPV6,
-	ITEM_IPV6_TC,
-	ITEM_IPV6_FLOW,
-	ITEM_IPV6_LEN,
-	ITEM_IPV6_PROTO,
-	ITEM_IPV6_HOP,
-	ITEM_IPV6_SRC,
-	ITEM_IPV6_DST,
-	ITEM_IPV6_HAS_FRAG_EXT,
-	ITEM_IPV6_ROUTING_EXT,
-	ITEM_IPV6_ROUTING_EXT_TYPE,
-	ITEM_IPV6_ROUTING_EXT_NEXT_HDR,
-	ITEM_IPV6_ROUTING_EXT_SEG_LEFT,
-	ITEM_ICMP,
-	ITEM_ICMP_TYPE,
-	ITEM_ICMP_CODE,
-	ITEM_ICMP_IDENT,
-	ITEM_ICMP_SEQ,
-	ITEM_UDP,
-	ITEM_UDP_SRC,
-	ITEM_UDP_DST,
-	ITEM_TCP,
-	ITEM_TCP_SRC,
-	ITEM_TCP_DST,
-	ITEM_TCP_FLAGS,
-	ITEM_SCTP,
-	ITEM_SCTP_SRC,
-	ITEM_SCTP_DST,
-	ITEM_SCTP_TAG,
-	ITEM_SCTP_CKSUM,
-	ITEM_VXLAN,
-	ITEM_VXLAN_VNI,
-	ITEM_VXLAN_FLAG_G,
-	ITEM_VXLAN_FLAG_VER,
-	ITEM_VXLAN_FLAG_I,
-	ITEM_VXLAN_FLAG_P,
-	ITEM_VXLAN_FLAG_B,
-	ITEM_VXLAN_FLAG_O,
-	ITEM_VXLAN_FLAG_D,
-	ITEM_VXLAN_FLAG_A,
-	ITEM_VXLAN_GBP_ID,
-	/* Used for "struct rte_vxlan_hdr", GPE Next protocol */
-	ITEM_VXLAN_GPE_PROTO,
-	ITEM_VXLAN_FIRST_RSVD,
-	ITEM_VXLAN_SECND_RSVD,
-	ITEM_VXLAN_THIRD_RSVD,
-	ITEM_VXLAN_LAST_RSVD,
-	ITEM_E_TAG,
-	ITEM_E_TAG_GRP_ECID_B,
-	ITEM_NVGRE,
-	ITEM_NVGRE_TNI,
-	ITEM_MPLS,
-	ITEM_MPLS_LABEL,
-	ITEM_MPLS_TC,
-	ITEM_MPLS_S,
-	ITEM_MPLS_TTL,
-	ITEM_GRE,
-	ITEM_GRE_PROTO,
-	ITEM_GRE_C_RSVD0_VER,
-	ITEM_GRE_C_BIT,
-	ITEM_GRE_K_BIT,
-	ITEM_GRE_S_BIT,
-	ITEM_FUZZY,
-	ITEM_FUZZY_THRESH,
-	ITEM_GTP,
-	ITEM_GTP_FLAGS,
-	ITEM_GTP_MSG_TYPE,
-	ITEM_GTP_TEID,
-	ITEM_GTPC,
-	ITEM_GTPU,
-	ITEM_GENEVE,
-	ITEM_GENEVE_VNI,
-	ITEM_GENEVE_PROTO,
-	ITEM_GENEVE_OPTLEN,
-	ITEM_VXLAN_GPE,
-	ITEM_VXLAN_GPE_VNI,
-	/* Used for "struct rte_vxlan_gpe_hdr", deprecated, prefer ITEM_VXLAN_GPE_PROTO */
-	ITEM_VXLAN_GPE_PROTO_IN_DEPRECATED_VXLAN_GPE_HDR,
-	ITEM_VXLAN_GPE_FLAGS,
-	ITEM_VXLAN_GPE_RSVD0,
-	ITEM_VXLAN_GPE_RSVD1,
-	ITEM_ARP_ETH_IPV4,
-	ITEM_ARP_ETH_IPV4_SHA,
-	ITEM_ARP_ETH_IPV4_SPA,
-	ITEM_ARP_ETH_IPV4_THA,
-	ITEM_ARP_ETH_IPV4_TPA,
-	ITEM_IPV6_EXT,
-	ITEM_IPV6_EXT_NEXT_HDR,
-	ITEM_IPV6_FRAG_EXT,
-	ITEM_IPV6_FRAG_EXT_NEXT_HDR,
-	ITEM_IPV6_FRAG_EXT_FRAG_DATA,
-	ITEM_IPV6_FRAG_EXT_ID,
-	ITEM_ICMP6,
-	ITEM_ICMP6_TYPE,
-	ITEM_ICMP6_CODE,
-	ITEM_ICMP6_ECHO_REQUEST,
-	ITEM_ICMP6_ECHO_REQUEST_ID,
-	ITEM_ICMP6_ECHO_REQUEST_SEQ,
-	ITEM_ICMP6_ECHO_REPLY,
-	ITEM_ICMP6_ECHO_REPLY_ID,
-	ITEM_ICMP6_ECHO_REPLY_SEQ,
-	ITEM_ICMP6_ND_NS,
-	ITEM_ICMP6_ND_NS_TARGET_ADDR,
-	ITEM_ICMP6_ND_NA,
-	ITEM_ICMP6_ND_NA_TARGET_ADDR,
-	ITEM_ICMP6_ND_OPT,
-	ITEM_ICMP6_ND_OPT_TYPE,
-	ITEM_ICMP6_ND_OPT_SLA_ETH,
-	ITEM_ICMP6_ND_OPT_SLA_ETH_SLA,
-	ITEM_ICMP6_ND_OPT_TLA_ETH,
-	ITEM_ICMP6_ND_OPT_TLA_ETH_TLA,
-	ITEM_META,
-	ITEM_META_DATA,
-	ITEM_RANDOM,
-	ITEM_RANDOM_VALUE,
-	ITEM_GRE_KEY,
-	ITEM_GRE_KEY_VALUE,
-	ITEM_GRE_OPTION,
-	ITEM_GRE_OPTION_CHECKSUM,
-	ITEM_GRE_OPTION_KEY,
-	ITEM_GRE_OPTION_SEQUENCE,
-	ITEM_GTP_PSC,
-	ITEM_GTP_PSC_QFI,
-	ITEM_GTP_PSC_PDU_T,
-	ITEM_PPPOES,
-	ITEM_PPPOED,
-	ITEM_PPPOE_SEID,
-	ITEM_PPPOE_PROTO_ID,
-	ITEM_HIGIG2,
-	ITEM_HIGIG2_CLASSIFICATION,
-	ITEM_HIGIG2_VID,
-	ITEM_TAG,
-	ITEM_TAG_DATA,
-	ITEM_TAG_INDEX,
-	ITEM_L2TPV3OIP,
-	ITEM_L2TPV3OIP_SESSION_ID,
-	ITEM_ESP,
-	ITEM_ESP_SPI,
-	ITEM_AH,
-	ITEM_AH_SPI,
-	ITEM_PFCP,
-	ITEM_PFCP_S_FIELD,
-	ITEM_PFCP_SEID,
-	ITEM_ECPRI,
-	ITEM_ECPRI_COMMON,
-	ITEM_ECPRI_COMMON_TYPE,
-	ITEM_ECPRI_COMMON_TYPE_IQ_DATA,
-	ITEM_ECPRI_COMMON_TYPE_RTC_CTRL,
-	ITEM_ECPRI_COMMON_TYPE_DLY_MSR,
-	ITEM_ECPRI_MSG_IQ_DATA_PCID,
-	ITEM_ECPRI_MSG_RTC_CTRL_RTCID,
-	ITEM_ECPRI_MSG_DLY_MSR_MSRID,
-	ITEM_GENEVE_OPT,
-	ITEM_GENEVE_OPT_CLASS,
-	ITEM_GENEVE_OPT_TYPE,
-	ITEM_GENEVE_OPT_LENGTH,
-	ITEM_GENEVE_OPT_DATA,
-	ITEM_INTEGRITY,
-	ITEM_INTEGRITY_LEVEL,
-	ITEM_INTEGRITY_VALUE,
-	ITEM_CONNTRACK,
-	ITEM_POL_PORT,
-	ITEM_POL_METER,
-	ITEM_POL_POLICY,
-	ITEM_PORT_REPRESENTOR,
-	ITEM_PORT_REPRESENTOR_PORT_ID,
-	ITEM_REPRESENTED_PORT,
-	ITEM_REPRESENTED_PORT_ETHDEV_PORT_ID,
-	ITEM_FLEX,
-	ITEM_FLEX_ITEM_HANDLE,
-	ITEM_FLEX_PATTERN_HANDLE,
-	ITEM_L2TPV2,
-	ITEM_L2TPV2_TYPE,
-	ITEM_L2TPV2_TYPE_DATA,
-	ITEM_L2TPV2_TYPE_DATA_L,
-	ITEM_L2TPV2_TYPE_DATA_S,
-	ITEM_L2TPV2_TYPE_DATA_O,
-	ITEM_L2TPV2_TYPE_DATA_L_S,
-	ITEM_L2TPV2_TYPE_CTRL,
-	ITEM_L2TPV2_MSG_DATA_TUNNEL_ID,
-	ITEM_L2TPV2_MSG_DATA_SESSION_ID,
-	ITEM_L2TPV2_MSG_DATA_L_LENGTH,
-	ITEM_L2TPV2_MSG_DATA_L_TUNNEL_ID,
-	ITEM_L2TPV2_MSG_DATA_L_SESSION_ID,
-	ITEM_L2TPV2_MSG_DATA_S_TUNNEL_ID,
-	ITEM_L2TPV2_MSG_DATA_S_SESSION_ID,
-	ITEM_L2TPV2_MSG_DATA_S_NS,
-	ITEM_L2TPV2_MSG_DATA_S_NR,
-	ITEM_L2TPV2_MSG_DATA_O_TUNNEL_ID,
-	ITEM_L2TPV2_MSG_DATA_O_SESSION_ID,
-	ITEM_L2TPV2_MSG_DATA_O_OFFSET,
-	ITEM_L2TPV2_MSG_DATA_L_S_LENGTH,
-	ITEM_L2TPV2_MSG_DATA_L_S_TUNNEL_ID,
-	ITEM_L2TPV2_MSG_DATA_L_S_SESSION_ID,
-	ITEM_L2TPV2_MSG_DATA_L_S_NS,
-	ITEM_L2TPV2_MSG_DATA_L_S_NR,
-	ITEM_L2TPV2_MSG_CTRL_LENGTH,
-	ITEM_L2TPV2_MSG_CTRL_TUNNEL_ID,
-	ITEM_L2TPV2_MSG_CTRL_SESSION_ID,
-	ITEM_L2TPV2_MSG_CTRL_NS,
-	ITEM_L2TPV2_MSG_CTRL_NR,
-	ITEM_PPP,
-	ITEM_PPP_ADDR,
-	ITEM_PPP_CTRL,
-	ITEM_PPP_PROTO_ID,
-	ITEM_METER,
-	ITEM_METER_COLOR,
-	ITEM_QUOTA,
-	ITEM_QUOTA_STATE,
-	ITEM_QUOTA_STATE_NAME,
-	ITEM_AGGR_AFFINITY,
-	ITEM_AGGR_AFFINITY_VALUE,
-	ITEM_TX_QUEUE,
-	ITEM_TX_QUEUE_VALUE,
-	ITEM_IB_BTH,
-	ITEM_IB_BTH_OPCODE,
-	ITEM_IB_BTH_PKEY,
-	ITEM_IB_BTH_DST_QPN,
-	ITEM_IB_BTH_PSN,
-	ITEM_IPV6_PUSH_REMOVE_EXT,
-	ITEM_IPV6_PUSH_REMOVE_EXT_TYPE,
-	ITEM_PTYPE,
-	ITEM_PTYPE_VALUE,
-	ITEM_NSH,
-	ITEM_COMPARE,
-	ITEM_COMPARE_OP,
-	ITEM_COMPARE_OP_VALUE,
-	ITEM_COMPARE_FIELD_A_TYPE,
-	ITEM_COMPARE_FIELD_A_TYPE_VALUE,
-	ITEM_COMPARE_FIELD_A_LEVEL,
-	ITEM_COMPARE_FIELD_A_LEVEL_VALUE,
-	ITEM_COMPARE_FIELD_A_TAG_INDEX,
-	ITEM_COMPARE_FIELD_A_TYPE_ID,
-	ITEM_COMPARE_FIELD_A_CLASS_ID,
-	ITEM_COMPARE_FIELD_A_OFFSET,
-	ITEM_COMPARE_FIELD_B_TYPE,
-	ITEM_COMPARE_FIELD_B_TYPE_VALUE,
-	ITEM_COMPARE_FIELD_B_LEVEL,
-	ITEM_COMPARE_FIELD_B_LEVEL_VALUE,
-	ITEM_COMPARE_FIELD_B_TAG_INDEX,
-	ITEM_COMPARE_FIELD_B_TYPE_ID,
-	ITEM_COMPARE_FIELD_B_CLASS_ID,
-	ITEM_COMPARE_FIELD_B_OFFSET,
-	ITEM_COMPARE_FIELD_B_VALUE,
-	ITEM_COMPARE_FIELD_B_POINTER,
-	ITEM_COMPARE_FIELD_WIDTH,
-
-	/* Validate/create actions. */
-	ACTIONS,
-	ACTION_NEXT,
-	ACTION_END,
-	ACTION_VOID,
-	ACTION_PASSTHRU,
-	ACTION_SKIP_CMAN,
-	ACTION_JUMP,
-	ACTION_JUMP_GROUP,
-	ACTION_MARK,
-	ACTION_MARK_ID,
-	ACTION_FLAG,
-	ACTION_QUEUE,
-	ACTION_QUEUE_INDEX,
-	ACTION_DROP,
-	ACTION_COUNT,
-	ACTION_COUNT_ID,
-	ACTION_RSS,
-	ACTION_RSS_FUNC,
-	ACTION_RSS_LEVEL,
-	ACTION_RSS_FUNC_DEFAULT,
-	ACTION_RSS_FUNC_TOEPLITZ,
-	ACTION_RSS_FUNC_SIMPLE_XOR,
-	ACTION_RSS_FUNC_SYMMETRIC_TOEPLITZ,
-	ACTION_RSS_TYPES,
-	ACTION_RSS_TYPE,
-	ACTION_RSS_KEY,
-	ACTION_RSS_KEY_LEN,
-	ACTION_RSS_QUEUES,
-	ACTION_RSS_QUEUE,
-	ACTION_PF,
-	ACTION_VF,
-	ACTION_VF_ORIGINAL,
-	ACTION_VF_ID,
-	ACTION_PORT_ID,
-	ACTION_PORT_ID_ORIGINAL,
-	ACTION_PORT_ID_ID,
-	ACTION_METER,
-	ACTION_METER_COLOR,
-	ACTION_METER_COLOR_TYPE,
-	ACTION_METER_COLOR_GREEN,
-	ACTION_METER_COLOR_YELLOW,
-	ACTION_METER_COLOR_RED,
-	ACTION_METER_ID,
-	ACTION_METER_MARK,
-	ACTION_METER_MARK_CONF,
-	ACTION_METER_MARK_CONF_COLOR,
-	ACTION_METER_PROFILE,
-	ACTION_METER_PROFILE_ID2PTR,
-	ACTION_METER_POLICY,
-	ACTION_METER_POLICY_ID2PTR,
-	ACTION_METER_COLOR_MODE,
-	ACTION_METER_STATE,
-	ACTION_OF_DEC_NW_TTL,
-	ACTION_OF_POP_VLAN,
-	ACTION_OF_PUSH_VLAN,
-	ACTION_OF_PUSH_VLAN_ETHERTYPE,
-	ACTION_OF_SET_VLAN_VID,
-	ACTION_OF_SET_VLAN_VID_VLAN_VID,
-	ACTION_OF_SET_VLAN_PCP,
-	ACTION_OF_SET_VLAN_PCP_VLAN_PCP,
-	ACTION_OF_POP_MPLS,
-	ACTION_OF_POP_MPLS_ETHERTYPE,
-	ACTION_OF_PUSH_MPLS,
-	ACTION_OF_PUSH_MPLS_ETHERTYPE,
-	ACTION_VXLAN_ENCAP,
-	ACTION_VXLAN_DECAP,
-	ACTION_NVGRE_ENCAP,
-	ACTION_NVGRE_DECAP,
-	ACTION_L2_ENCAP,
-	ACTION_L2_DECAP,
-	ACTION_MPLSOGRE_ENCAP,
-	ACTION_MPLSOGRE_DECAP,
-	ACTION_MPLSOUDP_ENCAP,
-	ACTION_MPLSOUDP_DECAP,
-	ACTION_SET_IPV4_SRC,
-	ACTION_SET_IPV4_SRC_IPV4_SRC,
-	ACTION_SET_IPV4_DST,
-	ACTION_SET_IPV4_DST_IPV4_DST,
-	ACTION_SET_IPV6_SRC,
-	ACTION_SET_IPV6_SRC_IPV6_SRC,
-	ACTION_SET_IPV6_DST,
-	ACTION_SET_IPV6_DST_IPV6_DST,
-	ACTION_SET_TP_SRC,
-	ACTION_SET_TP_SRC_TP_SRC,
-	ACTION_SET_TP_DST,
-	ACTION_SET_TP_DST_TP_DST,
-	ACTION_MAC_SWAP,
-	ACTION_DEC_TTL,
-	ACTION_SET_TTL,
-	ACTION_SET_TTL_TTL,
-	ACTION_SET_MAC_SRC,
-	ACTION_SET_MAC_SRC_MAC_SRC,
-	ACTION_SET_MAC_DST,
-	ACTION_SET_MAC_DST_MAC_DST,
-	ACTION_INC_TCP_SEQ,
-	ACTION_INC_TCP_SEQ_VALUE,
-	ACTION_DEC_TCP_SEQ,
-	ACTION_DEC_TCP_SEQ_VALUE,
-	ACTION_INC_TCP_ACK,
-	ACTION_INC_TCP_ACK_VALUE,
-	ACTION_DEC_TCP_ACK,
-	ACTION_DEC_TCP_ACK_VALUE,
-	ACTION_RAW_ENCAP,
-	ACTION_RAW_DECAP,
-	ACTION_RAW_ENCAP_SIZE,
-	ACTION_RAW_ENCAP_INDEX,
-	ACTION_RAW_ENCAP_INDEX_VALUE,
-	ACTION_RAW_DECAP_INDEX,
-	ACTION_RAW_DECAP_INDEX_VALUE,
-	ACTION_SET_TAG,
-	ACTION_SET_TAG_DATA,
-	ACTION_SET_TAG_INDEX,
-	ACTION_SET_TAG_MASK,
-	ACTION_SET_META,
-	ACTION_SET_META_DATA,
-	ACTION_SET_META_MASK,
-	ACTION_SET_IPV4_DSCP,
-	ACTION_SET_IPV4_DSCP_VALUE,
-	ACTION_SET_IPV6_DSCP,
-	ACTION_SET_IPV6_DSCP_VALUE,
-	ACTION_AGE,
-	ACTION_AGE_TIMEOUT,
-	ACTION_AGE_UPDATE,
-	ACTION_AGE_UPDATE_TIMEOUT,
-	ACTION_AGE_UPDATE_TOUCH,
-	ACTION_SAMPLE,
-	ACTION_SAMPLE_RATIO,
-	ACTION_SAMPLE_INDEX,
-	ACTION_SAMPLE_INDEX_VALUE,
-	ACTION_INDIRECT,
-	ACTION_INDIRECT_LIST,
-	ACTION_INDIRECT_LIST_HANDLE,
-	ACTION_INDIRECT_LIST_CONF,
-	INDIRECT_LIST_ACTION_ID2PTR_HANDLE,
-	INDIRECT_LIST_ACTION_ID2PTR_CONF,
-	ACTION_SHARED_INDIRECT,
-	INDIRECT_ACTION_PORT,
-	INDIRECT_ACTION_ID2PTR,
-	ACTION_MODIFY_FIELD,
-	ACTION_MODIFY_FIELD_OP,
-	ACTION_MODIFY_FIELD_OP_VALUE,
-	ACTION_MODIFY_FIELD_DST_TYPE,
-	ACTION_MODIFY_FIELD_DST_TYPE_VALUE,
-	ACTION_MODIFY_FIELD_DST_LEVEL,
-	ACTION_MODIFY_FIELD_DST_LEVEL_VALUE,
-	ACTION_MODIFY_FIELD_DST_TAG_INDEX,
-	ACTION_MODIFY_FIELD_DST_TYPE_ID,
-	ACTION_MODIFY_FIELD_DST_CLASS_ID,
-	ACTION_MODIFY_FIELD_DST_OFFSET,
-	ACTION_MODIFY_FIELD_SRC_TYPE,
-	ACTION_MODIFY_FIELD_SRC_TYPE_VALUE,
-	ACTION_MODIFY_FIELD_SRC_LEVEL,
-	ACTION_MODIFY_FIELD_SRC_LEVEL_VALUE,
-	ACTION_MODIFY_FIELD_SRC_TAG_INDEX,
-	ACTION_MODIFY_FIELD_SRC_TYPE_ID,
-	ACTION_MODIFY_FIELD_SRC_CLASS_ID,
-	ACTION_MODIFY_FIELD_SRC_OFFSET,
-	ACTION_MODIFY_FIELD_SRC_VALUE,
-	ACTION_MODIFY_FIELD_SRC_POINTER,
-	ACTION_MODIFY_FIELD_WIDTH,
-	ACTION_CONNTRACK,
-	ACTION_CONNTRACK_UPDATE,
-	ACTION_CONNTRACK_UPDATE_DIR,
-	ACTION_CONNTRACK_UPDATE_CTX,
-	ACTION_POL_G,
-	ACTION_POL_Y,
-	ACTION_POL_R,
-	ACTION_PORT_REPRESENTOR,
-	ACTION_PORT_REPRESENTOR_PORT_ID,
-	ACTION_REPRESENTED_PORT,
-	ACTION_REPRESENTED_PORT_ETHDEV_PORT_ID,
-	ACTION_SEND_TO_KERNEL,
-	ACTION_QUOTA_CREATE,
-	ACTION_QUOTA_CREATE_LIMIT,
-	ACTION_QUOTA_CREATE_MODE,
-	ACTION_QUOTA_CREATE_MODE_NAME,
-	ACTION_QUOTA_QU,
-	ACTION_QUOTA_QU_LIMIT,
-	ACTION_QUOTA_QU_UPDATE_OP,
-	ACTION_QUOTA_QU_UPDATE_OP_NAME,
-	ACTION_IPV6_EXT_REMOVE,
-	ACTION_IPV6_EXT_REMOVE_INDEX,
-	ACTION_IPV6_EXT_REMOVE_INDEX_VALUE,
-	ACTION_IPV6_EXT_PUSH,
-	ACTION_IPV6_EXT_PUSH_INDEX,
-	ACTION_IPV6_EXT_PUSH_INDEX_VALUE,
-	ACTION_NAT64,
-	ACTION_NAT64_MODE,
-	ACTION_JUMP_TO_TABLE_INDEX,
-	ACTION_JUMP_TO_TABLE_INDEX_TABLE,
-	ACTION_JUMP_TO_TABLE_INDEX_TABLE_VALUE,
-	ACTION_JUMP_TO_TABLE_INDEX_INDEX,
-};
-
-static enum rte_flow_parser_command
-parser_public_command(enum index idx)
-{
-	switch (idx) {
-	case INFO:
-		return RTE_FLOW_PARSER_CMD_INFO;
-	case CONFIGURE:
-		return RTE_FLOW_PARSER_CMD_CONFIGURE;
-	case PATTERN_TEMPLATE_CREATE:
-		return RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_CREATE;
-	case PATTERN_TEMPLATE_DESTROY:
-		return RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_DESTROY;
-	case ACTIONS_TEMPLATE_CREATE:
-		return RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_CREATE;
-	case ACTIONS_TEMPLATE_DESTROY:
-		return RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_DESTROY;
-	case TABLE_CREATE:
-		return RTE_FLOW_PARSER_CMD_TABLE_CREATE;
-	case TABLE_DESTROY:
-		return RTE_FLOW_PARSER_CMD_TABLE_DESTROY;
-	case TABLE_RESIZE:
-		return RTE_FLOW_PARSER_CMD_TABLE_RESIZE;
-	case TABLE_RESIZE_COMPLETE:
-		return RTE_FLOW_PARSER_CMD_TABLE_RESIZE_COMPLETE;
-	case GROUP_SET_MISS_ACTIONS:
-		return RTE_FLOW_PARSER_CMD_GROUP_SET_MISS_ACTIONS;
-	case QUEUE_CREATE:
-		return RTE_FLOW_PARSER_CMD_QUEUE_CREATE;
-	case QUEUE_DESTROY:
-		return RTE_FLOW_PARSER_CMD_QUEUE_DESTROY;
-	case QUEUE_FLOW_UPDATE_RESIZED:
-		return RTE_FLOW_PARSER_CMD_QUEUE_FLOW_UPDATE_RESIZED;
-	case QUEUE_UPDATE:
-		return RTE_FLOW_PARSER_CMD_QUEUE_UPDATE;
-	case QUEUE_AGED:
-		return RTE_FLOW_PARSER_CMD_QUEUE_AGED;
-	case QUEUE_INDIRECT_ACTION_CREATE:
-		return RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_CREATE;
-	case QUEUE_INDIRECT_ACTION_LIST_CREATE:
-		return RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_LIST_CREATE;
-	case QUEUE_INDIRECT_ACTION_UPDATE:
-		return RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_UPDATE;
-	case QUEUE_INDIRECT_ACTION_DESTROY:
-		return RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_DESTROY;
-	case QUEUE_INDIRECT_ACTION_QUERY:
-		return RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QUERY;
-	case QUEUE_INDIRECT_ACTION_QUERY_UPDATE:
-		return RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QUERY_UPDATE;
-	case PUSH:
-		return RTE_FLOW_PARSER_CMD_PUSH;
-	case PULL:
-		return RTE_FLOW_PARSER_CMD_PULL;
-	case HASH:
-		return RTE_FLOW_PARSER_CMD_HASH;
-	case INDIRECT_ACTION_CREATE:
-		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_CREATE;
-	case INDIRECT_ACTION_LIST_CREATE:
-		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_LIST_CREATE;
-	case INDIRECT_ACTION_UPDATE:
-		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_UPDATE;
-	case INDIRECT_ACTION_DESTROY:
-		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_DESTROY;
-	case INDIRECT_ACTION_QUERY:
-		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QUERY;
-	case INDIRECT_ACTION_QUERY_UPDATE:
-		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QUERY_UPDATE;
-	case INDIRECT_ACTION_FLOW_CONF_CREATE:
-		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_FLOW_CONF_CREATE;
-	case VALIDATE:
-		return RTE_FLOW_PARSER_CMD_VALIDATE;
-	case CREATE:
-		return RTE_FLOW_PARSER_CMD_CREATE;
-	case DESTROY:
-		return RTE_FLOW_PARSER_CMD_DESTROY;
-	case UPDATE:
-		return RTE_FLOW_PARSER_CMD_UPDATE;
-	case FLUSH:
-		return RTE_FLOW_PARSER_CMD_FLUSH;
-	case DUMP_ONE:
-		return RTE_FLOW_PARSER_CMD_DUMP_ONE;
-	case DUMP_ALL:
-		return RTE_FLOW_PARSER_CMD_DUMP_ALL;
-	case QUERY:
-		return RTE_FLOW_PARSER_CMD_QUERY;
-	case LIST:
-		return RTE_FLOW_PARSER_CMD_LIST;
-	case ISOLATE:
-		return RTE_FLOW_PARSER_CMD_ISOLATE;
-	case AGED:
-		return RTE_FLOW_PARSER_CMD_AGED;
-	case TUNNEL_CREATE:
-		return RTE_FLOW_PARSER_CMD_TUNNEL_CREATE;
-	case TUNNEL_DESTROY:
-		return RTE_FLOW_PARSER_CMD_TUNNEL_DESTROY;
-	case TUNNEL_LIST:
-		return RTE_FLOW_PARSER_CMD_TUNNEL_LIST;
-	case ADD:
-		return RTE_FLOW_PARSER_CMD_METER_POLICY_ADD;
-	case FLEX_ITEM_CREATE:
-		return RTE_FLOW_PARSER_CMD_FLEX_ITEM_CREATE;
-	case FLEX_ITEM_DESTROY:
-		return RTE_FLOW_PARSER_CMD_FLEX_ITEM_DESTROY;
-	case SET_RAW_ENCAP:
-		return RTE_FLOW_PARSER_CMD_SET_RAW_ENCAP;
-	case SET_RAW_DECAP:
-		return RTE_FLOW_PARSER_CMD_SET_RAW_DECAP;
-	case SET_SAMPLE_ACTIONS:
-		return RTE_FLOW_PARSER_CMD_SET_SAMPLE_ACTIONS;
-	case SET_IPV6_EXT_PUSH:
-		return RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_PUSH;
-	case SET_IPV6_EXT_REMOVE:
-		return RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_REMOVE;
-	default:
-		return RTE_FLOW_PARSER_CMD_NONE;
-	}
-}
-
 /** Maximum size for pattern in struct rte_flow_item_raw. */
 #define ITEM_RAW_PATTERN_SIZE 512
 
@@ -3245,16 +2363,16 @@ static const char *const table_hash_funcs[] = {
 /** Parser context. */
 struct context {
 	/** Stack of subsequent token lists to process. */
-	const enum index *next[CTX_STACK_SIZE];
+	const enum rte_flow_parser_command_index *next[CTX_STACK_SIZE];
 	/** Arguments for stacked tokens. */
 	const void *args[CTX_STACK_SIZE];
-	enum index curr; /**< Current token index. */
-	enum index prev; /**< Index of the last token seen. */
+	enum rte_flow_parser_command_index curr; /**< Current token index. */
+	enum rte_flow_parser_command_index prev; /**< Index of the last token seen. */
 	int next_num; /**< Number of entries in next[]. */
 	int args_num; /**< Number of entries in args[]. */
 	uint32_t eol:1; /**< EOL has been detected. */
 	uint32_t last:1; /**< No more arguments. */
-	portid_t port; /**< Current port ID (for completions). */
+	rte_port_id_t port; /**< Current port ID (for completions). */
 	uint32_t objdata; /**< Object-specific data. */
 	void *object; /**< Address of current object for relative offsets. */
 	void *objmask; /**< Object a full mask must be written to. */
@@ -3284,7 +2402,7 @@ struct token {
 	 * Lists of subsequent tokens to push on the stack. Each call to the
 	 * parser consumes the last entry of that stack.
 	 */
-	const enum index *const *next;
+	const enum rte_flow_parser_command_index *const *next;
 	/** Arguments stack for subsequent tokens that need them. */
 	const struct arg *const *args;
 	/**
@@ -3329,10 +2447,10 @@ parser_cmd_context(void)
 }
 
 /** Static initializer for the next field. */
-#define NEXT(...) (const enum index *const []){ __VA_ARGS__, NULL, }
+#define NEXT(...) (const enum rte_flow_parser_command_index *const []){ __VA_ARGS__, NULL, }
 
 /** Static initializer for a NEXT() entry. */
-#define NEXT_ENTRY(...) (const enum index []){ __VA_ARGS__, ZERO, }
+#define NEXT_ENTRY(...) (const enum rte_flow_parser_command_index []){ __VA_ARGS__, RTE_FLOW_PARSER_CMD_ZERO, }
 
 /** Static initializer for the args field. */
 #define ARGS(...) (const struct arg *const []){ __VA_ARGS__, NULL, }
@@ -3419,9 +2537,9 @@ parser_cmd_context(void)
 
 /** Parser output buffer layout expected by cmd_flow_parsed(). */
 struct buffer {
-	enum rte_flow_parser_command command; /**< Flow command. */
-	portid_t port; /**< Affected port ID. */
-	queueid_t queue; /** Async queue ID. */
+	enum rte_flow_parser_command_index command; /**< Flow command. */
+	rte_port_id_t port; /**< Affected port ID. */
+	rte_queue_id_t queue; /** Async queue ID. */
 	bool postpone; /** Postpone async operation */
 	union {
 		struct {
@@ -3510,16 +2628,16 @@ struct buffer {
 _Static_assert(sizeof(struct rte_flow_parser_output) == sizeof(struct buffer),
 	       "rte_flow_parser_output_mismatch");
 
-static inline enum index
+static inline enum rte_flow_parser_command_index
 buffer_cmd(const struct buffer *out)
 {
-	return (enum index)out->command;
+	return (enum rte_flow_parser_command_index)out->command;
 }
 
 static inline void
-buffer_cmd_set(struct buffer *out, enum index idx)
+buffer_cmd_set(struct buffer *out, enum rte_flow_parser_command_index idx)
 {
-	out->command = (enum rte_flow_parser_command)idx;
+	out->command = (enum rte_flow_parser_command_index)idx;
 }
 
 /** Private data for pattern items. */
@@ -3546,1384 +2664,1384 @@ struct parse_action_priv {
 		.size = s, \
 	})
 
-static const enum index next_flex_item[] = {
-	FLEX_ITEM_CREATE,
-	FLEX_ITEM_DESTROY,
-	ZERO,
-};
-
-static const enum index next_config_attr[] = {
-	CONFIG_QUEUES_NUMBER,
-	CONFIG_QUEUES_SIZE,
-	CONFIG_COUNTERS_NUMBER,
-	CONFIG_AGING_OBJECTS_NUMBER,
-	CONFIG_METERS_NUMBER,
-	CONFIG_CONN_TRACK_NUMBER,
-	CONFIG_QUOTAS_NUMBER,
-	CONFIG_FLAGS,
-	CONFIG_HOST_PORT,
-	END,
-	ZERO,
-};
-
-static const enum index next_pt_subcmd[] = {
-	PATTERN_TEMPLATE_CREATE,
-	PATTERN_TEMPLATE_DESTROY,
-	ZERO,
-};
-
-static const enum index next_pt_attr[] = {
-	PATTERN_TEMPLATE_CREATE_ID,
-	PATTERN_TEMPLATE_RELAXED_MATCHING,
-	PATTERN_TEMPLATE_INGRESS,
-	PATTERN_TEMPLATE_EGRESS,
-	PATTERN_TEMPLATE_TRANSFER,
-	PATTERN_TEMPLATE_SPEC,
-	ZERO,
-};
-
-static const enum index next_pt_destroy_attr[] = {
-	PATTERN_TEMPLATE_DESTROY_ID,
-	END,
-	ZERO,
-};
-
-static const enum index next_at_subcmd[] = {
-	ACTIONS_TEMPLATE_CREATE,
-	ACTIONS_TEMPLATE_DESTROY,
-	ZERO,
-};
-
-static const enum index next_at_attr[] = {
-	ACTIONS_TEMPLATE_CREATE_ID,
-	ACTIONS_TEMPLATE_INGRESS,
-	ACTIONS_TEMPLATE_EGRESS,
-	ACTIONS_TEMPLATE_TRANSFER,
-	ACTIONS_TEMPLATE_SPEC,
-	ZERO,
-};
-
-static const enum index next_at_destroy_attr[] = {
-	ACTIONS_TEMPLATE_DESTROY_ID,
-	END,
-	ZERO,
-};
-
-static const enum index next_group_attr[] = {
-	GROUP_INGRESS,
-	GROUP_EGRESS,
-	GROUP_TRANSFER,
-	GROUP_SET_MISS_ACTIONS,
-	ZERO,
-};
-
-static const enum index next_table_subcmd[] = {
-	TABLE_CREATE,
-	TABLE_DESTROY,
-	TABLE_RESIZE,
-	TABLE_RESIZE_COMPLETE,
-	ZERO,
-};
-
-static const enum index next_table_attr[] = {
-	TABLE_CREATE_ID,
-	TABLE_GROUP,
-	TABLE_INSERTION_TYPE,
-	TABLE_HASH_FUNC,
-	TABLE_PRIORITY,
-	TABLE_INGRESS,
-	TABLE_EGRESS,
-	TABLE_TRANSFER,
-	TABLE_TRANSFER_WIRE_ORIG,
-	TABLE_TRANSFER_VPORT_ORIG,
-	TABLE_RESIZABLE,
-	TABLE_RULES_NUMBER,
-	TABLE_PATTERN_TEMPLATE,
-	TABLE_ACTIONS_TEMPLATE,
-	END,
-	ZERO,
-};
-
-static const enum index next_table_destroy_attr[] = {
-	TABLE_DESTROY_ID,
-	END,
-	ZERO,
+static const enum rte_flow_parser_command_index next_flex_item[] = {
+	RTE_FLOW_PARSER_CMD_FLEX_ITEM_CREATE,
+	RTE_FLOW_PARSER_CMD_FLEX_ITEM_DESTROY,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_config_attr[] = {
+	RTE_FLOW_PARSER_CMD_CONFIG_QUEUES_NUMBER,
+	RTE_FLOW_PARSER_CMD_CONFIG_QUEUES_SIZE,
+	RTE_FLOW_PARSER_CMD_CONFIG_COUNTERS_NUMBER,
+	RTE_FLOW_PARSER_CMD_CONFIG_AGING_OBJECTS_NUMBER,
+	RTE_FLOW_PARSER_CMD_CONFIG_METERS_NUMBER,
+	RTE_FLOW_PARSER_CMD_CONFIG_CONN_TRACK_NUMBER,
+	RTE_FLOW_PARSER_CMD_CONFIG_QUOTAS_NUMBER,
+	RTE_FLOW_PARSER_CMD_CONFIG_FLAGS,
+	RTE_FLOW_PARSER_CMD_CONFIG_HOST_PORT,
+	RTE_FLOW_PARSER_CMD_END,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_pt_subcmd[] = {
+	RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_CREATE,
+	RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_DESTROY,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_pt_attr[] = {
+	RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_CREATE_ID,
+	RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_RELAXED_MATCHING,
+	RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_INGRESS,
+	RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_EGRESS,
+	RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_TRANSFER,
+	RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_SPEC,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_pt_destroy_attr[] = {
+	RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_DESTROY_ID,
+	RTE_FLOW_PARSER_CMD_END,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_at_subcmd[] = {
+	RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_CREATE,
+	RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_DESTROY,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_at_attr[] = {
+	RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_CREATE_ID,
+	RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_INGRESS,
+	RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_EGRESS,
+	RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_TRANSFER,
+	RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_SPEC,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_at_destroy_attr[] = {
+	RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_DESTROY_ID,
+	RTE_FLOW_PARSER_CMD_END,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_group_attr[] = {
+	RTE_FLOW_PARSER_CMD_GROUP_INGRESS,
+	RTE_FLOW_PARSER_CMD_GROUP_EGRESS,
+	RTE_FLOW_PARSER_CMD_GROUP_TRANSFER,
+	RTE_FLOW_PARSER_CMD_GROUP_SET_MISS_ACTIONS,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_table_subcmd[] = {
+	RTE_FLOW_PARSER_CMD_TABLE_CREATE,
+	RTE_FLOW_PARSER_CMD_TABLE_DESTROY,
+	RTE_FLOW_PARSER_CMD_TABLE_RESIZE,
+	RTE_FLOW_PARSER_CMD_TABLE_RESIZE_COMPLETE,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_table_attr[] = {
+	RTE_FLOW_PARSER_CMD_TABLE_CREATE_ID,
+	RTE_FLOW_PARSER_CMD_TABLE_GROUP,
+	RTE_FLOW_PARSER_CMD_TABLE_INSERTION_TYPE,
+	RTE_FLOW_PARSER_CMD_TABLE_HASH_FUNC,
+	RTE_FLOW_PARSER_CMD_TABLE_PRIORITY,
+	RTE_FLOW_PARSER_CMD_TABLE_INGRESS,
+	RTE_FLOW_PARSER_CMD_TABLE_EGRESS,
+	RTE_FLOW_PARSER_CMD_TABLE_TRANSFER,
+	RTE_FLOW_PARSER_CMD_TABLE_TRANSFER_WIRE_ORIG,
+	RTE_FLOW_PARSER_CMD_TABLE_TRANSFER_VPORT_ORIG,
+	RTE_FLOW_PARSER_CMD_TABLE_RESIZABLE,
+	RTE_FLOW_PARSER_CMD_TABLE_RULES_NUMBER,
+	RTE_FLOW_PARSER_CMD_TABLE_PATTERN_TEMPLATE,
+	RTE_FLOW_PARSER_CMD_TABLE_ACTIONS_TEMPLATE,
+	RTE_FLOW_PARSER_CMD_END,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_table_destroy_attr[] = {
+	RTE_FLOW_PARSER_CMD_TABLE_DESTROY_ID,
+	RTE_FLOW_PARSER_CMD_END,
+	RTE_FLOW_PARSER_CMD_ZERO,
 };
 
-static const enum index next_queue_subcmd[] = {
-	QUEUE_CREATE,
-	QUEUE_DESTROY,
-	QUEUE_FLOW_UPDATE_RESIZED,
-	QUEUE_UPDATE,
-	QUEUE_AGED,
-	QUEUE_INDIRECT_ACTION,
-	ZERO,
+static const enum rte_flow_parser_command_index next_queue_subcmd[] = {
+	RTE_FLOW_PARSER_CMD_QUEUE_CREATE,
+	RTE_FLOW_PARSER_CMD_QUEUE_DESTROY,
+	RTE_FLOW_PARSER_CMD_QUEUE_FLOW_UPDATE_RESIZED,
+	RTE_FLOW_PARSER_CMD_QUEUE_UPDATE,
+	RTE_FLOW_PARSER_CMD_QUEUE_AGED,
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION,
+	RTE_FLOW_PARSER_CMD_ZERO,
 };
 
-static const enum index next_queue_destroy_attr[] = {
-	QUEUE_DESTROY_ID,
-	END,
-	ZERO,
+static const enum rte_flow_parser_command_index next_queue_destroy_attr[] = {
+	RTE_FLOW_PARSER_CMD_QUEUE_DESTROY_ID,
+	RTE_FLOW_PARSER_CMD_END,
+	RTE_FLOW_PARSER_CMD_ZERO,
 };
 
-static const enum index next_qia_subcmd[] = {
-	QUEUE_INDIRECT_ACTION_CREATE,
-	QUEUE_INDIRECT_ACTION_UPDATE,
-	QUEUE_INDIRECT_ACTION_DESTROY,
-	QUEUE_INDIRECT_ACTION_QUERY,
-	QUEUE_INDIRECT_ACTION_QUERY_UPDATE,
-	ZERO,
+static const enum rte_flow_parser_command_index next_qia_subcmd[] = {
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_CREATE,
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_UPDATE,
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_DESTROY,
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QUERY,
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QUERY_UPDATE,
+	RTE_FLOW_PARSER_CMD_ZERO,
 };
 
-static const enum index next_qia_create_attr[] = {
-	QUEUE_INDIRECT_ACTION_CREATE_ID,
-	QUEUE_INDIRECT_ACTION_INGRESS,
-	QUEUE_INDIRECT_ACTION_EGRESS,
-	QUEUE_INDIRECT_ACTION_TRANSFER,
-	QUEUE_INDIRECT_ACTION_CREATE_POSTPONE,
-	QUEUE_INDIRECT_ACTION_SPEC,
-	QUEUE_INDIRECT_ACTION_LIST,
-	ZERO,
+static const enum rte_flow_parser_command_index next_qia_create_attr[] = {
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_CREATE_ID,
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_INGRESS,
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_EGRESS,
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_TRANSFER,
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_CREATE_POSTPONE,
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_SPEC,
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_LIST,
+	RTE_FLOW_PARSER_CMD_ZERO,
 };
 
-static const enum index next_qia_update_attr[] = {
-	QUEUE_INDIRECT_ACTION_UPDATE_POSTPONE,
-	QUEUE_INDIRECT_ACTION_SPEC,
-	ZERO,
+static const enum rte_flow_parser_command_index next_qia_update_attr[] = {
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_UPDATE_POSTPONE,
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_SPEC,
+	RTE_FLOW_PARSER_CMD_ZERO,
 };
 
-static const enum index next_qia_destroy_attr[] = {
-	QUEUE_INDIRECT_ACTION_DESTROY_POSTPONE,
-	QUEUE_INDIRECT_ACTION_DESTROY_ID,
-	END,
-	ZERO,
+static const enum rte_flow_parser_command_index next_qia_destroy_attr[] = {
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_DESTROY_POSTPONE,
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_DESTROY_ID,
+	RTE_FLOW_PARSER_CMD_END,
+	RTE_FLOW_PARSER_CMD_ZERO,
 };
 
-static const enum index next_qia_query_attr[] = {
-	QUEUE_INDIRECT_ACTION_QUERY_POSTPONE,
-	END,
-	ZERO,
+static const enum rte_flow_parser_command_index next_qia_query_attr[] = {
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QUERY_POSTPONE,
+	RTE_FLOW_PARSER_CMD_END,
+	RTE_FLOW_PARSER_CMD_ZERO,
 };
 
-static const enum index next_ia_create_attr[] = {
-	INDIRECT_ACTION_CREATE_ID,
-	INDIRECT_ACTION_INGRESS,
-	INDIRECT_ACTION_EGRESS,
-	INDIRECT_ACTION_TRANSFER,
-	INDIRECT_ACTION_SPEC,
-	INDIRECT_ACTION_LIST,
-	INDIRECT_ACTION_FLOW_CONF,
-	ZERO,
+static const enum rte_flow_parser_command_index next_ia_create_attr[] = {
+	RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_CREATE_ID,
+	RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_INGRESS,
+	RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_EGRESS,
+	RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_TRANSFER,
+	RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_SPEC,
+	RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_LIST,
+	RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_FLOW_CONF,
+	RTE_FLOW_PARSER_CMD_ZERO,
 };
 
-static const enum index next_ia[] = {
-	INDIRECT_ACTION_ID2PTR,
-	ACTION_NEXT,
-	ZERO
+static const enum rte_flow_parser_command_index next_ia[] = {
+	RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_ID2PTR,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO
 };
 
-static const enum index next_ial[] = {
-	ACTION_INDIRECT_LIST_HANDLE,
-	ACTION_INDIRECT_LIST_CONF,
-	ACTION_NEXT,
-	ZERO
+static const enum rte_flow_parser_command_index next_ial[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_INDIRECT_LIST_HANDLE,
+	RTE_FLOW_PARSER_CMD_ACTION_INDIRECT_LIST_CONF,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO
 };
 
-static const enum index next_qia_qu_attr[] = {
-	QUEUE_INDIRECT_ACTION_QU_MODE,
-	QUEUE_INDIRECT_ACTION_UPDATE_POSTPONE,
-	INDIRECT_ACTION_SPEC,
-	ZERO
+static const enum rte_flow_parser_command_index next_qia_qu_attr[] = {
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QU_MODE,
+	RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_UPDATE_POSTPONE,
+	RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_SPEC,
+	RTE_FLOW_PARSER_CMD_ZERO
 };
 
-static const enum index next_ia_qu_attr[] = {
-	INDIRECT_ACTION_QU_MODE,
-	INDIRECT_ACTION_SPEC,
-	ZERO
+static const enum rte_flow_parser_command_index next_ia_qu_attr[] = {
+	RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QU_MODE,
+	RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_SPEC,
+	RTE_FLOW_PARSER_CMD_ZERO
 };
 
-static const enum index next_dump_subcmd[] = {
-	DUMP_ALL,
-	DUMP_ONE,
-	DUMP_IS_USER_ID,
-	ZERO,
-};
-
-static const enum index next_ia_subcmd[] = {
-	INDIRECT_ACTION_CREATE,
-	INDIRECT_ACTION_UPDATE,
-	INDIRECT_ACTION_DESTROY,
-	INDIRECT_ACTION_QUERY,
-	INDIRECT_ACTION_QUERY_UPDATE,
-	ZERO,
-};
-
-static const enum index next_vc_attr[] = {
-	VC_GROUP,
-	VC_PRIORITY,
-	VC_INGRESS,
-	VC_EGRESS,
-	VC_TRANSFER,
-	VC_TUNNEL_SET,
-	VC_TUNNEL_MATCH,
-	VC_USER_ID,
-	ITEM_PATTERN,
-	ZERO,
-};
-
-static const enum index next_destroy_attr[] = {
-	DESTROY_RULE,
-	DESTROY_IS_USER_ID,
-	END,
-	ZERO,
-};
-
-static const enum index next_dump_attr[] = {
-	COMMON_FILE_PATH,
-	END,
-	ZERO,
-};
-
-static const enum index next_query_attr[] = {
-	QUERY_IS_USER_ID,
-	END,
-	ZERO,
-};
-
-static const enum index next_list_attr[] = {
-	LIST_GROUP,
-	END,
-	ZERO,
-};
-
-static const enum index next_aged_attr[] = {
-	AGED_DESTROY,
-	END,
-	ZERO,
-};
-
-static const enum index next_ia_destroy_attr[] = {
-	INDIRECT_ACTION_DESTROY_ID,
-	END,
-	ZERO,
-};
-
-static const enum index next_async_insert_subcmd[] = {
-	QUEUE_PATTERN_TEMPLATE,
-	QUEUE_RULE_ID,
-	ZERO,
-};
-
-static const enum index next_async_pattern_subcmd[] = {
-	QUEUE_PATTERN_TEMPLATE,
-	QUEUE_ACTIONS_TEMPLATE,
-	ZERO,
-};
-
-static const enum index item_param[] = {
-	ITEM_PARAM_IS,
-	ITEM_PARAM_SPEC,
-	ITEM_PARAM_LAST,
-	ITEM_PARAM_MASK,
-	ITEM_PARAM_PREFIX,
-	ZERO,
-};
-
-static const enum index next_item[] = {
-	ITEM_END,
-	ITEM_VOID,
-	ITEM_INVERT,
-	ITEM_ANY,
-	ITEM_PORT_ID,
-	ITEM_MARK,
-	ITEM_RAW,
-	ITEM_ETH,
-	ITEM_VLAN,
-	ITEM_IPV4,
-	ITEM_IPV6,
-	ITEM_ICMP,
-	ITEM_UDP,
-	ITEM_TCP,
-	ITEM_SCTP,
-	ITEM_VXLAN,
-	ITEM_E_TAG,
-	ITEM_NVGRE,
-	ITEM_MPLS,
-	ITEM_GRE,
-	ITEM_FUZZY,
-	ITEM_GTP,
-	ITEM_GTPC,
-	ITEM_GTPU,
-	ITEM_GENEVE,
-	ITEM_VXLAN_GPE,
-	ITEM_ARP_ETH_IPV4,
-	ITEM_IPV6_EXT,
-	ITEM_IPV6_FRAG_EXT,
-	ITEM_IPV6_ROUTING_EXT,
-	ITEM_ICMP6,
-	ITEM_ICMP6_ECHO_REQUEST,
-	ITEM_ICMP6_ECHO_REPLY,
-	ITEM_ICMP6_ND_NS,
-	ITEM_ICMP6_ND_NA,
-	ITEM_ICMP6_ND_OPT,
-	ITEM_ICMP6_ND_OPT_SLA_ETH,
-	ITEM_ICMP6_ND_OPT_TLA_ETH,
-	ITEM_META,
-	ITEM_RANDOM,
-	ITEM_GRE_KEY,
-	ITEM_GRE_OPTION,
-	ITEM_GTP_PSC,
-	ITEM_PPPOES,
-	ITEM_PPPOED,
-	ITEM_PPPOE_PROTO_ID,
-	ITEM_HIGIG2,
-	ITEM_TAG,
-	ITEM_L2TPV3OIP,
-	ITEM_ESP,
-	ITEM_AH,
-	ITEM_PFCP,
-	ITEM_ECPRI,
-	ITEM_GENEVE_OPT,
-	ITEM_INTEGRITY,
-	ITEM_CONNTRACK,
-	ITEM_PORT_REPRESENTOR,
-	ITEM_REPRESENTED_PORT,
-	ITEM_FLEX,
-	ITEM_L2TPV2,
-	ITEM_PPP,
-	ITEM_METER,
-	ITEM_QUOTA,
-	ITEM_AGGR_AFFINITY,
-	ITEM_TX_QUEUE,
-	ITEM_IB_BTH,
-	ITEM_PTYPE,
-	ITEM_NSH,
-	ITEM_COMPARE,
-	END_SET,
-	ZERO,
-};
-
-static const enum index item_fuzzy[] = {
-	ITEM_FUZZY_THRESH,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_any[] = {
-	ITEM_ANY_NUM,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_port_id[] = {
-	ITEM_PORT_ID_ID,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_mark[] = {
-	ITEM_MARK_ID,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_raw[] = {
-	ITEM_RAW_RELATIVE,
-	ITEM_RAW_SEARCH,
-	ITEM_RAW_OFFSET,
-	ITEM_RAW_LIMIT,
-	ITEM_RAW_PATTERN,
-	ITEM_RAW_PATTERN_HEX,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_eth[] = {
-	ITEM_ETH_DST,
-	ITEM_ETH_SRC,
-	ITEM_ETH_TYPE,
-	ITEM_ETH_HAS_VLAN,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_vlan[] = {
-	ITEM_VLAN_TCI,
-	ITEM_VLAN_PCP,
-	ITEM_VLAN_DEI,
-	ITEM_VLAN_VID,
-	ITEM_VLAN_INNER_TYPE,
-	ITEM_VLAN_HAS_MORE_VLAN,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_ipv4[] = {
-	ITEM_IPV4_VER_IHL,
-	ITEM_IPV4_TOS,
-	ITEM_IPV4_LENGTH,
-	ITEM_IPV4_ID,
-	ITEM_IPV4_FRAGMENT_OFFSET,
-	ITEM_IPV4_TTL,
-	ITEM_IPV4_PROTO,
-	ITEM_IPV4_SRC,
-	ITEM_IPV4_DST,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_ipv6[] = {
-	ITEM_IPV6_TC,
-	ITEM_IPV6_FLOW,
-	ITEM_IPV6_LEN,
-	ITEM_IPV6_PROTO,
-	ITEM_IPV6_HOP,
-	ITEM_IPV6_SRC,
-	ITEM_IPV6_DST,
-	ITEM_IPV6_HAS_FRAG_EXT,
-	ITEM_IPV6_ROUTING_EXT,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_ipv6_routing_ext[] = {
-	ITEM_IPV6_ROUTING_EXT_TYPE,
-	ITEM_IPV6_ROUTING_EXT_NEXT_HDR,
-	ITEM_IPV6_ROUTING_EXT_SEG_LEFT,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_icmp[] = {
-	ITEM_ICMP_TYPE,
-	ITEM_ICMP_CODE,
-	ITEM_ICMP_IDENT,
-	ITEM_ICMP_SEQ,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_udp[] = {
-	ITEM_UDP_SRC,
-	ITEM_UDP_DST,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_tcp[] = {
-	ITEM_TCP_SRC,
-	ITEM_TCP_DST,
-	ITEM_TCP_FLAGS,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_sctp[] = {
-	ITEM_SCTP_SRC,
-	ITEM_SCTP_DST,
-	ITEM_SCTP_TAG,
-	ITEM_SCTP_CKSUM,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_vxlan[] = {
-	ITEM_VXLAN_VNI,
-	ITEM_VXLAN_FLAG_G,
-	ITEM_VXLAN_FLAG_VER,
-	ITEM_VXLAN_FLAG_I,
-	ITEM_VXLAN_FLAG_P,
-	ITEM_VXLAN_FLAG_B,
-	ITEM_VXLAN_FLAG_O,
-	ITEM_VXLAN_FLAG_D,
-	ITEM_VXLAN_FLAG_A,
-	ITEM_VXLAN_GBP_ID,
-	ITEM_VXLAN_GPE_PROTO,
-	ITEM_VXLAN_FIRST_RSVD,
-	ITEM_VXLAN_SECND_RSVD,
-	ITEM_VXLAN_THIRD_RSVD,
-	ITEM_VXLAN_LAST_RSVD,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_e_tag[] = {
-	ITEM_E_TAG_GRP_ECID_B,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_nvgre[] = {
-	ITEM_NVGRE_TNI,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_mpls[] = {
-	ITEM_MPLS_LABEL,
-	ITEM_MPLS_TC,
-	ITEM_MPLS_S,
-	ITEM_MPLS_TTL,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_gre[] = {
-	ITEM_GRE_PROTO,
-	ITEM_GRE_C_RSVD0_VER,
-	ITEM_GRE_C_BIT,
-	ITEM_GRE_K_BIT,
-	ITEM_GRE_S_BIT,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_gre_key[] = {
-	ITEM_GRE_KEY_VALUE,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_gre_option[] = {
-	ITEM_GRE_OPTION_CHECKSUM,
-	ITEM_GRE_OPTION_KEY,
-	ITEM_GRE_OPTION_SEQUENCE,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_gtp[] = {
-	ITEM_GTP_FLAGS,
-	ITEM_GTP_MSG_TYPE,
-	ITEM_GTP_TEID,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_geneve[] = {
-	ITEM_GENEVE_VNI,
-	ITEM_GENEVE_PROTO,
-	ITEM_GENEVE_OPTLEN,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_vxlan_gpe[] = {
-	ITEM_VXLAN_GPE_VNI,
-	ITEM_VXLAN_GPE_PROTO_IN_DEPRECATED_VXLAN_GPE_HDR,
-	ITEM_VXLAN_GPE_FLAGS,
-	ITEM_VXLAN_GPE_RSVD0,
-	ITEM_VXLAN_GPE_RSVD1,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_arp_eth_ipv4[] = {
-	ITEM_ARP_ETH_IPV4_SHA,
-	ITEM_ARP_ETH_IPV4_SPA,
-	ITEM_ARP_ETH_IPV4_THA,
-	ITEM_ARP_ETH_IPV4_TPA,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_ipv6_ext[] = {
-	ITEM_IPV6_EXT_NEXT_HDR,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_ipv6_frag_ext[] = {
-	ITEM_IPV6_FRAG_EXT_NEXT_HDR,
-	ITEM_IPV6_FRAG_EXT_FRAG_DATA,
-	ITEM_IPV6_FRAG_EXT_ID,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_icmp6[] = {
-	ITEM_ICMP6_TYPE,
-	ITEM_ICMP6_CODE,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_icmp6_echo_request[] = {
-	ITEM_ICMP6_ECHO_REQUEST_ID,
-	ITEM_ICMP6_ECHO_REQUEST_SEQ,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_icmp6_echo_reply[] = {
-	ITEM_ICMP6_ECHO_REPLY_ID,
-	ITEM_ICMP6_ECHO_REPLY_SEQ,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_icmp6_nd_ns[] = {
-	ITEM_ICMP6_ND_NS_TARGET_ADDR,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_icmp6_nd_na[] = {
-	ITEM_ICMP6_ND_NA_TARGET_ADDR,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_icmp6_nd_opt[] = {
-	ITEM_ICMP6_ND_OPT_TYPE,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_icmp6_nd_opt_sla_eth[] = {
-	ITEM_ICMP6_ND_OPT_SLA_ETH_SLA,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_icmp6_nd_opt_tla_eth[] = {
-	ITEM_ICMP6_ND_OPT_TLA_ETH_TLA,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_meta[] = {
-	ITEM_META_DATA,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_random[] = {
-	ITEM_RANDOM_VALUE,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_gtp_psc[] = {
-	ITEM_GTP_PSC_QFI,
-	ITEM_GTP_PSC_PDU_T,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_pppoed[] = {
-	ITEM_PPPOE_SEID,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_pppoes[] = {
-	ITEM_PPPOE_SEID,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_pppoe_proto_id[] = {
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_higig2[] = {
-	ITEM_HIGIG2_CLASSIFICATION,
-	ITEM_HIGIG2_VID,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_esp[] = {
-	ITEM_ESP_SPI,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_ah[] = {
-	ITEM_AH_SPI,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_pfcp[] = {
-	ITEM_PFCP_S_FIELD,
-	ITEM_PFCP_SEID,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index next_set_raw[] = {
-	SET_RAW_INDEX,
-	ITEM_ETH,
-	ZERO,
-};
-
-static const enum index item_tag[] = {
-	ITEM_TAG_DATA,
-	ITEM_TAG_INDEX,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_l2tpv3oip[] = {
-	ITEM_L2TPV3OIP_SESSION_ID,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_ecpri[] = {
-	ITEM_ECPRI_COMMON,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_ecpri_common[] = {
-	ITEM_ECPRI_COMMON_TYPE,
-	ZERO,
-};
-
-static const enum index item_ecpri_common_type[] = {
-	ITEM_ECPRI_COMMON_TYPE_IQ_DATA,
-	ITEM_ECPRI_COMMON_TYPE_RTC_CTRL,
-	ITEM_ECPRI_COMMON_TYPE_DLY_MSR,
-	ZERO,
-};
-
-static const enum index item_geneve_opt[] = {
-	ITEM_GENEVE_OPT_CLASS,
-	ITEM_GENEVE_OPT_TYPE,
-	ITEM_GENEVE_OPT_LENGTH,
-	ITEM_GENEVE_OPT_DATA,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_integrity[] = {
-	ITEM_INTEGRITY_LEVEL,
-	ITEM_INTEGRITY_VALUE,
-	ZERO,
-};
-
-static const enum index item_integrity_lv[] = {
-	ITEM_INTEGRITY_LEVEL,
-	ITEM_INTEGRITY_VALUE,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_port_representor[] = {
-	ITEM_PORT_REPRESENTOR_PORT_ID,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_represented_port[] = {
-	ITEM_REPRESENTED_PORT_ETHDEV_PORT_ID,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_flex[] = {
-	ITEM_FLEX_PATTERN_HANDLE,
-	ITEM_FLEX_ITEM_HANDLE,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_l2tpv2[] = {
-	ITEM_L2TPV2_TYPE,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_l2tpv2_type[] = {
-	ITEM_L2TPV2_TYPE_DATA,
-	ITEM_L2TPV2_TYPE_DATA_L,
-	ITEM_L2TPV2_TYPE_DATA_S,
-	ITEM_L2TPV2_TYPE_DATA_O,
-	ITEM_L2TPV2_TYPE_DATA_L_S,
-	ITEM_L2TPV2_TYPE_CTRL,
-	ZERO,
-};
-
-static const enum index item_l2tpv2_type_data[] = {
-	ITEM_L2TPV2_MSG_DATA_TUNNEL_ID,
-	ITEM_L2TPV2_MSG_DATA_SESSION_ID,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_l2tpv2_type_data_l[] = {
-	ITEM_L2TPV2_MSG_DATA_L_LENGTH,
-	ITEM_L2TPV2_MSG_DATA_L_TUNNEL_ID,
-	ITEM_L2TPV2_MSG_DATA_L_SESSION_ID,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_l2tpv2_type_data_s[] = {
-	ITEM_L2TPV2_MSG_DATA_S_TUNNEL_ID,
-	ITEM_L2TPV2_MSG_DATA_S_SESSION_ID,
-	ITEM_L2TPV2_MSG_DATA_S_NS,
-	ITEM_L2TPV2_MSG_DATA_S_NR,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_l2tpv2_type_data_o[] = {
-	ITEM_L2TPV2_MSG_DATA_O_TUNNEL_ID,
-	ITEM_L2TPV2_MSG_DATA_O_SESSION_ID,
-	ITEM_L2TPV2_MSG_DATA_O_OFFSET,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_l2tpv2_type_data_l_s[] = {
-	ITEM_L2TPV2_MSG_DATA_L_S_LENGTH,
-	ITEM_L2TPV2_MSG_DATA_L_S_TUNNEL_ID,
-	ITEM_L2TPV2_MSG_DATA_L_S_SESSION_ID,
-	ITEM_L2TPV2_MSG_DATA_L_S_NS,
-	ITEM_L2TPV2_MSG_DATA_L_S_NR,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_l2tpv2_type_ctrl[] = {
-	ITEM_L2TPV2_MSG_CTRL_LENGTH,
-	ITEM_L2TPV2_MSG_CTRL_TUNNEL_ID,
-	ITEM_L2TPV2_MSG_CTRL_SESSION_ID,
-	ITEM_L2TPV2_MSG_CTRL_NS,
-	ITEM_L2TPV2_MSG_CTRL_NR,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_ppp[] = {
-	ITEM_PPP_ADDR,
-	ITEM_PPP_CTRL,
-	ITEM_PPP_PROTO_ID,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_meter[] = {
-	ITEM_METER_COLOR,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_quota[] = {
-	ITEM_QUOTA_STATE,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_aggr_affinity[] = {
-	ITEM_AGGR_AFFINITY_VALUE,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_tx_queue[] = {
-	ITEM_TX_QUEUE_VALUE,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_ib_bth[] = {
-	ITEM_IB_BTH_OPCODE,
-	ITEM_IB_BTH_PKEY,
-	ITEM_IB_BTH_DST_QPN,
-	ITEM_IB_BTH_PSN,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_ptype[] = {
-	ITEM_PTYPE_VALUE,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_nsh[] = {
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index item_compare_field[] = {
-	ITEM_COMPARE_OP,
-	ITEM_COMPARE_FIELD_A_TYPE,
-	ITEM_COMPARE_FIELD_B_TYPE,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index compare_field_a[] = {
-	ITEM_COMPARE_FIELD_A_TYPE,
-	ITEM_COMPARE_FIELD_A_LEVEL,
-	ITEM_COMPARE_FIELD_A_TAG_INDEX,
-	ITEM_COMPARE_FIELD_A_TYPE_ID,
-	ITEM_COMPARE_FIELD_A_CLASS_ID,
-	ITEM_COMPARE_FIELD_A_OFFSET,
-	ITEM_COMPARE_FIELD_B_TYPE,
-	ZERO,
-};
-
-static const enum index compare_field_b[] = {
-	ITEM_COMPARE_FIELD_B_TYPE,
-	ITEM_COMPARE_FIELD_B_LEVEL,
-	ITEM_COMPARE_FIELD_B_TAG_INDEX,
-	ITEM_COMPARE_FIELD_B_TYPE_ID,
-	ITEM_COMPARE_FIELD_B_CLASS_ID,
-	ITEM_COMPARE_FIELD_B_OFFSET,
-	ITEM_COMPARE_FIELD_B_VALUE,
-	ITEM_COMPARE_FIELD_B_POINTER,
-	ITEM_COMPARE_FIELD_WIDTH,
-	ZERO,
-};
-
-static const enum index next_action[] = {
-	ACTION_END,
-	ACTION_VOID,
-	ACTION_PASSTHRU,
-	ACTION_SKIP_CMAN,
-	ACTION_JUMP,
-	ACTION_MARK,
-	ACTION_FLAG,
-	ACTION_QUEUE,
-	ACTION_DROP,
-	ACTION_COUNT,
-	ACTION_RSS,
-	ACTION_PF,
-	ACTION_VF,
-	ACTION_PORT_ID,
-	ACTION_METER,
-	ACTION_METER_COLOR,
-	ACTION_METER_MARK,
-	ACTION_METER_MARK_CONF,
-	ACTION_OF_DEC_NW_TTL,
-	ACTION_OF_POP_VLAN,
-	ACTION_OF_PUSH_VLAN,
-	ACTION_OF_SET_VLAN_VID,
-	ACTION_OF_SET_VLAN_PCP,
-	ACTION_OF_POP_MPLS,
-	ACTION_OF_PUSH_MPLS,
-	ACTION_VXLAN_ENCAP,
-	ACTION_VXLAN_DECAP,
-	ACTION_NVGRE_ENCAP,
-	ACTION_NVGRE_DECAP,
-	ACTION_L2_ENCAP,
-	ACTION_L2_DECAP,
-	ACTION_MPLSOGRE_ENCAP,
-	ACTION_MPLSOGRE_DECAP,
-	ACTION_MPLSOUDP_ENCAP,
-	ACTION_MPLSOUDP_DECAP,
-	ACTION_SET_IPV4_SRC,
-	ACTION_SET_IPV4_DST,
-	ACTION_SET_IPV6_SRC,
-	ACTION_SET_IPV6_DST,
-	ACTION_SET_TP_SRC,
-	ACTION_SET_TP_DST,
-	ACTION_MAC_SWAP,
-	ACTION_DEC_TTL,
-	ACTION_SET_TTL,
-	ACTION_SET_MAC_SRC,
-	ACTION_SET_MAC_DST,
-	ACTION_INC_TCP_SEQ,
-	ACTION_DEC_TCP_SEQ,
-	ACTION_INC_TCP_ACK,
-	ACTION_DEC_TCP_ACK,
-	ACTION_RAW_ENCAP,
-	ACTION_RAW_DECAP,
-	ACTION_SET_TAG,
-	ACTION_SET_META,
-	ACTION_SET_IPV4_DSCP,
-	ACTION_SET_IPV6_DSCP,
-	ACTION_AGE,
-	ACTION_AGE_UPDATE,
-	ACTION_SAMPLE,
-	ACTION_INDIRECT,
-	ACTION_INDIRECT_LIST,
-	ACTION_SHARED_INDIRECT,
-	ACTION_MODIFY_FIELD,
-	ACTION_CONNTRACK,
-	ACTION_CONNTRACK_UPDATE,
-	ACTION_PORT_REPRESENTOR,
-	ACTION_REPRESENTED_PORT,
-	ACTION_SEND_TO_KERNEL,
-	ACTION_QUOTA_CREATE,
-	ACTION_QUOTA_QU,
-	ACTION_IPV6_EXT_REMOVE,
-	ACTION_IPV6_EXT_PUSH,
-	ACTION_NAT64,
-	ACTION_JUMP_TO_TABLE_INDEX,
-	ZERO,
-};
-
-static const enum index action_quota_create[] = {
-	ACTION_QUOTA_CREATE_LIMIT,
-	ACTION_QUOTA_CREATE_MODE,
-	ACTION_NEXT,
-	ZERO
-};
-
-static const enum index action_quota_update[] = {
-	ACTION_QUOTA_QU_LIMIT,
-	ACTION_QUOTA_QU_UPDATE_OP,
-	ACTION_NEXT,
-	ZERO
-};
-
-static const enum index action_mark[] = {
-	ACTION_MARK_ID,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_queue[] = {
-	ACTION_QUEUE_INDEX,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_count[] = {
-	ACTION_COUNT_ID,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_rss[] = {
-	ACTION_RSS_FUNC,
-	ACTION_RSS_LEVEL,
-	ACTION_RSS_TYPES,
-	ACTION_RSS_KEY,
-	ACTION_RSS_KEY_LEN,
-	ACTION_RSS_QUEUES,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_vf[] = {
-	ACTION_VF_ORIGINAL,
-	ACTION_VF_ID,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_port_id[] = {
-	ACTION_PORT_ID_ORIGINAL,
-	ACTION_PORT_ID_ID,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_meter[] = {
-	ACTION_METER_ID,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_meter_color[] = {
-	ACTION_METER_COLOR_TYPE,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_meter_mark[] = {
-	ACTION_METER_PROFILE,
-	ACTION_METER_POLICY,
-	ACTION_METER_COLOR_MODE,
-	ACTION_METER_STATE,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_of_push_vlan[] = {
-	ACTION_OF_PUSH_VLAN_ETHERTYPE,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_of_set_vlan_vid[] = {
-	ACTION_OF_SET_VLAN_VID_VLAN_VID,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_of_set_vlan_pcp[] = {
-	ACTION_OF_SET_VLAN_PCP_VLAN_PCP,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_of_pop_mpls[] = {
-	ACTION_OF_POP_MPLS_ETHERTYPE,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_of_push_mpls[] = {
-	ACTION_OF_PUSH_MPLS_ETHERTYPE,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_set_ipv4_src[] = {
-	ACTION_SET_IPV4_SRC_IPV4_SRC,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_set_mac_src[] = {
-	ACTION_SET_MAC_SRC_MAC_SRC,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_set_ipv4_dst[] = {
-	ACTION_SET_IPV4_DST_IPV4_DST,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_set_ipv6_src[] = {
-	ACTION_SET_IPV6_SRC_IPV6_SRC,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_set_ipv6_dst[] = {
-	ACTION_SET_IPV6_DST_IPV6_DST,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_set_tp_src[] = {
-	ACTION_SET_TP_SRC_TP_SRC,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_set_tp_dst[] = {
-	ACTION_SET_TP_DST_TP_DST,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_set_ttl[] = {
-	ACTION_SET_TTL_TTL,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_jump[] = {
-	ACTION_JUMP_GROUP,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_set_mac_dst[] = {
-	ACTION_SET_MAC_DST_MAC_DST,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_inc_tcp_seq[] = {
-	ACTION_INC_TCP_SEQ_VALUE,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_dec_tcp_seq[] = {
-	ACTION_DEC_TCP_SEQ_VALUE,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_inc_tcp_ack[] = {
-	ACTION_INC_TCP_ACK_VALUE,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_dec_tcp_ack[] = {
-	ACTION_DEC_TCP_ACK_VALUE,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_raw_encap[] = {
-	ACTION_RAW_ENCAP_SIZE,
-	ACTION_RAW_ENCAP_INDEX,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_raw_decap[] = {
-	ACTION_RAW_DECAP_INDEX,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_ipv6_ext_remove[] = {
-	ACTION_IPV6_EXT_REMOVE_INDEX,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_ipv6_ext_push[] = {
-	ACTION_IPV6_EXT_PUSH_INDEX,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_set_tag[] = {
-	ACTION_SET_TAG_DATA,
-	ACTION_SET_TAG_INDEX,
-	ACTION_SET_TAG_MASK,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_set_meta[] = {
-	ACTION_SET_META_DATA,
-	ACTION_SET_META_MASK,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_set_ipv4_dscp[] = {
-	ACTION_SET_IPV4_DSCP_VALUE,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_set_ipv6_dscp[] = {
-	ACTION_SET_IPV6_DSCP_VALUE,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_age[] = {
-	ACTION_AGE,
-	ACTION_AGE_TIMEOUT,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_age_update[] = {
-	ACTION_AGE_UPDATE,
-	ACTION_AGE_UPDATE_TIMEOUT,
-	ACTION_AGE_UPDATE_TOUCH,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_sample[] = {
-	ACTION_SAMPLE,
-	ACTION_SAMPLE_RATIO,
-	ACTION_SAMPLE_INDEX,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index next_action_sample[] = {
-	ACTION_QUEUE,
-	ACTION_RSS,
-	ACTION_MARK,
-	ACTION_COUNT,
-	ACTION_PORT_ID,
-	ACTION_RAW_ENCAP,
-	ACTION_VXLAN_ENCAP,
-	ACTION_NVGRE_ENCAP,
-	ACTION_REPRESENTED_PORT,
-	ACTION_PORT_REPRESENTOR,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index item_ipv6_push_ext[] = {
-	ITEM_IPV6_PUSH_REMOVE_EXT,
-	ZERO,
-};
-
-static const enum index item_ipv6_push_ext_type[] = {
-	ITEM_IPV6_PUSH_REMOVE_EXT_TYPE,
-	ZERO,
-};
-
-static const enum index item_ipv6_push_ext_header[] = {
-	ITEM_IPV6_ROUTING_EXT,
-	ITEM_NEXT,
-	ZERO,
-};
-
-static const enum index action_modify_field_dst[] = {
-	ACTION_MODIFY_FIELD_DST_LEVEL,
-	ACTION_MODIFY_FIELD_DST_TAG_INDEX,
-	ACTION_MODIFY_FIELD_DST_TYPE_ID,
-	ACTION_MODIFY_FIELD_DST_CLASS_ID,
-	ACTION_MODIFY_FIELD_DST_OFFSET,
-	ACTION_MODIFY_FIELD_SRC_TYPE,
-	ZERO,
-};
-
-static const enum index action_modify_field_src[] = {
-	ACTION_MODIFY_FIELD_SRC_LEVEL,
-	ACTION_MODIFY_FIELD_SRC_TAG_INDEX,
-	ACTION_MODIFY_FIELD_SRC_TYPE_ID,
-	ACTION_MODIFY_FIELD_SRC_CLASS_ID,
-	ACTION_MODIFY_FIELD_SRC_OFFSET,
-	ACTION_MODIFY_FIELD_SRC_VALUE,
-	ACTION_MODIFY_FIELD_SRC_POINTER,
-	ACTION_MODIFY_FIELD_WIDTH,
-	ZERO,
-};
-
-static const enum index action_update_conntrack[] = {
-	ACTION_CONNTRACK_UPDATE_DIR,
-	ACTION_CONNTRACK_UPDATE_CTX,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_port_representor[] = {
-	ACTION_PORT_REPRESENTOR_PORT_ID,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_represented_port[] = {
-	ACTION_REPRESENTED_PORT_ETHDEV_PORT_ID,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index action_nat64[] = {
-	ACTION_NAT64_MODE,
-	ACTION_NEXT,
-	ZERO,
-};
-
-static const enum index next_hash_subcmd[] = {
-	HASH_CALC_TABLE,
-	HASH_CALC_ENCAP,
-	ZERO,
-};
-
-static const enum index next_hash_encap_dest_subcmd[] = {
-	ENCAP_HASH_FIELD_SRC_PORT,
-	ENCAP_HASH_FIELD_GRE_FLOW_ID,
-	ZERO,
-};
-
-static const enum index action_jump_to_table_index[] = {
-	ACTION_JUMP_TO_TABLE_INDEX_TABLE,
-	ACTION_JUMP_TO_TABLE_INDEX_INDEX,
-	ACTION_NEXT,
-	ZERO,
+static const enum rte_flow_parser_command_index next_dump_subcmd[] = {
+	RTE_FLOW_PARSER_CMD_DUMP_ALL,
+	RTE_FLOW_PARSER_CMD_DUMP_ONE,
+	RTE_FLOW_PARSER_CMD_DUMP_IS_USER_ID,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_ia_subcmd[] = {
+	RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_CREATE,
+	RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_UPDATE,
+	RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_DESTROY,
+	RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QUERY,
+	RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QUERY_UPDATE,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_vc_attr[] = {
+	RTE_FLOW_PARSER_CMD_VC_GROUP,
+	RTE_FLOW_PARSER_CMD_VC_PRIORITY,
+	RTE_FLOW_PARSER_CMD_VC_INGRESS,
+	RTE_FLOW_PARSER_CMD_VC_EGRESS,
+	RTE_FLOW_PARSER_CMD_VC_TRANSFER,
+	RTE_FLOW_PARSER_CMD_VC_TUNNEL_SET,
+	RTE_FLOW_PARSER_CMD_VC_TUNNEL_MATCH,
+	RTE_FLOW_PARSER_CMD_VC_USER_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_PATTERN,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_destroy_attr[] = {
+	RTE_FLOW_PARSER_CMD_DESTROY_RULE,
+	RTE_FLOW_PARSER_CMD_DESTROY_IS_USER_ID,
+	RTE_FLOW_PARSER_CMD_END,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_dump_attr[] = {
+	RTE_FLOW_PARSER_CMD_COMMON_FILE_PATH,
+	RTE_FLOW_PARSER_CMD_END,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_query_attr[] = {
+	RTE_FLOW_PARSER_CMD_QUERY_IS_USER_ID,
+	RTE_FLOW_PARSER_CMD_END,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_list_attr[] = {
+	RTE_FLOW_PARSER_CMD_LIST_GROUP,
+	RTE_FLOW_PARSER_CMD_END,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_aged_attr[] = {
+	RTE_FLOW_PARSER_CMD_AGED_DESTROY,
+	RTE_FLOW_PARSER_CMD_END,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_ia_destroy_attr[] = {
+	RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_DESTROY_ID,
+	RTE_FLOW_PARSER_CMD_END,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_async_insert_subcmd[] = {
+	RTE_FLOW_PARSER_CMD_QUEUE_PATTERN_TEMPLATE,
+	RTE_FLOW_PARSER_CMD_QUEUE_RULE_ID,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_async_pattern_subcmd[] = {
+	RTE_FLOW_PARSER_CMD_QUEUE_PATTERN_TEMPLATE,
+	RTE_FLOW_PARSER_CMD_QUEUE_ACTIONS_TEMPLATE,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_param[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_PARAM_IS,
+	RTE_FLOW_PARSER_CMD_ITEM_PARAM_SPEC,
+	RTE_FLOW_PARSER_CMD_ITEM_PARAM_LAST,
+	RTE_FLOW_PARSER_CMD_ITEM_PARAM_MASK,
+	RTE_FLOW_PARSER_CMD_ITEM_PARAM_PREFIX,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_item[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_END,
+	RTE_FLOW_PARSER_CMD_ITEM_VOID,
+	RTE_FLOW_PARSER_CMD_ITEM_INVERT,
+	RTE_FLOW_PARSER_CMD_ITEM_ANY,
+	RTE_FLOW_PARSER_CMD_ITEM_PORT_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_MARK,
+	RTE_FLOW_PARSER_CMD_ITEM_RAW,
+	RTE_FLOW_PARSER_CMD_ITEM_ETH,
+	RTE_FLOW_PARSER_CMD_ITEM_VLAN,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV4,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6,
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP,
+	RTE_FLOW_PARSER_CMD_ITEM_UDP,
+	RTE_FLOW_PARSER_CMD_ITEM_TCP,
+	RTE_FLOW_PARSER_CMD_ITEM_SCTP,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN,
+	RTE_FLOW_PARSER_CMD_ITEM_E_TAG,
+	RTE_FLOW_PARSER_CMD_ITEM_NVGRE,
+	RTE_FLOW_PARSER_CMD_ITEM_MPLS,
+	RTE_FLOW_PARSER_CMD_ITEM_GRE,
+	RTE_FLOW_PARSER_CMD_ITEM_FUZZY,
+	RTE_FLOW_PARSER_CMD_ITEM_GTP,
+	RTE_FLOW_PARSER_CMD_ITEM_GTPC,
+	RTE_FLOW_PARSER_CMD_ITEM_GTPU,
+	RTE_FLOW_PARSER_CMD_ITEM_GENEVE,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_GPE,
+	RTE_FLOW_PARSER_CMD_ITEM_ARP_ETH_IPV4,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_EXT,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_FRAG_EXT,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_ROUTING_EXT,
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6,
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ECHO_REQUEST,
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ECHO_REPLY,
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_NS,
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_NA,
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_OPT,
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_OPT_SLA_ETH,
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_OPT_TLA_ETH,
+	RTE_FLOW_PARSER_CMD_ITEM_META,
+	RTE_FLOW_PARSER_CMD_ITEM_RANDOM,
+	RTE_FLOW_PARSER_CMD_ITEM_GRE_KEY,
+	RTE_FLOW_PARSER_CMD_ITEM_GRE_OPTION,
+	RTE_FLOW_PARSER_CMD_ITEM_GTP_PSC,
+	RTE_FLOW_PARSER_CMD_ITEM_PPPOES,
+	RTE_FLOW_PARSER_CMD_ITEM_PPPOED,
+	RTE_FLOW_PARSER_CMD_ITEM_PPPOE_PROTO_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_HIGIG2,
+	RTE_FLOW_PARSER_CMD_ITEM_TAG,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV3OIP,
+	RTE_FLOW_PARSER_CMD_ITEM_ESP,
+	RTE_FLOW_PARSER_CMD_ITEM_AH,
+	RTE_FLOW_PARSER_CMD_ITEM_PFCP,
+	RTE_FLOW_PARSER_CMD_ITEM_ECPRI,
+	RTE_FLOW_PARSER_CMD_ITEM_GENEVE_OPT,
+	RTE_FLOW_PARSER_CMD_ITEM_INTEGRITY,
+	RTE_FLOW_PARSER_CMD_ITEM_CONNTRACK,
+	RTE_FLOW_PARSER_CMD_ITEM_PORT_REPRESENTOR,
+	RTE_FLOW_PARSER_CMD_ITEM_REPRESENTED_PORT,
+	RTE_FLOW_PARSER_CMD_ITEM_FLEX,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2,
+	RTE_FLOW_PARSER_CMD_ITEM_PPP,
+	RTE_FLOW_PARSER_CMD_ITEM_METER,
+	RTE_FLOW_PARSER_CMD_ITEM_QUOTA,
+	RTE_FLOW_PARSER_CMD_ITEM_AGGR_AFFINITY,
+	RTE_FLOW_PARSER_CMD_ITEM_TX_QUEUE,
+	RTE_FLOW_PARSER_CMD_ITEM_IB_BTH,
+	RTE_FLOW_PARSER_CMD_ITEM_PTYPE,
+	RTE_FLOW_PARSER_CMD_ITEM_NSH,
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE,
+	RTE_FLOW_PARSER_CMD_END_SET,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_fuzzy[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_FUZZY_THRESH,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_any[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_ANY_NUM,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_port_id[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_PORT_ID_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_mark[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_MARK_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_raw[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_RAW_RELATIVE,
+	RTE_FLOW_PARSER_CMD_ITEM_RAW_SEARCH,
+	RTE_FLOW_PARSER_CMD_ITEM_RAW_OFFSET,
+	RTE_FLOW_PARSER_CMD_ITEM_RAW_LIMIT,
+	RTE_FLOW_PARSER_CMD_ITEM_RAW_PATTERN,
+	RTE_FLOW_PARSER_CMD_ITEM_RAW_PATTERN_HEX,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_eth[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_ETH_DST,
+	RTE_FLOW_PARSER_CMD_ITEM_ETH_SRC,
+	RTE_FLOW_PARSER_CMD_ITEM_ETH_TYPE,
+	RTE_FLOW_PARSER_CMD_ITEM_ETH_HAS_VLAN,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_vlan[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_VLAN_TCI,
+	RTE_FLOW_PARSER_CMD_ITEM_VLAN_PCP,
+	RTE_FLOW_PARSER_CMD_ITEM_VLAN_DEI,
+	RTE_FLOW_PARSER_CMD_ITEM_VLAN_VID,
+	RTE_FLOW_PARSER_CMD_ITEM_VLAN_INNER_TYPE,
+	RTE_FLOW_PARSER_CMD_ITEM_VLAN_HAS_MORE_VLAN,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_ipv4[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_IPV4_VER_IHL,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV4_TOS,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV4_LENGTH,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV4_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV4_FRAGMENT_OFFSET,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV4_TTL,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV4_PROTO,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV4_SRC,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV4_DST,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_ipv6[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_TC,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_FLOW,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_LEN,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_PROTO,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_HOP,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_SRC,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_DST,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_HAS_FRAG_EXT,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_ROUTING_EXT,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_ipv6_routing_ext[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_ROUTING_EXT_TYPE,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_ROUTING_EXT_NEXT_HDR,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_ROUTING_EXT_SEG_LEFT,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_icmp[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP_TYPE,
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP_CODE,
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP_IDENT,
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP_SEQ,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_udp[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_UDP_SRC,
+	RTE_FLOW_PARSER_CMD_ITEM_UDP_DST,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_tcp[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_TCP_SRC,
+	RTE_FLOW_PARSER_CMD_ITEM_TCP_DST,
+	RTE_FLOW_PARSER_CMD_ITEM_TCP_FLAGS,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_sctp[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_SCTP_SRC,
+	RTE_FLOW_PARSER_CMD_ITEM_SCTP_DST,
+	RTE_FLOW_PARSER_CMD_ITEM_SCTP_TAG,
+	RTE_FLOW_PARSER_CMD_ITEM_SCTP_CKSUM,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_vxlan[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_VNI,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_FLAG_G,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_FLAG_VER,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_FLAG_I,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_FLAG_P,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_FLAG_B,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_FLAG_O,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_FLAG_D,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_FLAG_A,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_GBP_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_GPE_PROTO,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_FIRST_RSVD,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_SECND_RSVD,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_THIRD_RSVD,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_LAST_RSVD,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_e_tag[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_E_TAG_GRP_ECID_B,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_nvgre[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_NVGRE_TNI,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_mpls[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_MPLS_LABEL,
+	RTE_FLOW_PARSER_CMD_ITEM_MPLS_TC,
+	RTE_FLOW_PARSER_CMD_ITEM_MPLS_S,
+	RTE_FLOW_PARSER_CMD_ITEM_MPLS_TTL,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_gre[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_GRE_PROTO,
+	RTE_FLOW_PARSER_CMD_ITEM_GRE_C_RSVD0_VER,
+	RTE_FLOW_PARSER_CMD_ITEM_GRE_C_BIT,
+	RTE_FLOW_PARSER_CMD_ITEM_GRE_K_BIT,
+	RTE_FLOW_PARSER_CMD_ITEM_GRE_S_BIT,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_gre_key[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_GRE_KEY_VALUE,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_gre_option[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_GRE_OPTION_CHECKSUM,
+	RTE_FLOW_PARSER_CMD_ITEM_GRE_OPTION_KEY,
+	RTE_FLOW_PARSER_CMD_ITEM_GRE_OPTION_SEQUENCE,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_gtp[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_GTP_FLAGS,
+	RTE_FLOW_PARSER_CMD_ITEM_GTP_MSG_TYPE,
+	RTE_FLOW_PARSER_CMD_ITEM_GTP_TEID,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_geneve[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_GENEVE_VNI,
+	RTE_FLOW_PARSER_CMD_ITEM_GENEVE_PROTO,
+	RTE_FLOW_PARSER_CMD_ITEM_GENEVE_OPTLEN,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_vxlan_gpe[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_GPE_VNI,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_GPE_PROTO_IN_DEPRECATED_VXLAN_GPE_HDR,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_GPE_FLAGS,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_GPE_RSVD0,
+	RTE_FLOW_PARSER_CMD_ITEM_VXLAN_GPE_RSVD1,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_arp_eth_ipv4[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_ARP_ETH_IPV4_SHA,
+	RTE_FLOW_PARSER_CMD_ITEM_ARP_ETH_IPV4_SPA,
+	RTE_FLOW_PARSER_CMD_ITEM_ARP_ETH_IPV4_THA,
+	RTE_FLOW_PARSER_CMD_ITEM_ARP_ETH_IPV4_TPA,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_ipv6_ext[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_EXT_NEXT_HDR,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_ipv6_frag_ext[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_FRAG_EXT_NEXT_HDR,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_FRAG_EXT_FRAG_DATA,
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_FRAG_EXT_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_icmp6[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6_TYPE,
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6_CODE,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_icmp6_echo_request[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ECHO_REQUEST_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ECHO_REQUEST_SEQ,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_icmp6_echo_reply[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ECHO_REPLY_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ECHO_REPLY_SEQ,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_icmp6_nd_ns[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_NS_TARGET_ADDR,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_icmp6_nd_na[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_NA_TARGET_ADDR,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_icmp6_nd_opt[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_OPT_TYPE,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_icmp6_nd_opt_sla_eth[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_OPT_SLA_ETH_SLA,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_icmp6_nd_opt_tla_eth[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_OPT_TLA_ETH_TLA,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_meta[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_META_DATA,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_random[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_RANDOM_VALUE,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_gtp_psc[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_GTP_PSC_QFI,
+	RTE_FLOW_PARSER_CMD_ITEM_GTP_PSC_PDU_T,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_pppoed[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_PPPOE_SEID,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_pppoes[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_PPPOE_SEID,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_pppoe_proto_id[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_higig2[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_HIGIG2_CLASSIFICATION,
+	RTE_FLOW_PARSER_CMD_ITEM_HIGIG2_VID,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_esp[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_ESP_SPI,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_ah[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_AH_SPI,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_pfcp[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_PFCP_S_FIELD,
+	RTE_FLOW_PARSER_CMD_ITEM_PFCP_SEID,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_set_raw[] = {
+	RTE_FLOW_PARSER_CMD_SET_RAW_INDEX,
+	RTE_FLOW_PARSER_CMD_ITEM_ETH,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_tag[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_TAG_DATA,
+	RTE_FLOW_PARSER_CMD_ITEM_TAG_INDEX,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_l2tpv3oip[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV3OIP_SESSION_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_ecpri[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_ECPRI_COMMON,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_ecpri_common[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_ECPRI_COMMON_TYPE,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_ecpri_common_type[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_ECPRI_COMMON_TYPE_IQ_DATA,
+	RTE_FLOW_PARSER_CMD_ITEM_ECPRI_COMMON_TYPE_RTC_CTRL,
+	RTE_FLOW_PARSER_CMD_ITEM_ECPRI_COMMON_TYPE_DLY_MSR,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_geneve_opt[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_GENEVE_OPT_CLASS,
+	RTE_FLOW_PARSER_CMD_ITEM_GENEVE_OPT_TYPE,
+	RTE_FLOW_PARSER_CMD_ITEM_GENEVE_OPT_LENGTH,
+	RTE_FLOW_PARSER_CMD_ITEM_GENEVE_OPT_DATA,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_integrity[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_INTEGRITY_LEVEL,
+	RTE_FLOW_PARSER_CMD_ITEM_INTEGRITY_VALUE,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_integrity_lv[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_INTEGRITY_LEVEL,
+	RTE_FLOW_PARSER_CMD_ITEM_INTEGRITY_VALUE,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_port_representor[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_PORT_REPRESENTOR_PORT_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_represented_port[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_REPRESENTED_PORT_ETHDEV_PORT_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_flex[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_FLEX_PATTERN_HANDLE,
+	RTE_FLOW_PARSER_CMD_ITEM_FLEX_ITEM_HANDLE,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_l2tpv2[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_l2tpv2_type[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE_DATA,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE_DATA_L,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE_DATA_S,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE_DATA_O,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE_DATA_L_S,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE_CTRL,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_l2tpv2_type_data[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_TUNNEL_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_SESSION_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_l2tpv2_type_data_l[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_L_LENGTH,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_L_TUNNEL_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_L_SESSION_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_l2tpv2_type_data_s[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_S_TUNNEL_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_S_SESSION_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_S_NS,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_S_NR,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_l2tpv2_type_data_o[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_O_TUNNEL_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_O_SESSION_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_O_OFFSET,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_l2tpv2_type_data_l_s[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_L_S_LENGTH,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_L_S_TUNNEL_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_L_S_SESSION_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_L_S_NS,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_L_S_NR,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_l2tpv2_type_ctrl[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_CTRL_LENGTH,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_CTRL_TUNNEL_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_CTRL_SESSION_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_CTRL_NS,
+	RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_CTRL_NR,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_ppp[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_PPP_ADDR,
+	RTE_FLOW_PARSER_CMD_ITEM_PPP_CTRL,
+	RTE_FLOW_PARSER_CMD_ITEM_PPP_PROTO_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_meter[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_METER_COLOR,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_quota[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_QUOTA_STATE,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_aggr_affinity[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_AGGR_AFFINITY_VALUE,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_tx_queue[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_TX_QUEUE_VALUE,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_ib_bth[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_IB_BTH_OPCODE,
+	RTE_FLOW_PARSER_CMD_ITEM_IB_BTH_PKEY,
+	RTE_FLOW_PARSER_CMD_ITEM_IB_BTH_DST_QPN,
+	RTE_FLOW_PARSER_CMD_ITEM_IB_BTH_PSN,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_ptype[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_PTYPE_VALUE,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_nsh[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_compare_field[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_OP,
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_TYPE,
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_TYPE,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index compare_field_a[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_TYPE,
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_LEVEL,
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_TAG_INDEX,
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_TYPE_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_CLASS_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_OFFSET,
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_TYPE,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index compare_field_b[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_TYPE,
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_LEVEL,
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_TAG_INDEX,
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_TYPE_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_CLASS_ID,
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_OFFSET,
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_VALUE,
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_POINTER,
+	RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_WIDTH,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_action[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_END,
+	RTE_FLOW_PARSER_CMD_ACTION_VOID,
+	RTE_FLOW_PARSER_CMD_ACTION_PASSTHRU,
+	RTE_FLOW_PARSER_CMD_ACTION_SKIP_CMAN,
+	RTE_FLOW_PARSER_CMD_ACTION_JUMP,
+	RTE_FLOW_PARSER_CMD_ACTION_MARK,
+	RTE_FLOW_PARSER_CMD_ACTION_FLAG,
+	RTE_FLOW_PARSER_CMD_ACTION_QUEUE,
+	RTE_FLOW_PARSER_CMD_ACTION_DROP,
+	RTE_FLOW_PARSER_CMD_ACTION_COUNT,
+	RTE_FLOW_PARSER_CMD_ACTION_RSS,
+	RTE_FLOW_PARSER_CMD_ACTION_PF,
+	RTE_FLOW_PARSER_CMD_ACTION_VF,
+	RTE_FLOW_PARSER_CMD_ACTION_PORT_ID,
+	RTE_FLOW_PARSER_CMD_ACTION_METER,
+	RTE_FLOW_PARSER_CMD_ACTION_METER_COLOR,
+	RTE_FLOW_PARSER_CMD_ACTION_METER_MARK,
+	RTE_FLOW_PARSER_CMD_ACTION_METER_MARK_CONF,
+	RTE_FLOW_PARSER_CMD_ACTION_OF_DEC_NW_TTL,
+	RTE_FLOW_PARSER_CMD_ACTION_OF_POP_VLAN,
+	RTE_FLOW_PARSER_CMD_ACTION_OF_PUSH_VLAN,
+	RTE_FLOW_PARSER_CMD_ACTION_OF_SET_VLAN_VID,
+	RTE_FLOW_PARSER_CMD_ACTION_OF_SET_VLAN_PCP,
+	RTE_FLOW_PARSER_CMD_ACTION_OF_POP_MPLS,
+	RTE_FLOW_PARSER_CMD_ACTION_OF_PUSH_MPLS,
+	RTE_FLOW_PARSER_CMD_ACTION_VXLAN_ENCAP,
+	RTE_FLOW_PARSER_CMD_ACTION_VXLAN_DECAP,
+	RTE_FLOW_PARSER_CMD_ACTION_NVGRE_ENCAP,
+	RTE_FLOW_PARSER_CMD_ACTION_NVGRE_DECAP,
+	RTE_FLOW_PARSER_CMD_ACTION_L2_ENCAP,
+	RTE_FLOW_PARSER_CMD_ACTION_L2_DECAP,
+	RTE_FLOW_PARSER_CMD_ACTION_MPLSOGRE_ENCAP,
+	RTE_FLOW_PARSER_CMD_ACTION_MPLSOGRE_DECAP,
+	RTE_FLOW_PARSER_CMD_ACTION_MPLSOUDP_ENCAP,
+	RTE_FLOW_PARSER_CMD_ACTION_MPLSOUDP_DECAP,
+	RTE_FLOW_PARSER_CMD_ACTION_SET_IPV4_SRC,
+	RTE_FLOW_PARSER_CMD_ACTION_SET_IPV4_DST,
+	RTE_FLOW_PARSER_CMD_ACTION_SET_IPV6_SRC,
+	RTE_FLOW_PARSER_CMD_ACTION_SET_IPV6_DST,
+	RTE_FLOW_PARSER_CMD_ACTION_SET_TP_SRC,
+	RTE_FLOW_PARSER_CMD_ACTION_SET_TP_DST,
+	RTE_FLOW_PARSER_CMD_ACTION_MAC_SWAP,
+	RTE_FLOW_PARSER_CMD_ACTION_DEC_TTL,
+	RTE_FLOW_PARSER_CMD_ACTION_SET_TTL,
+	RTE_FLOW_PARSER_CMD_ACTION_SET_MAC_SRC,
+	RTE_FLOW_PARSER_CMD_ACTION_SET_MAC_DST,
+	RTE_FLOW_PARSER_CMD_ACTION_INC_TCP_SEQ,
+	RTE_FLOW_PARSER_CMD_ACTION_DEC_TCP_SEQ,
+	RTE_FLOW_PARSER_CMD_ACTION_INC_TCP_ACK,
+	RTE_FLOW_PARSER_CMD_ACTION_DEC_TCP_ACK,
+	RTE_FLOW_PARSER_CMD_ACTION_RAW_ENCAP,
+	RTE_FLOW_PARSER_CMD_ACTION_RAW_DECAP,
+	RTE_FLOW_PARSER_CMD_ACTION_SET_TAG,
+	RTE_FLOW_PARSER_CMD_ACTION_SET_META,
+	RTE_FLOW_PARSER_CMD_ACTION_SET_IPV4_DSCP,
+	RTE_FLOW_PARSER_CMD_ACTION_SET_IPV6_DSCP,
+	RTE_FLOW_PARSER_CMD_ACTION_AGE,
+	RTE_FLOW_PARSER_CMD_ACTION_AGE_UPDATE,
+	RTE_FLOW_PARSER_CMD_ACTION_SAMPLE,
+	RTE_FLOW_PARSER_CMD_ACTION_INDIRECT,
+	RTE_FLOW_PARSER_CMD_ACTION_INDIRECT_LIST,
+	RTE_FLOW_PARSER_CMD_ACTION_SHARED_INDIRECT,
+	RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD,
+	RTE_FLOW_PARSER_CMD_ACTION_CONNTRACK,
+	RTE_FLOW_PARSER_CMD_ACTION_CONNTRACK_UPDATE,
+	RTE_FLOW_PARSER_CMD_ACTION_PORT_REPRESENTOR,
+	RTE_FLOW_PARSER_CMD_ACTION_REPRESENTED_PORT,
+	RTE_FLOW_PARSER_CMD_ACTION_SEND_TO_KERNEL,
+	RTE_FLOW_PARSER_CMD_ACTION_QUOTA_CREATE,
+	RTE_FLOW_PARSER_CMD_ACTION_QUOTA_QU,
+	RTE_FLOW_PARSER_CMD_ACTION_IPV6_EXT_REMOVE,
+	RTE_FLOW_PARSER_CMD_ACTION_IPV6_EXT_PUSH,
+	RTE_FLOW_PARSER_CMD_ACTION_NAT64,
+	RTE_FLOW_PARSER_CMD_ACTION_JUMP_TO_TABLE_INDEX,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_quota_create[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_QUOTA_CREATE_LIMIT,
+	RTE_FLOW_PARSER_CMD_ACTION_QUOTA_CREATE_MODE,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO
+};
+
+static const enum rte_flow_parser_command_index action_quota_update[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_QUOTA_QU_LIMIT,
+	RTE_FLOW_PARSER_CMD_ACTION_QUOTA_QU_UPDATE_OP,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO
+};
+
+static const enum rte_flow_parser_command_index action_mark[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_MARK_ID,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_queue[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_QUEUE_INDEX,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_count[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_COUNT_ID,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_rss[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_RSS_FUNC,
+	RTE_FLOW_PARSER_CMD_ACTION_RSS_LEVEL,
+	RTE_FLOW_PARSER_CMD_ACTION_RSS_TYPES,
+	RTE_FLOW_PARSER_CMD_ACTION_RSS_KEY,
+	RTE_FLOW_PARSER_CMD_ACTION_RSS_KEY_LEN,
+	RTE_FLOW_PARSER_CMD_ACTION_RSS_QUEUES,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_vf[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_VF_ORIGINAL,
+	RTE_FLOW_PARSER_CMD_ACTION_VF_ID,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_port_id[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_PORT_ID_ORIGINAL,
+	RTE_FLOW_PARSER_CMD_ACTION_PORT_ID_ID,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_meter[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_METER_ID,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_meter_color[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_METER_COLOR_TYPE,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_meter_mark[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_METER_PROFILE,
+	RTE_FLOW_PARSER_CMD_ACTION_METER_POLICY,
+	RTE_FLOW_PARSER_CMD_ACTION_METER_COLOR_MODE,
+	RTE_FLOW_PARSER_CMD_ACTION_METER_STATE,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_of_push_vlan[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_OF_PUSH_VLAN_ETHERTYPE,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_of_set_vlan_vid[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_OF_SET_VLAN_VID_VLAN_VID,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_of_set_vlan_pcp[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_OF_SET_VLAN_PCP_VLAN_PCP,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_of_pop_mpls[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_OF_POP_MPLS_ETHERTYPE,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_of_push_mpls[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_OF_PUSH_MPLS_ETHERTYPE,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_set_ipv4_src[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_SET_IPV4_SRC_IPV4_SRC,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_set_mac_src[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_SET_MAC_SRC_MAC_SRC,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_set_ipv4_dst[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_SET_IPV4_DST_IPV4_DST,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_set_ipv6_src[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_SET_IPV6_SRC_IPV6_SRC,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_set_ipv6_dst[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_SET_IPV6_DST_IPV6_DST,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_set_tp_src[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_SET_TP_SRC_TP_SRC,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_set_tp_dst[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_SET_TP_DST_TP_DST,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_set_ttl[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_SET_TTL_TTL,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_jump[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_JUMP_GROUP,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_set_mac_dst[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_SET_MAC_DST_MAC_DST,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_inc_tcp_seq[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_INC_TCP_SEQ_VALUE,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_dec_tcp_seq[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_DEC_TCP_SEQ_VALUE,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_inc_tcp_ack[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_INC_TCP_ACK_VALUE,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_dec_tcp_ack[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_DEC_TCP_ACK_VALUE,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_raw_encap[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_RAW_ENCAP_SIZE,
+	RTE_FLOW_PARSER_CMD_ACTION_RAW_ENCAP_INDEX,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_raw_decap[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_RAW_DECAP_INDEX,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_ipv6_ext_remove[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_IPV6_EXT_REMOVE_INDEX,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_ipv6_ext_push[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_IPV6_EXT_PUSH_INDEX,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_set_tag[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_SET_TAG_DATA,
+	RTE_FLOW_PARSER_CMD_ACTION_SET_TAG_INDEX,
+	RTE_FLOW_PARSER_CMD_ACTION_SET_TAG_MASK,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_set_meta[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_SET_META_DATA,
+	RTE_FLOW_PARSER_CMD_ACTION_SET_META_MASK,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_set_ipv4_dscp[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_SET_IPV4_DSCP_VALUE,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_set_ipv6_dscp[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_SET_IPV6_DSCP_VALUE,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_age[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_AGE,
+	RTE_FLOW_PARSER_CMD_ACTION_AGE_TIMEOUT,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_age_update[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_AGE_UPDATE,
+	RTE_FLOW_PARSER_CMD_ACTION_AGE_UPDATE_TIMEOUT,
+	RTE_FLOW_PARSER_CMD_ACTION_AGE_UPDATE_TOUCH,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_sample[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_SAMPLE,
+	RTE_FLOW_PARSER_CMD_ACTION_SAMPLE_RATIO,
+	RTE_FLOW_PARSER_CMD_ACTION_SAMPLE_INDEX,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_action_sample[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_QUEUE,
+	RTE_FLOW_PARSER_CMD_ACTION_RSS,
+	RTE_FLOW_PARSER_CMD_ACTION_MARK,
+	RTE_FLOW_PARSER_CMD_ACTION_COUNT,
+	RTE_FLOW_PARSER_CMD_ACTION_PORT_ID,
+	RTE_FLOW_PARSER_CMD_ACTION_RAW_ENCAP,
+	RTE_FLOW_PARSER_CMD_ACTION_VXLAN_ENCAP,
+	RTE_FLOW_PARSER_CMD_ACTION_NVGRE_ENCAP,
+	RTE_FLOW_PARSER_CMD_ACTION_REPRESENTED_PORT,
+	RTE_FLOW_PARSER_CMD_ACTION_PORT_REPRESENTOR,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_ipv6_push_ext[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_PUSH_REMOVE_EXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_ipv6_push_ext_type[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_PUSH_REMOVE_EXT_TYPE,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index item_ipv6_push_ext_header[] = {
+	RTE_FLOW_PARSER_CMD_ITEM_IPV6_ROUTING_EXT,
+	RTE_FLOW_PARSER_CMD_ITEM_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_modify_field_dst[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_LEVEL,
+	RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_TAG_INDEX,
+	RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_TYPE_ID,
+	RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_CLASS_ID,
+	RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_OFFSET,
+	RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_TYPE,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_modify_field_src[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_LEVEL,
+	RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_TAG_INDEX,
+	RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_TYPE_ID,
+	RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_CLASS_ID,
+	RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_OFFSET,
+	RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_VALUE,
+	RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_POINTER,
+	RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_WIDTH,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_update_conntrack[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_CONNTRACK_UPDATE_DIR,
+	RTE_FLOW_PARSER_CMD_ACTION_CONNTRACK_UPDATE_CTX,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_port_representor[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_PORT_REPRESENTOR_PORT_ID,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_represented_port[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_REPRESENTED_PORT_ETHDEV_PORT_ID,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_nat64[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_NAT64_MODE,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_hash_subcmd[] = {
+	RTE_FLOW_PARSER_CMD_HASH_CALC_TABLE,
+	RTE_FLOW_PARSER_CMD_HASH_CALC_ENCAP,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index next_hash_encap_dest_subcmd[] = {
+	RTE_FLOW_PARSER_CMD_ENCAP_HASH_FIELD_SRC_PORT,
+	RTE_FLOW_PARSER_CMD_ENCAP_HASH_FIELD_GRE_FLOW_ID,
+	RTE_FLOW_PARSER_CMD_ZERO,
+};
+
+static const enum rte_flow_parser_command_index action_jump_to_table_index[] = {
+	RTE_FLOW_PARSER_CMD_ACTION_JUMP_TO_TABLE_INDEX_TABLE,
+	RTE_FLOW_PARSER_CMD_ACTION_JUMP_TO_TABLE_INDEX_INDEX,
+	RTE_FLOW_PARSER_CMD_ACTION_NEXT,
+	RTE_FLOW_PARSER_CMD_ZERO,
 };
 
 static int parse_set_raw_encap_decap(struct context *, const struct token *,
@@ -5290,1400 +4408,1400 @@ static const struct indlst_conf *indirect_action_list_conf_get(uint32_t conf_id)
 /** Token definitions. */
 static const struct token token_list[] = {
 	/* Special tokens. */
-	[ZERO] = {
-		.name = "ZERO",
+	[RTE_FLOW_PARSER_CMD_ZERO] = {
+		.name = "RTE_FLOW_PARSER_CMD_ZERO",
 		.help = "null entry, abused as the entry point",
-		.next = NEXT(NEXT_ENTRY(FLOW, ADD)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_FLOW, RTE_FLOW_PARSER_CMD_ADD)),
 	},
-	[END] = {
+	[RTE_FLOW_PARSER_CMD_END] = {
 		.name = "",
 		.type = "RETURN",
 		.help = "command may end here",
 	},
-	[START_SET] = {
-		.name = "START_SET",
+	[RTE_FLOW_PARSER_CMD_START_SET] = {
+		.name = "RTE_FLOW_PARSER_CMD_START_SET",
 		.help = "null entry, abused as the entry point for set",
-		.next = NEXT(NEXT_ENTRY(SET)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_SET)),
 	},
-	[END_SET] = {
+	[RTE_FLOW_PARSER_CMD_END_SET] = {
 		.name = "end_set",
 		.type = "RETURN",
 		.help = "set command may end here",
 	},
 	/* Common tokens. */
-	[COMMON_INTEGER] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_INTEGER] = {
 		.name = "{int}",
 		.type = "INTEGER",
 		.help = "integer value",
 		.call = parse_int,
 		.comp = comp_none,
 	},
-	[COMMON_UNSIGNED] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED] = {
 		.name = "{unsigned}",
 		.type = "UNSIGNED",
 		.help = "unsigned integer value",
 		.call = parse_int,
 		.comp = comp_none,
 	},
-	[COMMON_PREFIX] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_PREFIX] = {
 		.name = "{prefix}",
 		.type = "PREFIX",
 		.help = "prefix length for bit-mask",
 		.call = parse_prefix,
 		.comp = comp_none,
 	},
-	[COMMON_BOOLEAN] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN] = {
 		.name = "{boolean}",
 		.type = "BOOLEAN",
 		.help = "any boolean value",
 		.call = parse_boolean,
 		.comp = comp_boolean,
 	},
-	[COMMON_STRING] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_STRING] = {
 		.name = "{string}",
 		.type = "STRING",
 		.help = "fixed string",
 		.call = parse_string,
 		.comp = comp_none,
 	},
-	[COMMON_HEX] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_HEX] = {
 		.name = "{hex}",
 		.type = "HEX",
 		.help = "fixed string",
 		.call = parse_hex,
 	},
-	[COMMON_FILE_PATH] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_FILE_PATH] = {
 		.name = "{file path}",
 		.type = "STRING",
 		.help = "file path",
 		.call = parse_string0,
 		.comp = comp_none,
 	},
-	[COMMON_MAC_ADDR] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_MAC_ADDR] = {
 		.name = "{MAC address}",
 		.type = "MAC-48",
 		.help = "standard MAC address notation",
 		.call = parse_mac_addr,
 		.comp = comp_none,
 	},
-	[COMMON_IPV4_ADDR] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_IPV4_ADDR] = {
 		.name = "{IPv4 address}",
 		.type = "IPV4 ADDRESS",
 		.help = "standard IPv4 address notation",
 		.call = parse_ipv4_addr,
 		.comp = comp_none,
 	},
-	[COMMON_IPV6_ADDR] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_IPV6_ADDR] = {
 		.name = "{IPv6 address}",
 		.type = "IPV6 ADDRESS",
 		.help = "standard IPv6 address notation",
 		.call = parse_ipv6_addr,
 		.comp = comp_none,
 	},
-	[COMMON_RULE_ID] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_RULE_ID] = {
 		.name = "{rule id}",
 		.type = "RULE ID",
 		.help = "rule identifier",
 		.call = parse_int,
 		.comp = comp_rule_id,
 	},
-	[COMMON_PORT_ID] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_PORT_ID] = {
 		.name = "{port_id}",
 		.type = "PORT ID",
 		.help = "port identifier",
 		.call = parse_port,
 		.comp = comp_port,
 	},
-	[COMMON_GROUP_ID] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_GROUP_ID] = {
 		.name = "{group_id}",
 		.type = "GROUP ID",
 		.help = "group identifier",
 		.call = parse_int,
 		.comp = comp_none,
 	},
-	[COMMON_PRIORITY_LEVEL] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_PRIORITY_LEVEL] = {
 		.name = "{level}",
 		.type = "PRIORITY",
 		.help = "priority level",
 		.call = parse_int,
 		.comp = comp_none,
 	},
-	[COMMON_INDIRECT_ACTION_ID] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID] = {
 		.name = "{indirect_action_id}",
 		.type = "INDIRECT_ACTION_ID",
 		.help = "indirect action id",
 		.call = parse_int,
 		.comp = comp_none,
 	},
-	[COMMON_PROFILE_ID] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_PROFILE_ID] = {
 		.name = "{profile_id}",
 		.type = "PROFILE_ID",
 		.help = "profile id",
 		.call = parse_int,
 		.comp = comp_none,
 	},
-	[COMMON_POLICY_ID] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_POLICY_ID] = {
 		.name = "{policy_id}",
 		.type = "POLICY_ID",
 		.help = "policy id",
 		.call = parse_int,
 		.comp = comp_none,
 	},
-	[COMMON_FLEX_TOKEN] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_FLEX_TOKEN] = {
 		.name = "{flex token}",
 		.type = "flex token",
 		.help = "flex token",
 		.call = parse_int,
 		.comp = comp_none,
 	},
-	[COMMON_FLEX_HANDLE] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_FLEX_HANDLE] = {
 		.name = "{flex handle}",
-		.type = "FLEX HANDLE",
+		.type = "RTE_FLOW_PARSER_CMD_FLEX HANDLE",
 		.help = "fill flex item data",
 		.call = parse_flex_handle,
 		.comp = comp_none,
 	},
-	[COMMON_PATTERN_TEMPLATE_ID] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_PATTERN_TEMPLATE_ID] = {
 		.name = "{pattern_template_id}",
 		.type = "PATTERN_TEMPLATE_ID",
 		.help = "pattern template id",
 		.call = parse_int,
 		.comp = comp_pattern_template_id,
 	},
-	[COMMON_ACTIONS_TEMPLATE_ID] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_ACTIONS_TEMPLATE_ID] = {
 		.name = "{actions_template_id}",
 		.type = "ACTIONS_TEMPLATE_ID",
 		.help = "actions template id",
 		.call = parse_int,
 		.comp = comp_actions_template_id,
 	},
-	[COMMON_TABLE_ID] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_TABLE_ID] = {
 		.name = "{table_id}",
 		.type = "TABLE_ID",
 		.help = "table id",
 		.call = parse_int,
 		.comp = comp_table_id,
 	},
-	[COMMON_QUEUE_ID] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_QUEUE_ID] = {
 		.name = "{queue_id}",
 		.type = "QUEUE_ID",
 		.help = "queue id",
 		.call = parse_int,
 		.comp = comp_queue_id,
 	},
-	[COMMON_METER_COLOR_NAME] = {
+	[RTE_FLOW_PARSER_CMD_COMMON_METER_COLOR_NAME] = {
 		.name = "color_name",
 		.help = "meter color name",
 		.call = parse_meter_color,
 		.comp = comp_meter_color,
 	},
 	/* Top-level command. */
-	[FLOW] = {
+	[RTE_FLOW_PARSER_CMD_FLOW] = {
 		.name = "flow",
 		.type = "{command} {port_id} [{arg} [...]]",
 		.help = "manage ingress/egress flow rules",
 		.next = NEXT(NEXT_ENTRY
-			     (INFO,
-			      CONFIGURE,
-			      PATTERN_TEMPLATE,
-			      ACTIONS_TEMPLATE,
-			      TABLE,
-			      FLOW_GROUP,
-			      INDIRECT_ACTION,
-			      VALIDATE,
-			      CREATE,
-			      DESTROY,
-			      UPDATE,
-			      FLUSH,
-			      DUMP,
-			      LIST,
-			      AGED,
-			      QUERY,
-			      ISOLATE,
-			      TUNNEL,
-			      FLEX,
-			      QUEUE,
-			      PUSH,
-			      PULL,
-			      HASH)),
+			     (RTE_FLOW_PARSER_CMD_INFO,
+			      RTE_FLOW_PARSER_CMD_CONFIGURE,
+			      RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE,
+			      RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE,
+			      RTE_FLOW_PARSER_CMD_TABLE,
+			      RTE_FLOW_PARSER_CMD_FLOW_GROUP,
+			      RTE_FLOW_PARSER_CMD_INDIRECT_ACTION,
+			      RTE_FLOW_PARSER_CMD_VALIDATE,
+			      RTE_FLOW_PARSER_CMD_CREATE,
+			      RTE_FLOW_PARSER_CMD_DESTROY,
+			      RTE_FLOW_PARSER_CMD_UPDATE,
+			      RTE_FLOW_PARSER_CMD_FLUSH,
+			      RTE_FLOW_PARSER_CMD_DUMP,
+			      RTE_FLOW_PARSER_CMD_LIST,
+			      RTE_FLOW_PARSER_CMD_AGED,
+			      RTE_FLOW_PARSER_CMD_QUERY,
+			      RTE_FLOW_PARSER_CMD_ISOLATE,
+			      RTE_FLOW_PARSER_CMD_TUNNEL,
+			      RTE_FLOW_PARSER_CMD_FLEX,
+			      RTE_FLOW_PARSER_CMD_QUEUE,
+			      RTE_FLOW_PARSER_CMD_PUSH,
+			      RTE_FLOW_PARSER_CMD_PULL,
+			      RTE_FLOW_PARSER_CMD_HASH)),
 		.call = parse_init,
 	},
 	/* Top-level command. */
-	[INFO] = {
+	[RTE_FLOW_PARSER_CMD_INFO] = {
 		.name = "info",
 		.help = "get information about flow engine",
-		.next = NEXT(NEXT_ENTRY(END),
-			     NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_END),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_configure,
 	},
 	/* Top-level command. */
-	[CONFIGURE] = {
+	[RTE_FLOW_PARSER_CMD_CONFIGURE] = {
 		.name = "configure",
 		.help = "configure flow engine",
 		.next = NEXT(next_config_attr,
-			     NEXT_ENTRY(COMMON_PORT_ID)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_configure,
 	},
 	/* Configure arguments. */
-	[CONFIG_QUEUES_NUMBER] = {
+	[RTE_FLOW_PARSER_CMD_CONFIG_QUEUES_NUMBER] = {
 		.name = "queues_number",
 		.help = "number of queues",
 		.next = NEXT(next_config_attr,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.configure.nb_queue)),
 	},
-	[CONFIG_QUEUES_SIZE] = {
+	[RTE_FLOW_PARSER_CMD_CONFIG_QUEUES_SIZE] = {
 		.name = "queues_size",
 		.help = "number of elements in queues",
 		.next = NEXT(next_config_attr,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.configure.queue_attr.size)),
 	},
-	[CONFIG_COUNTERS_NUMBER] = {
+	[RTE_FLOW_PARSER_CMD_CONFIG_COUNTERS_NUMBER] = {
 		.name = "counters_number",
 		.help = "number of counters",
 		.next = NEXT(next_config_attr,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.configure.port_attr.nb_counters)),
 	},
-	[CONFIG_AGING_OBJECTS_NUMBER] = {
+	[RTE_FLOW_PARSER_CMD_CONFIG_AGING_OBJECTS_NUMBER] = {
 		.name = "aging_counters_number",
 		.help = "number of aging objects",
 		.next = NEXT(next_config_attr,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.configure.port_attr.nb_aging_objects)),
 	},
-	[CONFIG_QUOTAS_NUMBER] = {
+	[RTE_FLOW_PARSER_CMD_CONFIG_QUOTAS_NUMBER] = {
 		.name = "quotas_number",
 		.help = "number of quotas",
 		.next = NEXT(next_config_attr,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 				     args.configure.port_attr.nb_quotas)),
 	},
-	[CONFIG_METERS_NUMBER] = {
+	[RTE_FLOW_PARSER_CMD_CONFIG_METERS_NUMBER] = {
 		.name = "meters_number",
 		.help = "number of meters",
 		.next = NEXT(next_config_attr,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.configure.port_attr.nb_meters)),
 	},
-	[CONFIG_CONN_TRACK_NUMBER] = {
+	[RTE_FLOW_PARSER_CMD_CONFIG_CONN_TRACK_NUMBER] = {
 		.name = "conn_tracks_number",
 		.help = "number of connection trackings",
 		.next = NEXT(next_config_attr,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.configure.port_attr.nb_conn_tracks)),
 	},
-	[CONFIG_FLAGS] = {
+	[RTE_FLOW_PARSER_CMD_CONFIG_FLAGS] = {
 		.name = "flags",
 		.help = "configuration flags",
 		.next = NEXT(next_config_attr,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.configure.port_attr.flags)),
 	},
-	[CONFIG_HOST_PORT] = {
+	[RTE_FLOW_PARSER_CMD_CONFIG_HOST_PORT] = {
 		.name = "host_port",
 		.help = "host port for shared objects",
 		.next = NEXT(next_config_attr,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.configure.port_attr.host_port_id)),
 	},
 	/* Top-level command. */
-	[PATTERN_TEMPLATE] = {
+	[RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE] = {
 		.name = "pattern_template",
 		.type = "{command} {port_id} [{arg} [...]]",
 		.help = "manage pattern templates",
-		.next = NEXT(next_pt_subcmd, NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(next_pt_subcmd, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_template,
 	},
 	/* Sub-level commands. */
-	[PATTERN_TEMPLATE_CREATE] = {
+	[RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_CREATE] = {
 		.name = "create",
 		.help = "create pattern template",
 		.next = NEXT(next_pt_attr),
 		.call = parse_template,
 	},
-	[PATTERN_TEMPLATE_DESTROY] = {
+	[RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_DESTROY] = {
 		.name = "destroy",
 		.help = "destroy pattern template",
-		.next = NEXT(NEXT_ENTRY(PATTERN_TEMPLATE_DESTROY_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_DESTROY_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_template_destroy,
 	},
 	/* Pattern template arguments. */
-	[PATTERN_TEMPLATE_CREATE_ID] = {
+	[RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_CREATE_ID] = {
 		.name = "pattern_template_id",
 		.help = "specify a pattern template id to create",
 		.next = NEXT(next_pt_attr,
-			     NEXT_ENTRY(COMMON_PATTERN_TEMPLATE_ID)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PATTERN_TEMPLATE_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.vc.pat_templ_id)),
 	},
-	[PATTERN_TEMPLATE_DESTROY_ID] = {
+	[RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_DESTROY_ID] = {
 		.name = "pattern_template",
 		.help = "specify a pattern template id to destroy",
 		.next = NEXT(next_pt_destroy_attr,
-			     NEXT_ENTRY(COMMON_PATTERN_TEMPLATE_ID)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PATTERN_TEMPLATE_ID)),
 		.args = ARGS(ARGS_ENTRY_PTR(struct buffer,
 					    args.templ_destroy.template_id)),
 		.call = parse_template_destroy,
 	},
-	[PATTERN_TEMPLATE_RELAXED_MATCHING] = {
+	[RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_RELAXED_MATCHING] = {
 		.name = "relaxed",
 		.help = "is matching relaxed",
 		.next = NEXT(next_pt_attr,
-			     NEXT_ENTRY(COMMON_BOOLEAN)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN)),
 		.args = ARGS(ARGS_ENTRY_BF(struct buffer,
 			     args.vc.attr.reserved, 1)),
 	},
-	[PATTERN_TEMPLATE_INGRESS] = {
+	[RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_INGRESS] = {
 		.name = "ingress",
 		.help = "attribute pattern to ingress",
 		.next = NEXT(next_pt_attr),
 		.call = parse_template,
 	},
-	[PATTERN_TEMPLATE_EGRESS] = {
+	[RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_EGRESS] = {
 		.name = "egress",
 		.help = "attribute pattern to egress",
 		.next = NEXT(next_pt_attr),
 		.call = parse_template,
 	},
-	[PATTERN_TEMPLATE_TRANSFER] = {
+	[RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_TRANSFER] = {
 		.name = "transfer",
 		.help = "attribute pattern to transfer",
 		.next = NEXT(next_pt_attr),
 		.call = parse_template,
 	},
-	[PATTERN_TEMPLATE_SPEC] = {
+	[RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_SPEC] = {
 		.name = "template",
 		.help = "specify item to create pattern template",
 		.next = NEXT(next_item),
 	},
 	/* Top-level command. */
-	[ACTIONS_TEMPLATE] = {
+	[RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE] = {
 		.name = "actions_template",
 		.type = "{command} {port_id} [{arg} [...]]",
 		.help = "manage actions templates",
-		.next = NEXT(next_at_subcmd, NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(next_at_subcmd, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_template,
 	},
 	/* Sub-level commands. */
-	[ACTIONS_TEMPLATE_CREATE] = {
+	[RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_CREATE] = {
 		.name = "create",
 		.help = "create actions template",
 		.next = NEXT(next_at_attr),
 		.call = parse_template,
 	},
-	[ACTIONS_TEMPLATE_DESTROY] = {
+	[RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_DESTROY] = {
 		.name = "destroy",
 		.help = "destroy actions template",
-		.next = NEXT(NEXT_ENTRY(ACTIONS_TEMPLATE_DESTROY_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_DESTROY_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_template_destroy,
 	},
 	/* Actions template arguments. */
-	[ACTIONS_TEMPLATE_CREATE_ID] = {
+	[RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_CREATE_ID] = {
 		.name = "actions_template_id",
 		.help = "specify an actions template id to create",
-		.next = NEXT(NEXT_ENTRY(ACTIONS_TEMPLATE_MASK),
-			     NEXT_ENTRY(ACTIONS_TEMPLATE_SPEC),
-			     NEXT_ENTRY(COMMON_ACTIONS_TEMPLATE_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_MASK),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_SPEC),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_ACTIONS_TEMPLATE_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.vc.act_templ_id)),
 	},
-	[ACTIONS_TEMPLATE_DESTROY_ID] = {
+	[RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_DESTROY_ID] = {
 		.name = "actions_template",
 		.help = "specify an actions template id to destroy",
 		.next = NEXT(next_at_destroy_attr,
-			     NEXT_ENTRY(COMMON_ACTIONS_TEMPLATE_ID)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_ACTIONS_TEMPLATE_ID)),
 		.args = ARGS(ARGS_ENTRY_PTR(struct buffer,
 					    args.templ_destroy.template_id)),
 		.call = parse_template_destroy,
 	},
-	[ACTIONS_TEMPLATE_INGRESS] = {
+	[RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_INGRESS] = {
 		.name = "ingress",
 		.help = "attribute actions to ingress",
 		.next = NEXT(next_at_attr),
 		.call = parse_template,
 	},
-	[ACTIONS_TEMPLATE_EGRESS] = {
+	[RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_EGRESS] = {
 		.name = "egress",
 		.help = "attribute actions to egress",
 		.next = NEXT(next_at_attr),
 		.call = parse_template,
 	},
-	[ACTIONS_TEMPLATE_TRANSFER] = {
+	[RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_TRANSFER] = {
 		.name = "transfer",
 		.help = "attribute actions to transfer",
 		.next = NEXT(next_at_attr),
 		.call = parse_template,
 	},
-	[ACTIONS_TEMPLATE_SPEC] = {
+	[RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_SPEC] = {
 		.name = "template",
 		.help = "specify action to create actions template",
 		.next = NEXT(next_action),
 		.call = parse_template,
 	},
-	[ACTIONS_TEMPLATE_MASK] = {
+	[RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_MASK] = {
 		.name = "mask",
 		.help = "specify action mask to create actions template",
 		.next = NEXT(next_action),
 		.call = parse_template,
 	},
 	/* Top-level command. */
-	[TABLE] = {
+	[RTE_FLOW_PARSER_CMD_TABLE] = {
 		.name = "template_table",
 		.type = "{command} {port_id} [{arg} [...]]",
 		.help = "manage template tables",
-		.next = NEXT(next_table_subcmd, NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(next_table_subcmd, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_table,
 	},
 	/* Sub-level commands. */
-	[TABLE_CREATE] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_CREATE] = {
 		.name = "create",
 		.help = "create template table",
 		.next = NEXT(next_table_attr),
 		.call = parse_table,
 	},
-	[TABLE_DESTROY] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_DESTROY] = {
 		.name = "destroy",
 		.help = "destroy template table",
-		.next = NEXT(NEXT_ENTRY(TABLE_DESTROY_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_TABLE_DESTROY_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_table_destroy,
 	},
-	[TABLE_RESIZE] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_RESIZE] = {
 		.name = "resize",
 		.help = "resize template table",
-		.next = NEXT(NEXT_ENTRY(TABLE_RESIZE_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_TABLE_RESIZE_ID)),
 		.call = parse_table
 	},
-	[TABLE_RESIZE_COMPLETE] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_RESIZE_COMPLETE] = {
 		.name = "resize_complete",
 		.help = "complete table resize",
-		.next = NEXT(NEXT_ENTRY(TABLE_DESTROY_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_TABLE_DESTROY_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_table_destroy,
 	},
 	/* Table  arguments. */
-	[TABLE_CREATE_ID] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_CREATE_ID] = {
 		.name = "table_id",
 		.help = "specify table id to create",
 		.next = NEXT(next_table_attr,
-			     NEXT_ENTRY(COMMON_TABLE_ID)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_TABLE_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.table.id)),
 	},
-	[TABLE_DESTROY_ID] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_DESTROY_ID] = {
 		.name = "table",
 		.help = "table id",
 		.next = NEXT(next_table_destroy_attr,
-			     NEXT_ENTRY(COMMON_TABLE_ID)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_TABLE_ID)),
 		.args = ARGS(ARGS_ENTRY_PTR(struct buffer,
 					    args.table_destroy.table_id)),
 		.call = parse_table_destroy,
 	},
-	[TABLE_RESIZE_ID] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_RESIZE_ID] = {
 		.name = "table_resize_id",
 		.help = "table resize id",
-		.next = NEXT(NEXT_ENTRY(TABLE_RESIZE_RULES_NUMBER),
-			     NEXT_ENTRY(COMMON_TABLE_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_TABLE_RESIZE_RULES_NUMBER),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_TABLE_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.table.id)),
 		.call = parse_table
 	},
-	[TABLE_RESIZE_RULES_NUMBER] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_RESIZE_RULES_NUMBER] = {
 		.name = "table_resize_rules_num",
 		.help = "table resize rules number",
-		.next = NEXT(NEXT_ENTRY(END), NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_END), NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.table.attr.nb_flows)),
 		.call = parse_table
 	},
-	[TABLE_INSERTION_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_INSERTION_TYPE] = {
 		.name = "insertion_type",
 		.help = "specify insertion type",
 		.next = NEXT(next_table_attr,
-			     NEXT_ENTRY(TABLE_INSERTION_TYPE_NAME)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_TABLE_INSERTION_TYPE_NAME)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.table.attr.insertion_type)),
 	},
-	[TABLE_INSERTION_TYPE_NAME] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_INSERTION_TYPE_NAME] = {
 		.name = "insertion_type_name",
 		.help = "insertion type name",
 		.call = parse_insertion_table_type,
 		.comp = comp_insertion_table_type,
 	},
-	[TABLE_HASH_FUNC] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_HASH_FUNC] = {
 		.name = "hash_func",
 		.help = "specify hash calculation function",
 		.next = NEXT(next_table_attr,
-			     NEXT_ENTRY(TABLE_HASH_FUNC_NAME)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_TABLE_HASH_FUNC_NAME)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.table.attr.hash_func)),
 	},
-	[TABLE_HASH_FUNC_NAME] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_HASH_FUNC_NAME] = {
 		.name = "hash_func_name",
 		.help = "hash calculation function name",
 		.call = parse_hash_table_type,
 		.comp = comp_hash_table_type,
 	},
-	[TABLE_GROUP] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_GROUP] = {
 		.name = "group",
 		.help = "specify a group",
-		.next = NEXT(next_table_attr, NEXT_ENTRY(COMMON_GROUP_ID)),
+		.next = NEXT(next_table_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_GROUP_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.table.attr.flow_attr.group)),
 	},
-	[TABLE_PRIORITY] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_PRIORITY] = {
 		.name = "priority",
 		.help = "specify a priority level",
-		.next = NEXT(next_table_attr, NEXT_ENTRY(COMMON_PRIORITY_LEVEL)),
+		.next = NEXT(next_table_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PRIORITY_LEVEL)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.table.attr.flow_attr.priority)),
 	},
-	[TABLE_EGRESS] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_EGRESS] = {
 		.name = "egress",
 		.help = "affect rule to egress",
 		.next = NEXT(next_table_attr),
 		.call = parse_table,
 	},
-	[TABLE_INGRESS] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_INGRESS] = {
 		.name = "ingress",
 		.help = "affect rule to ingress",
 		.next = NEXT(next_table_attr),
 		.call = parse_table,
 	},
-	[TABLE_TRANSFER] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_TRANSFER] = {
 		.name = "transfer",
 		.help = "affect rule to transfer",
 		.next = NEXT(next_table_attr),
 		.call = parse_table,
 	},
-	[TABLE_TRANSFER_WIRE_ORIG] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_TRANSFER_WIRE_ORIG] = {
 		.name = "wire_orig",
 		.help = "affect rule direction to transfer",
 		.next = NEXT(next_table_attr),
 		.call = parse_table,
 	},
-	[TABLE_TRANSFER_VPORT_ORIG] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_TRANSFER_VPORT_ORIG] = {
 		.name = "vport_orig",
 		.help = "affect rule direction to transfer",
 		.next = NEXT(next_table_attr),
 		.call = parse_table,
 	},
-	[TABLE_RESIZABLE] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_RESIZABLE] = {
 		.name = "resizable",
 		.help = "set resizable attribute",
 		.next = NEXT(next_table_attr),
 		.call = parse_table,
 	},
-	[TABLE_RULES_NUMBER] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_RULES_NUMBER] = {
 		.name = "rules_number",
 		.help = "number of rules in table",
 		.next = NEXT(next_table_attr,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.table.attr.nb_flows)),
 		.call = parse_table,
 	},
-	[TABLE_PATTERN_TEMPLATE] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_PATTERN_TEMPLATE] = {
 		.name = "pattern_template",
 		.help = "specify pattern template id",
 		.next = NEXT(next_table_attr,
-			     NEXT_ENTRY(COMMON_PATTERN_TEMPLATE_ID)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PATTERN_TEMPLATE_ID)),
 		.args = ARGS(ARGS_ENTRY_PTR(struct buffer,
 					    args.table.pat_templ_id)),
 		.call = parse_table,
 	},
-	[TABLE_ACTIONS_TEMPLATE] = {
+	[RTE_FLOW_PARSER_CMD_TABLE_ACTIONS_TEMPLATE] = {
 		.name = "actions_template",
 		.help = "specify actions template id",
 		.next = NEXT(next_table_attr,
-			     NEXT_ENTRY(COMMON_ACTIONS_TEMPLATE_ID)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_ACTIONS_TEMPLATE_ID)),
 		.args = ARGS(ARGS_ENTRY_PTR(struct buffer,
 					    args.table.act_templ_id)),
 		.call = parse_table,
 	},
 	/* Top-level command. */
-	[FLOW_GROUP] = {
+	[RTE_FLOW_PARSER_CMD_FLOW_GROUP] = {
 		.name = "group",
 		.help = "manage flow groups",
-		.next = NEXT(NEXT_ENTRY(GROUP_ID), NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_GROUP_ID), NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_group,
 	},
 	/* Sub-level commands. */
-	[GROUP_SET_MISS_ACTIONS] = {
+	[RTE_FLOW_PARSER_CMD_GROUP_SET_MISS_ACTIONS] = {
 		.name = "set_miss_actions",
 		.help = "set group miss actions",
 		.next = NEXT(next_action),
 		.call = parse_group,
 	},
 	/* Group arguments */
-	[GROUP_ID]	= {
+	[RTE_FLOW_PARSER_CMD_GROUP_ID]	= {
 		.name = "group_id",
 		.help = "group id",
-		.next = NEXT(next_group_attr, NEXT_ENTRY(COMMON_GROUP_ID)),
+		.next = NEXT(next_group_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_GROUP_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.vc.attr.group)),
 	},
-	[GROUP_INGRESS] = {
+	[RTE_FLOW_PARSER_CMD_GROUP_INGRESS] = {
 		.name = "ingress",
 		.help = "group ingress attr",
 		.next = NEXT(next_group_attr),
 		.call = parse_group,
 	},
-	[GROUP_EGRESS] = {
+	[RTE_FLOW_PARSER_CMD_GROUP_EGRESS] = {
 		.name = "egress",
 		.help = "group egress attr",
 		.next = NEXT(next_group_attr),
 		.call = parse_group,
 	},
-	[GROUP_TRANSFER] = {
+	[RTE_FLOW_PARSER_CMD_GROUP_TRANSFER] = {
 		.name = "transfer",
 		.help = "group transfer attr",
 		.next = NEXT(next_group_attr),
 		.call = parse_group,
 	},
 	/* Top-level command. */
-	[QUEUE] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE] = {
 		.name = "queue",
 		.help = "queue a flow rule operation",
-		.next = NEXT(next_queue_subcmd, NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(next_queue_subcmd, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_qo,
 	},
 	/* Sub-level commands. */
-	[QUEUE_CREATE] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_CREATE] = {
 		.name = "create",
 		.help = "create a flow rule",
-		.next = NEXT(NEXT_ENTRY(QUEUE_TEMPLATE_TABLE),
-			     NEXT_ENTRY(COMMON_QUEUE_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_QUEUE_TEMPLATE_TABLE),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_QUEUE_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, queue)),
 		.call = parse_qo,
 	},
-	[QUEUE_DESTROY] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_DESTROY] = {
 		.name = "destroy",
 		.help = "destroy a flow rule",
-		.next = NEXT(NEXT_ENTRY(QUEUE_DESTROY_POSTPONE),
-			     NEXT_ENTRY(COMMON_QUEUE_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_QUEUE_DESTROY_POSTPONE),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_QUEUE_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, queue)),
 		.call = parse_qo_destroy,
 	},
-	[QUEUE_FLOW_UPDATE_RESIZED] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_FLOW_UPDATE_RESIZED] = {
 		.name = "update_resized",
 		.help = "update a flow after table resize",
-		.next = NEXT(NEXT_ENTRY(QUEUE_DESTROY_ID),
-			     NEXT_ENTRY(COMMON_QUEUE_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_QUEUE_DESTROY_ID),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_QUEUE_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, queue)),
 		.call = parse_qo_destroy,
 	},
-	[QUEUE_UPDATE] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_UPDATE] = {
 		.name = "update",
 		.help = "update a flow rule",
-		.next = NEXT(NEXT_ENTRY(QUEUE_UPDATE_ID),
-			     NEXT_ENTRY(COMMON_QUEUE_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_QUEUE_UPDATE_ID),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_QUEUE_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, queue)),
 		.call = parse_qo,
 	},
-	[QUEUE_AGED] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_AGED] = {
 		.name = "aged",
 		.help = "list and destroy aged flows",
-		.next = NEXT(next_aged_attr, NEXT_ENTRY(COMMON_QUEUE_ID)),
+		.next = NEXT(next_aged_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_QUEUE_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, queue)),
 		.call = parse_aged,
 	},
-	[QUEUE_INDIRECT_ACTION] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION] = {
 		.name = "indirect_action",
 		.help = "queue indirect actions",
-		.next = NEXT(next_qia_subcmd, NEXT_ENTRY(COMMON_QUEUE_ID)),
+		.next = NEXT(next_qia_subcmd, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_QUEUE_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, queue)),
 		.call = parse_qia,
 	},
 	/* Queue  arguments. */
-	[QUEUE_TEMPLATE_TABLE] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_TEMPLATE_TABLE] = {
 		.name = "template_table",
 		.help = "specify table id",
 		.next = NEXT(next_async_insert_subcmd,
-			     NEXT_ENTRY(COMMON_TABLE_ID)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_TABLE_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.vc.table_id)),
 		.call = parse_qo,
 	},
-	[QUEUE_PATTERN_TEMPLATE] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_PATTERN_TEMPLATE] = {
 		.name = "pattern_template",
 		.help = "specify pattern template index",
-		.next = NEXT(NEXT_ENTRY(QUEUE_ACTIONS_TEMPLATE),
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_QUEUE_ACTIONS_TEMPLATE),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.vc.pat_templ_id)),
 		.call = parse_qo,
 	},
-	[QUEUE_ACTIONS_TEMPLATE] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_ACTIONS_TEMPLATE] = {
 		.name = "actions_template",
 		.help = "specify actions template index",
-		.next = NEXT(NEXT_ENTRY(QUEUE_CREATE_POSTPONE),
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_QUEUE_CREATE_POSTPONE),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.vc.act_templ_id)),
 		.call = parse_qo,
 	},
-	[QUEUE_RULE_ID] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_RULE_ID] = {
 		.name = "rule_index",
 		.help = "specify flow rule index",
 		.next = NEXT(next_async_pattern_subcmd,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.vc.rule_id)),
 		.call = parse_qo,
 	},
-	[QUEUE_CREATE_POSTPONE] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_CREATE_POSTPONE] = {
 		.name = "postpone",
 		.help = "postpone create operation",
-		.next = NEXT(NEXT_ENTRY(ITEM_PATTERN),
-			     NEXT_ENTRY(COMMON_BOOLEAN)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_PATTERN),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, postpone)),
 		.call = parse_qo,
 	},
-	[QUEUE_DESTROY_POSTPONE] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_DESTROY_POSTPONE] = {
 		.name = "postpone",
 		.help = "postpone destroy operation",
-		.next = NEXT(NEXT_ENTRY(QUEUE_DESTROY_ID),
-			     NEXT_ENTRY(COMMON_BOOLEAN)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_QUEUE_DESTROY_ID),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, postpone)),
 		.call = parse_qo_destroy,
 	},
-	[QUEUE_DESTROY_ID] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_DESTROY_ID] = {
 		.name = "rule",
 		.help = "specify rule id to destroy",
 		.next = NEXT(next_queue_destroy_attr,
-			NEXT_ENTRY(COMMON_UNSIGNED)),
+			NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY_PTR(struct buffer,
 					    args.destroy.rule)),
 		.call = parse_qo_destroy,
 	},
-	[QUEUE_UPDATE_ID] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_UPDATE_ID] = {
 		.name = "rule",
 		.help = "specify rule id to update",
-		.next = NEXT(NEXT_ENTRY(QUEUE_ACTIONS_TEMPLATE),
-			NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_QUEUE_ACTIONS_TEMPLATE),
+			NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 				     args.vc.rule_id)),
 		.call = parse_qo,
 	},
 	/* Queue indirect action arguments */
-	[QUEUE_INDIRECT_ACTION_CREATE] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_CREATE] = {
 		.name = "create",
 		.help = "create indirect action",
 		.next = NEXT(next_qia_create_attr),
 		.call = parse_qia,
 	},
-	[QUEUE_INDIRECT_ACTION_UPDATE] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_UPDATE] = {
 		.name = "update",
 		.help = "update indirect action",
 		.next = NEXT(next_qia_update_attr,
-			     NEXT_ENTRY(COMMON_INDIRECT_ACTION_ID)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.vc.attr.group)),
 		.call = parse_qia,
 	},
-	[QUEUE_INDIRECT_ACTION_DESTROY] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_DESTROY] = {
 		.name = "destroy",
 		.help = "destroy indirect action",
 		.next = NEXT(next_qia_destroy_attr),
 		.call = parse_qia_destroy,
 	},
-	[QUEUE_INDIRECT_ACTION_QUERY] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QUERY] = {
 		.name = "query",
 		.help = "query indirect action",
 		.next = NEXT(next_qia_query_attr,
-			     NEXT_ENTRY(COMMON_INDIRECT_ACTION_ID)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.ia.action_id)),
 		.call = parse_qia,
 	},
 	/* Indirect action destroy arguments. */
-	[QUEUE_INDIRECT_ACTION_DESTROY_POSTPONE] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_DESTROY_POSTPONE] = {
 		.name = "postpone",
 		.help = "postpone destroy operation",
 		.next = NEXT(next_qia_destroy_attr,
-			     NEXT_ENTRY(COMMON_BOOLEAN)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, postpone)),
 	},
-	[QUEUE_INDIRECT_ACTION_DESTROY_ID] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_DESTROY_ID] = {
 		.name = "action_id",
 		.help = "specify a indirect action id to destroy",
 		.next = NEXT(next_qia_destroy_attr,
-			     NEXT_ENTRY(COMMON_INDIRECT_ACTION_ID)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
 		.args = ARGS(ARGS_ENTRY_PTR(struct buffer,
 					    args.ia_destroy.action_id)),
 		.call = parse_qia_destroy,
 	},
-	[QUEUE_INDIRECT_ACTION_QUERY_UPDATE] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QUERY_UPDATE] = {
 		.name = "query_update",
 		.help = "indirect query [and|or] update action",
-		.next = NEXT(next_qia_qu_attr, NEXT_ENTRY(COMMON_INDIRECT_ACTION_ID)),
+		.next = NEXT(next_qia_qu_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.ia.action_id)),
 		.call = parse_qia
 	},
-	[QUEUE_INDIRECT_ACTION_QU_MODE] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QU_MODE] = {
 		.name = "mode",
 		.help = "indirect query [and|or] update action",
 		.next = NEXT(next_qia_qu_attr,
-			     NEXT_ENTRY(INDIRECT_ACTION_QU_MODE_NAME)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QU_MODE_NAME)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.ia.qu_mode)),
 		.call = parse_qia
 	},
 	/* Indirect action update arguments. */
-	[QUEUE_INDIRECT_ACTION_UPDATE_POSTPONE] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_UPDATE_POSTPONE] = {
 		.name = "postpone",
 		.help = "postpone update operation",
 		.next = NEXT(next_qia_update_attr,
-			     NEXT_ENTRY(COMMON_BOOLEAN)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, postpone)),
 	},
 	/* Indirect action update arguments. */
-	[QUEUE_INDIRECT_ACTION_QUERY_POSTPONE] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QUERY_POSTPONE] = {
 		.name = "postpone",
 		.help = "postpone query operation",
 		.next = NEXT(next_qia_query_attr,
-			     NEXT_ENTRY(COMMON_BOOLEAN)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, postpone)),
 	},
 	/* Indirect action create arguments. */
-	[QUEUE_INDIRECT_ACTION_CREATE_ID] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_CREATE_ID] = {
 		.name = "action_id",
 		.help = "specify a indirect action id to create",
 		.next = NEXT(next_qia_create_attr,
-			     NEXT_ENTRY(COMMON_INDIRECT_ACTION_ID)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.vc.attr.group)),
 	},
-	[QUEUE_INDIRECT_ACTION_INGRESS] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_INGRESS] = {
 		.name = "ingress",
 		.help = "affect rule to ingress",
 		.next = NEXT(next_qia_create_attr),
 		.call = parse_qia,
 	},
-	[QUEUE_INDIRECT_ACTION_EGRESS] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_EGRESS] = {
 		.name = "egress",
 		.help = "affect rule to egress",
 		.next = NEXT(next_qia_create_attr),
 		.call = parse_qia,
 	},
-	[QUEUE_INDIRECT_ACTION_TRANSFER] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_TRANSFER] = {
 		.name = "transfer",
 		.help = "affect rule to transfer",
 		.next = NEXT(next_qia_create_attr),
 		.call = parse_qia,
 	},
-	[QUEUE_INDIRECT_ACTION_CREATE_POSTPONE] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_CREATE_POSTPONE] = {
 		.name = "postpone",
 		.help = "postpone create operation",
 		.next = NEXT(next_qia_create_attr,
-			     NEXT_ENTRY(COMMON_BOOLEAN)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, postpone)),
 	},
-	[QUEUE_INDIRECT_ACTION_SPEC] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_SPEC] = {
 		.name = "action",
 		.help = "specify action to create indirect handle",
 		.next = NEXT(next_action),
 	},
-	[QUEUE_INDIRECT_ACTION_LIST] = {
+	[RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_LIST] = {
 		.name = "list",
 		.help = "specify actions for indirect handle list",
-		.next = NEXT(NEXT_ENTRY(ACTIONS, END)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTIONS, RTE_FLOW_PARSER_CMD_END)),
 		.call = parse_qia,
 	},
 	/* Top-level command. */
-	[PUSH] = {
+	[RTE_FLOW_PARSER_CMD_PUSH] = {
 		.name = "push",
 		.help = "push enqueued operations",
-		.next = NEXT(NEXT_ENTRY(PUSH_QUEUE), NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_PUSH_QUEUE), NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_push,
 	},
 	/* Sub-level commands. */
-	[PUSH_QUEUE] = {
+	[RTE_FLOW_PARSER_CMD_PUSH_QUEUE] = {
 		.name = "queue",
 		.help = "specify queue id",
-		.next = NEXT(NEXT_ENTRY(END), NEXT_ENTRY(COMMON_QUEUE_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_END), NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_QUEUE_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, queue)),
 	},
 	/* Top-level command. */
-	[PULL] = {
+	[RTE_FLOW_PARSER_CMD_PULL] = {
 		.name = "pull",
 		.help = "pull flow operations results",
-		.next = NEXT(NEXT_ENTRY(PULL_QUEUE), NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_PULL_QUEUE), NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_pull,
 	},
 	/* Sub-level commands. */
-	[PULL_QUEUE] = {
+	[RTE_FLOW_PARSER_CMD_PULL_QUEUE] = {
 		.name = "queue",
 		.help = "specify queue id",
-		.next = NEXT(NEXT_ENTRY(END), NEXT_ENTRY(COMMON_QUEUE_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_END), NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_QUEUE_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, queue)),
 	},
 	/* Top-level command. */
-	[HASH] = {
+	[RTE_FLOW_PARSER_CMD_HASH] = {
 		.name = "hash",
 		.help = "calculate hash for a given pattern in a given template table",
-		.next = NEXT(next_hash_subcmd, NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(next_hash_subcmd, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_hash,
 	},
 	/* Sub-level commands. */
-	[HASH_CALC_TABLE] = {
+	[RTE_FLOW_PARSER_CMD_HASH_CALC_TABLE] = {
 		.name = "template_table",
 		.help = "specify table id",
-		.next = NEXT(NEXT_ENTRY(HASH_CALC_PATTERN_INDEX),
-			     NEXT_ENTRY(COMMON_TABLE_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_HASH_CALC_PATTERN_INDEX),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_TABLE_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.vc.table_id)),
 		.call = parse_hash,
 	},
-	[HASH_CALC_ENCAP] = {
+	[RTE_FLOW_PARSER_CMD_HASH_CALC_ENCAP] = {
 		.name = "encap",
 		.help = "calculates encap hash",
 		.next = NEXT(next_hash_encap_dest_subcmd),
 		.call = parse_hash,
 	},
-	[HASH_CALC_PATTERN_INDEX] = {
+	[RTE_FLOW_PARSER_CMD_HASH_CALC_PATTERN_INDEX] = {
 		.name = "pattern_template",
 		.help = "specify pattern template id",
-		.next = NEXT(NEXT_ENTRY(ITEM_PATTERN),
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_PATTERN),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct buffer,
 					args.vc.pat_templ_id)),
 		.call = parse_hash,
 	},
-	[ENCAP_HASH_FIELD_SRC_PORT] = {
+	[RTE_FLOW_PARSER_CMD_ENCAP_HASH_FIELD_SRC_PORT] = {
 		.name = "hash_field_sport",
 		.help = "the encap hash field is src port",
-		.next = NEXT(NEXT_ENTRY(ITEM_PATTERN)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_PATTERN)),
 		.call = parse_hash,
 	},
-	[ENCAP_HASH_FIELD_GRE_FLOW_ID] = {
+	[RTE_FLOW_PARSER_CMD_ENCAP_HASH_FIELD_GRE_FLOW_ID] = {
 		.name = "hash_field_flow_id",
 		.help = "the encap hash field is NVGRE flow id",
-		.next = NEXT(NEXT_ENTRY(ITEM_PATTERN)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_PATTERN)),
 		.call = parse_hash,
 	},
 	/* Top-level command. */
-	[INDIRECT_ACTION] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION] = {
 		.name = "indirect_action",
 		.type = "{command} {port_id} [{arg} [...]]",
 		.help = "manage indirect actions",
-		.next = NEXT(next_ia_subcmd, NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(next_ia_subcmd, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_ia,
 	},
 	/* Sub-level commands. */
-	[INDIRECT_ACTION_CREATE] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_CREATE] = {
 		.name = "create",
 		.help = "create indirect action",
 		.next = NEXT(next_ia_create_attr),
 		.call = parse_ia,
 	},
-	[INDIRECT_ACTION_UPDATE] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_UPDATE] = {
 		.name = "update",
 		.help = "update indirect action",
-		.next = NEXT(NEXT_ENTRY(INDIRECT_ACTION_SPEC),
-			     NEXT_ENTRY(COMMON_INDIRECT_ACTION_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_SPEC),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.vc.attr.group)),
 		.call = parse_ia,
 	},
-	[INDIRECT_ACTION_DESTROY] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_DESTROY] = {
 		.name = "destroy",
 		.help = "destroy indirect action",
-		.next = NEXT(NEXT_ENTRY(INDIRECT_ACTION_DESTROY_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_DESTROY_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_ia_destroy,
 	},
-	[INDIRECT_ACTION_QUERY] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QUERY] = {
 		.name = "query",
 		.help = "query indirect action",
-		.next = NEXT(NEXT_ENTRY(END),
-			     NEXT_ENTRY(COMMON_INDIRECT_ACTION_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_END),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.ia.action_id)),
 		.call = parse_ia,
 	},
-	[INDIRECT_ACTION_QUERY_UPDATE] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QUERY_UPDATE] = {
 		.name = "query_update",
 		.help = "query [and|or] update",
-		.next = NEXT(next_ia_qu_attr, NEXT_ENTRY(COMMON_INDIRECT_ACTION_ID)),
+		.next = NEXT(next_ia_qu_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.ia.action_id)),
 		.call = parse_ia
 	},
-	[INDIRECT_ACTION_QU_MODE] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QU_MODE] = {
 		.name = "mode",
 		.help = "query_update mode",
 		.next = NEXT(next_ia_qu_attr,
-			     NEXT_ENTRY(INDIRECT_ACTION_QU_MODE_NAME)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QU_MODE_NAME)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.ia.qu_mode)),
 		.call = parse_ia,
 	},
-	[INDIRECT_ACTION_QU_MODE_NAME] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QU_MODE_NAME] = {
 		.name = "mode_name",
 		.help = "query-update mode name",
 		.call = parse_qu_mode_name,
 		.comp = comp_qu_mode_name,
 	},
-	[VALIDATE] = {
+	[RTE_FLOW_PARSER_CMD_VALIDATE] = {
 		.name = "validate",
 		.help = "check whether a flow rule can be created",
-		.next = NEXT(next_vc_attr, NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(next_vc_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_vc,
 	},
-	[CREATE] = {
+	[RTE_FLOW_PARSER_CMD_CREATE] = {
 		.name = "create",
 		.help = "create a flow rule",
-		.next = NEXT(next_vc_attr, NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(next_vc_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_vc,
 	},
-	[DESTROY] = {
+	[RTE_FLOW_PARSER_CMD_DESTROY] = {
 		.name = "destroy",
 		.help = "destroy specific flow rules",
 		.next = NEXT(next_destroy_attr,
-			     NEXT_ENTRY(COMMON_PORT_ID)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_destroy,
 	},
-	[UPDATE] = {
+	[RTE_FLOW_PARSER_CMD_UPDATE] = {
 		.name = "update",
 		.help = "update a flow rule with new actions",
-		.next = NEXT(NEXT_ENTRY(VC_IS_USER_ID, END),
-			     NEXT_ENTRY(ACTIONS),
-			     NEXT_ENTRY(COMMON_RULE_ID),
-			     NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_VC_IS_USER_ID, RTE_FLOW_PARSER_CMD_END),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTIONS),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_RULE_ID),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.vc.rule_id),
 			     ARGS_ENTRY(struct buffer, port)),
 		.call = parse_vc,
 	},
-	[FLUSH] = {
+	[RTE_FLOW_PARSER_CMD_FLUSH] = {
 		.name = "flush",
 		.help = "destroy all flow rules",
-		.next = NEXT(NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_flush,
 	},
-	[DUMP] = {
+	[RTE_FLOW_PARSER_CMD_DUMP] = {
 		.name = "dump",
 		.help = "dump single/all flow rules to file",
-		.next = NEXT(next_dump_subcmd, NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(next_dump_subcmd, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_dump,
 	},
-	[QUERY] = {
+	[RTE_FLOW_PARSER_CMD_QUERY] = {
 		.name = "query",
 		.help = "query an existing flow rule",
-		.next = NEXT(next_query_attr, NEXT_ENTRY(QUERY_ACTION),
-			     NEXT_ENTRY(COMMON_RULE_ID),
-			     NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(next_query_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_QUERY_ACTION),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_RULE_ID),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.query.action.type),
 			     ARGS_ENTRY(struct buffer, args.query.rule),
 			     ARGS_ENTRY(struct buffer, port)),
 		.call = parse_query,
 	},
-	[LIST] = {
+	[RTE_FLOW_PARSER_CMD_LIST] = {
 		.name = "list",
 		.help = "list existing flow rules",
-		.next = NEXT(next_list_attr, NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(next_list_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_list,
 	},
-	[AGED] = {
+	[RTE_FLOW_PARSER_CMD_AGED] = {
 		.name = "aged",
 		.help = "list and destroy aged flows",
-		.next = NEXT(next_aged_attr, NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(next_aged_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_aged,
 	},
-	[ISOLATE] = {
+	[RTE_FLOW_PARSER_CMD_ISOLATE] = {
 		.name = "isolate",
 		.help = "restrict ingress traffic to the defined flow rules",
-		.next = NEXT(NEXT_ENTRY(COMMON_BOOLEAN),
-			     NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.isolate.set),
 			     ARGS_ENTRY(struct buffer, port)),
 		.call = parse_isolate,
 	},
-	[FLEX] = {
+	[RTE_FLOW_PARSER_CMD_FLEX] = {
 		.name = "flex_item",
 		.help = "flex item API",
 		.next = NEXT(next_flex_item),
 		.call = parse_flex,
 	},
-	[FLEX_ITEM_CREATE] = {
+	[RTE_FLOW_PARSER_CMD_FLEX_ITEM_CREATE] = {
 		.name = "create",
 		.help = "flex item create",
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.flex.filename),
 			     ARGS_ENTRY(struct buffer, args.flex.token),
 			     ARGS_ENTRY(struct buffer, port)),
-		.next = NEXT(NEXT_ENTRY(COMMON_FILE_PATH),
-			     NEXT_ENTRY(COMMON_FLEX_TOKEN),
-			     NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_FILE_PATH),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_FLEX_TOKEN),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.call = parse_flex
 	},
-	[FLEX_ITEM_DESTROY] = {
+	[RTE_FLOW_PARSER_CMD_FLEX_ITEM_DESTROY] = {
 		.name = "destroy",
 		.help = "flex item destroy",
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.flex.token),
 			     ARGS_ENTRY(struct buffer, port)),
-		.next = NEXT(NEXT_ENTRY(COMMON_FLEX_TOKEN),
-			     NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_FLEX_TOKEN),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.call = parse_flex
 	},
-	[TUNNEL] = {
+	[RTE_FLOW_PARSER_CMD_TUNNEL] = {
 		.name = "tunnel",
 		.help = "new tunnel API",
 		.next = NEXT(NEXT_ENTRY
-			     (TUNNEL_CREATE, TUNNEL_LIST, TUNNEL_DESTROY)),
+			     (RTE_FLOW_PARSER_CMD_TUNNEL_CREATE, RTE_FLOW_PARSER_CMD_TUNNEL_LIST, RTE_FLOW_PARSER_CMD_TUNNEL_DESTROY)),
 		.call = parse_tunnel,
 	},
 	/* Tunnel arguments. */
-	[TUNNEL_CREATE] = {
+	[RTE_FLOW_PARSER_CMD_TUNNEL_CREATE] = {
 		.name = "create",
 		.help = "create new tunnel object",
-		.next = NEXT(NEXT_ENTRY(TUNNEL_CREATE_TYPE),
-			     NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_TUNNEL_CREATE_TYPE),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_tunnel,
 	},
-	[TUNNEL_CREATE_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_TUNNEL_CREATE_TYPE] = {
 		.name = "type",
 		.help = "create new tunnel",
-		.next = NEXT(NEXT_ENTRY(COMMON_FILE_PATH)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_FILE_PATH)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_tunnel_ops, type)),
 		.call = parse_tunnel,
 	},
-	[TUNNEL_DESTROY] = {
+	[RTE_FLOW_PARSER_CMD_TUNNEL_DESTROY] = {
 		.name = "destroy",
 		.help = "destroy tunnel",
-		.next = NEXT(NEXT_ENTRY(TUNNEL_DESTROY_ID),
-			     NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_TUNNEL_DESTROY_ID),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_tunnel,
 	},
-	[TUNNEL_DESTROY_ID] = {
+	[RTE_FLOW_PARSER_CMD_TUNNEL_DESTROY_ID] = {
 		.name = "id",
 		.help = "tunnel identifier to destroy",
-		.next = NEXT(NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_tunnel_ops, id)),
 		.call = parse_tunnel,
 	},
-	[TUNNEL_LIST] = {
+	[RTE_FLOW_PARSER_CMD_TUNNEL_LIST] = {
 		.name = "list",
 		.help = "list existing tunnels",
-		.next = NEXT(NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, port)),
 		.call = parse_tunnel,
 	},
 	/* Destroy arguments. */
-	[DESTROY_RULE] = {
+	[RTE_FLOW_PARSER_CMD_DESTROY_RULE] = {
 		.name = "rule",
 		.help = "specify a rule identifier",
-		.next = NEXT(next_destroy_attr, NEXT_ENTRY(COMMON_RULE_ID)),
+		.next = NEXT(next_destroy_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_RULE_ID)),
 		.args = ARGS(ARGS_ENTRY_PTR(struct buffer, args.destroy.rule)),
 		.call = parse_destroy,
 	},
-	[DESTROY_IS_USER_ID] = {
+	[RTE_FLOW_PARSER_CMD_DESTROY_IS_USER_ID] = {
 		.name = "user_id",
 		.help = "rule identifier is user-id",
 		.next = NEXT(next_destroy_attr),
 		.call = parse_destroy,
 	},
 	/* Dump arguments. */
-	[DUMP_ALL] = {
+	[RTE_FLOW_PARSER_CMD_DUMP_ALL] = {
 		.name = "all",
 		.help = "dump all",
 		.next = NEXT(next_dump_attr),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.dump.file)),
 		.call = parse_dump,
 	},
-	[DUMP_ONE] = {
+	[RTE_FLOW_PARSER_CMD_DUMP_ONE] = {
 		.name = "rule",
 		.help = "dump one rule",
-		.next = NEXT(next_dump_attr, NEXT_ENTRY(COMMON_RULE_ID)),
+		.next = NEXT(next_dump_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_RULE_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.dump.file),
 				ARGS_ENTRY(struct buffer, args.dump.rule)),
 		.call = parse_dump,
 	},
-	[DUMP_IS_USER_ID] = {
+	[RTE_FLOW_PARSER_CMD_DUMP_IS_USER_ID] = {
 		.name = "user_id",
 		.help = "rule identifier is user-id",
 		.next = NEXT(next_dump_subcmd),
 		.call = parse_dump,
 	},
 	/* Query arguments. */
-	[QUERY_ACTION] = {
+	[RTE_FLOW_PARSER_CMD_QUERY_ACTION] = {
 		.name = "{action}",
 		.type = "ACTION",
 		.help = "action to query, must be part of the rule",
 		.call = parse_action,
 		.comp = comp_action,
 	},
-	[QUERY_IS_USER_ID] = {
+	[RTE_FLOW_PARSER_CMD_QUERY_IS_USER_ID] = {
 		.name = "user_id",
 		.help = "rule identifier is user-id",
 		.next = NEXT(next_query_attr),
 		.call = parse_query,
 	},
 	/* List arguments. */
-	[LIST_GROUP] = {
+	[RTE_FLOW_PARSER_CMD_LIST_GROUP] = {
 		.name = "group",
 		.help = "specify a group",
-		.next = NEXT(next_list_attr, NEXT_ENTRY(COMMON_GROUP_ID)),
+		.next = NEXT(next_list_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_GROUP_ID)),
 		.args = ARGS(ARGS_ENTRY_PTR(struct buffer, args.list.group)),
 		.call = parse_list,
 	},
-	[AGED_DESTROY] = {
+	[RTE_FLOW_PARSER_CMD_AGED_DESTROY] = {
 		.name = "destroy",
 		.help = "specify aged flows need be destroyed",
 		.call = parse_aged,
 		.comp = comp_none,
 	},
 	/* Validate/create attributes. */
-	[VC_GROUP] = {
+	[RTE_FLOW_PARSER_CMD_VC_GROUP] = {
 		.name = "group",
 		.help = "specify a group",
-		.next = NEXT(next_vc_attr, NEXT_ENTRY(COMMON_GROUP_ID)),
+		.next = NEXT(next_vc_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_GROUP_ID)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_attr, group)),
 		.call = parse_vc,
 	},
-	[VC_PRIORITY] = {
+	[RTE_FLOW_PARSER_CMD_VC_PRIORITY] = {
 		.name = "priority",
 		.help = "specify a priority level",
-		.next = NEXT(next_vc_attr, NEXT_ENTRY(COMMON_PRIORITY_LEVEL)),
+		.next = NEXT(next_vc_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PRIORITY_LEVEL)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_attr, priority)),
 		.call = parse_vc,
 	},
-	[VC_INGRESS] = {
+	[RTE_FLOW_PARSER_CMD_VC_INGRESS] = {
 		.name = "ingress",
 		.help = "affect rule to ingress",
 		.next = NEXT(next_vc_attr),
 		.call = parse_vc,
 	},
-	[VC_EGRESS] = {
+	[RTE_FLOW_PARSER_CMD_VC_EGRESS] = {
 		.name = "egress",
 		.help = "affect rule to egress",
 		.next = NEXT(next_vc_attr),
 		.call = parse_vc,
 	},
-	[VC_TRANSFER] = {
+	[RTE_FLOW_PARSER_CMD_VC_TRANSFER] = {
 		.name = "transfer",
 		.help = "apply rule directly to endpoints found in pattern",
 		.next = NEXT(next_vc_attr),
 		.call = parse_vc,
 	},
-	[VC_TUNNEL_SET] = {
+	[RTE_FLOW_PARSER_CMD_VC_TUNNEL_SET] = {
 		.name = "tunnel_set",
 		.help = "tunnel steer rule",
-		.next = NEXT(next_vc_attr, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(next_vc_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_tunnel_ops, id)),
 		.call = parse_vc,
 	},
-	[VC_TUNNEL_MATCH] = {
+	[RTE_FLOW_PARSER_CMD_VC_TUNNEL_MATCH] = {
 		.name = "tunnel_match",
 		.help = "tunnel match rule",
-		.next = NEXT(next_vc_attr, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(next_vc_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_parser_tunnel_ops, id)),
 		.call = parse_vc,
 	},
-	[VC_USER_ID] = {
+	[RTE_FLOW_PARSER_CMD_VC_USER_ID] = {
 		.name = "user_id",
 		.help = "specify a user id to create",
-		.next = NEXT(next_vc_attr, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(next_vc_attr, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.vc.user_id)),
 		.call = parse_vc,
 	},
-	[VC_IS_USER_ID] = {
+	[RTE_FLOW_PARSER_CMD_VC_IS_USER_ID] = {
 		.name = "user_id",
 		.help = "rule identifier is user-id",
 		.call = parse_vc,
 	},
 	/* Validate/create pattern. */
-	[ITEM_PATTERN] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PATTERN] = {
 		.name = "pattern",
 		.help = "submit a list of pattern items",
 		.next = NEXT(next_item),
 		.call = parse_vc,
 	},
-	[ITEM_PARAM_IS] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PARAM_IS] = {
 		.name = "is",
 		.help = "match value perfectly (with full bit-mask)",
 		.call = parse_vc_spec,
 	},
-	[ITEM_PARAM_SPEC] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PARAM_SPEC] = {
 		.name = "spec",
 		.help = "match value according to configured bit-mask",
 		.call = parse_vc_spec,
 	},
-	[ITEM_PARAM_LAST] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PARAM_LAST] = {
 		.name = "last",
 		.help = "specify upper bound to establish a range",
 		.call = parse_vc_spec,
 	},
-	[ITEM_PARAM_MASK] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PARAM_MASK] = {
 		.name = "mask",
 		.help = "specify bit-mask with relevant bits set to one",
 		.call = parse_vc_spec,
 	},
-	[ITEM_PARAM_PREFIX] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PARAM_PREFIX] = {
 		.name = "prefix",
 		.help = "generate bit-mask from a prefix length",
 		.call = parse_vc_spec,
 	},
-	[ITEM_NEXT] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_NEXT] = {
 		.name = "/",
 		.help = "specify next pattern item",
 		.next = NEXT(next_item),
 	},
-	[ITEM_END] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_END] = {
 		.name = "end",
 		.help = "end list of pattern items",
 		.priv = PRIV_ITEM(END, 0),
-		.next = NEXT(NEXT_ENTRY(ACTIONS, END)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTIONS, RTE_FLOW_PARSER_CMD_END)),
 		.call = parse_vc,
 	},
-	[ITEM_VOID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VOID] = {
 		.name = "void",
 		.help = "no-op pattern item",
 		.priv = PRIV_ITEM(VOID, 0),
-		.next = NEXT(NEXT_ENTRY(ITEM_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_NEXT)),
 		.call = parse_vc,
 	},
-	[ITEM_INVERT] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_INVERT] = {
 		.name = "invert",
 		.help = "perform actions when pattern does not match",
 		.priv = PRIV_ITEM(INVERT, 0),
-		.next = NEXT(NEXT_ENTRY(ITEM_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_NEXT)),
 		.call = parse_vc,
 	},
-	[ITEM_ANY] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ANY] = {
 		.name = "any",
 		.help = "match any protocol for the current layer",
 		.priv = PRIV_ITEM(ANY, sizeof(struct rte_flow_item_any)),
 		.next = NEXT(item_any),
 		.call = parse_vc,
 	},
-	[ITEM_ANY_NUM] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ANY_NUM] = {
 		.name = "num",
 		.help = "number of layers covered",
-		.next = NEXT(item_any, NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+		.next = NEXT(item_any, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_any, num)),
 	},
-	[ITEM_PORT_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PORT_ID] = {
 		.name = "port_id",
 		.help = "match traffic from/to a given DPDK port ID",
 		.priv = PRIV_ITEM(PORT_ID,
@@ -6691,325 +5809,325 @@ static const struct token token_list[] = {
 		.next = NEXT(item_port_id),
 		.call = parse_vc,
 	},
-	[ITEM_PORT_ID_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PORT_ID_ID] = {
 		.name = "id",
 		.help = "DPDK port ID",
-		.next = NEXT(item_port_id, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_port_id, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_port_id, id)),
 	},
-	[ITEM_MARK] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_MARK] = {
 		.name = "mark",
 		.help = "match traffic against value set in previously matched rule",
 		.priv = PRIV_ITEM(MARK, sizeof(struct rte_flow_item_mark)),
 		.next = NEXT(item_mark),
 		.call = parse_vc,
 	},
-	[ITEM_MARK_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_MARK_ID] = {
 		.name = "id",
 		.help = "Integer value to match against",
-		.next = NEXT(item_mark, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_mark, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_mark, id)),
 	},
-	[ITEM_RAW] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_RAW] = {
 		.name = "raw",
 		.help = "match an arbitrary byte string",
 		.priv = PRIV_ITEM(RAW, ITEM_RAW_SIZE),
 		.next = NEXT(item_raw),
 		.call = parse_vc,
 	},
-	[ITEM_RAW_RELATIVE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_RAW_RELATIVE] = {
 		.name = "relative",
 		.help = "look for pattern after the previous item",
-		.next = NEXT(item_raw, NEXT_ENTRY(COMMON_BOOLEAN), item_param),
+		.next = NEXT(item_raw, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN), item_param),
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_item_raw,
 					   relative, 1)),
 	},
-	[ITEM_RAW_SEARCH] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_RAW_SEARCH] = {
 		.name = "search",
 		.help = "search pattern from offset (see also limit)",
-		.next = NEXT(item_raw, NEXT_ENTRY(COMMON_BOOLEAN), item_param),
+		.next = NEXT(item_raw, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN), item_param),
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_item_raw,
 					   search, 1)),
 	},
-	[ITEM_RAW_OFFSET] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_RAW_OFFSET] = {
 		.name = "offset",
 		.help = "absolute or relative offset for pattern",
-		.next = NEXT(item_raw, NEXT_ENTRY(COMMON_INTEGER), item_param),
+		.next = NEXT(item_raw, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INTEGER), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_raw, offset)),
 	},
-	[ITEM_RAW_LIMIT] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_RAW_LIMIT] = {
 		.name = "limit",
 		.help = "search area limit for start of pattern",
-		.next = NEXT(item_raw, NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+		.next = NEXT(item_raw, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_raw, limit)),
 	},
-	[ITEM_RAW_PATTERN] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_RAW_PATTERN] = {
 		.name = "pattern",
 		.help = "byte string to look for",
 		.next = NEXT(item_raw,
-			     NEXT_ENTRY(COMMON_STRING),
-			     NEXT_ENTRY(ITEM_PARAM_IS,
-					ITEM_PARAM_SPEC,
-					ITEM_PARAM_MASK)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_STRING),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_PARAM_IS,
+					RTE_FLOW_PARSER_CMD_ITEM_PARAM_SPEC,
+					RTE_FLOW_PARSER_CMD_ITEM_PARAM_MASK)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_raw, pattern),
 			     ARGS_ENTRY(struct rte_flow_item_raw, length),
 			     ARGS_ENTRY_ARB(sizeof(struct rte_flow_item_raw),
 					    ITEM_RAW_PATTERN_SIZE)),
 	},
-	[ITEM_RAW_PATTERN_HEX] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_RAW_PATTERN_HEX] = {
 		.name = "pattern_hex",
 		.help = "hex string to look for",
 		.next = NEXT(item_raw,
-			     NEXT_ENTRY(COMMON_HEX),
-			     NEXT_ENTRY(ITEM_PARAM_IS,
-					ITEM_PARAM_SPEC,
-					ITEM_PARAM_MASK)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_HEX),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_PARAM_IS,
+					RTE_FLOW_PARSER_CMD_ITEM_PARAM_SPEC,
+					RTE_FLOW_PARSER_CMD_ITEM_PARAM_MASK)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_raw, pattern),
 			     ARGS_ENTRY(struct rte_flow_item_raw, length),
 			     ARGS_ENTRY_ARB(sizeof(struct rte_flow_item_raw),
 					    ITEM_RAW_PATTERN_SIZE)),
 	},
-	[ITEM_ETH] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ETH] = {
 		.name = "eth",
 		.help = "match Ethernet header",
 		.priv = PRIV_ITEM(ETH, sizeof(struct rte_flow_item_eth)),
 		.next = NEXT(item_eth),
 		.call = parse_vc,
 	},
-	[ITEM_ETH_DST] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ETH_DST] = {
 		.name = "dst",
 		.help = "destination MAC",
-		.next = NEXT(item_eth, NEXT_ENTRY(COMMON_MAC_ADDR), item_param),
+		.next = NEXT(item_eth, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_MAC_ADDR), item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_eth, hdr.dst_addr)),
 	},
-	[ITEM_ETH_SRC] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ETH_SRC] = {
 		.name = "src",
 		.help = "source MAC",
-		.next = NEXT(item_eth, NEXT_ENTRY(COMMON_MAC_ADDR), item_param),
+		.next = NEXT(item_eth, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_MAC_ADDR), item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_eth, hdr.src_addr)),
 	},
-	[ITEM_ETH_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ETH_TYPE] = {
 		.name = "type",
 		.help = "EtherType",
-		.next = NEXT(item_eth, NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+		.next = NEXT(item_eth, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_eth, hdr.ether_type)),
 	},
-	[ITEM_ETH_HAS_VLAN] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ETH_HAS_VLAN] = {
 		.name = "has_vlan",
 		.help = "packet header contains VLAN",
-		.next = NEXT(item_eth, NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+		.next = NEXT(item_eth, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_item_eth,
 					   has_vlan, 1)),
 	},
-	[ITEM_VLAN] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VLAN] = {
 		.name = "vlan",
 		.help = "match 802.1Q/ad VLAN tag",
 		.priv = PRIV_ITEM(VLAN, sizeof(struct rte_flow_item_vlan)),
 		.next = NEXT(item_vlan),
 		.call = parse_vc,
 	},
-	[ITEM_VLAN_TCI] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VLAN_TCI] = {
 		.name = "tci",
 		.help = "tag control information",
-		.next = NEXT(item_vlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_vlan, hdr.vlan_tci)),
 	},
-	[ITEM_VLAN_PCP] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VLAN_PCP] = {
 		.name = "pcp",
 		.help = "priority code point",
-		.next = NEXT(item_vlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_MASK_HTON(struct rte_flow_item_vlan,
 						  hdr.vlan_tci, "\xe0\x00")),
 	},
-	[ITEM_VLAN_DEI] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VLAN_DEI] = {
 		.name = "dei",
 		.help = "drop eligible indicator",
-		.next = NEXT(item_vlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_MASK_HTON(struct rte_flow_item_vlan,
 						  hdr.vlan_tci, "\x10\x00")),
 	},
-	[ITEM_VLAN_VID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VLAN_VID] = {
 		.name = "vid",
 		.help = "VLAN identifier",
-		.next = NEXT(item_vlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_MASK_HTON(struct rte_flow_item_vlan,
 						  hdr.vlan_tci, "\x0f\xff")),
 	},
-	[ITEM_VLAN_INNER_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VLAN_INNER_TYPE] = {
 		.name = "inner_type",
 		.help = "inner EtherType",
-		.next = NEXT(item_vlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_vlan,
 					     hdr.eth_proto)),
 	},
-	[ITEM_VLAN_HAS_MORE_VLAN] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VLAN_HAS_MORE_VLAN] = {
 		.name = "has_more_vlan",
 		.help = "packet header contains another VLAN",
-		.next = NEXT(item_vlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_item_vlan,
 					   has_more_vlan, 1)),
 	},
-	[ITEM_IPV4] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV4] = {
 		.name = "ipv4",
 		.help = "match IPv4 header",
 		.priv = PRIV_ITEM(IPV4, sizeof(struct rte_flow_item_ipv4)),
 		.next = NEXT(item_ipv4),
 		.call = parse_vc,
 	},
-	[ITEM_IPV4_VER_IHL] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV4_VER_IHL] = {
 		.name = "version_ihl",
 		.help = "match header length",
-		.next = NEXT(item_ipv4, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv4, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_ipv4,
 				     hdr.version_ihl)),
 	},
-	[ITEM_IPV4_TOS] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV4_TOS] = {
 		.name = "tos",
 		.help = "type of service",
-		.next = NEXT(item_ipv4, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv4, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv4,
 					     hdr.type_of_service)),
 	},
-	[ITEM_IPV4_LENGTH] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV4_LENGTH] = {
 		.name = "length",
 		.help = "total length",
-		.next = NEXT(item_ipv4, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv4, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv4,
 					     hdr.total_length)),
 	},
-	[ITEM_IPV4_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV4_ID] = {
 		.name = "packet_id",
 		.help = "fragment packet id",
-		.next = NEXT(item_ipv4, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv4, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv4,
 					     hdr.packet_id)),
 	},
-	[ITEM_IPV4_FRAGMENT_OFFSET] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV4_FRAGMENT_OFFSET] = {
 		.name = "fragment_offset",
 		.help = "fragmentation flags and fragment offset",
-		.next = NEXT(item_ipv4, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv4, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv4,
 					     hdr.fragment_offset)),
 	},
-	[ITEM_IPV4_TTL] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV4_TTL] = {
 		.name = "ttl",
 		.help = "time to live",
-		.next = NEXT(item_ipv4, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv4, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv4,
 					     hdr.time_to_live)),
 	},
-	[ITEM_IPV4_PROTO] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV4_PROTO] = {
 		.name = "proto",
 		.help = "next protocol ID",
-		.next = NEXT(item_ipv4, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv4, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv4,
 					     hdr.next_proto_id)),
 	},
-	[ITEM_IPV4_SRC] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV4_SRC] = {
 		.name = "src",
 		.help = "source address",
-		.next = NEXT(item_ipv4, NEXT_ENTRY(COMMON_IPV4_ADDR),
+		.next = NEXT(item_ipv4, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_IPV4_ADDR),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv4,
 					     hdr.src_addr)),
 	},
-	[ITEM_IPV4_DST] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV4_DST] = {
 		.name = "dst",
 		.help = "destination address",
-		.next = NEXT(item_ipv4, NEXT_ENTRY(COMMON_IPV4_ADDR),
+		.next = NEXT(item_ipv4, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_IPV4_ADDR),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv4,
 					     hdr.dst_addr)),
 	},
-	[ITEM_IPV6] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6] = {
 		.name = "ipv6",
 		.help = "match IPv6 header",
 		.priv = PRIV_ITEM(IPV6, sizeof(struct rte_flow_item_ipv6)),
 		.next = NEXT(item_ipv6),
 		.call = parse_vc,
 	},
-	[ITEM_IPV6_TC] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_TC] = {
 		.name = "tc",
 		.help = "traffic class",
-		.next = NEXT(item_ipv6, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv6, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_MASK_HTON(struct rte_flow_item_ipv6,
 						  hdr.vtc_flow,
 						  "\x0f\xf0\x00\x00")),
 	},
-	[ITEM_IPV6_FLOW] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_FLOW] = {
 		.name = "flow",
 		.help = "flow label",
-		.next = NEXT(item_ipv6, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv6, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_MASK_HTON(struct rte_flow_item_ipv6,
 						  hdr.vtc_flow,
 						  "\x00\x0f\xff\xff")),
 	},
-	[ITEM_IPV6_LEN] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_LEN] = {
 		.name = "length",
 		.help = "payload length",
-		.next = NEXT(item_ipv6, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv6, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv6,
 					     hdr.payload_len)),
 	},
-	[ITEM_IPV6_PROTO] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_PROTO] = {
 		.name = "proto",
 		.help = "protocol (next header)",
-		.next = NEXT(item_ipv6, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv6, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv6,
 					     hdr.proto)),
 	},
-	[ITEM_IPV6_HOP] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_HOP] = {
 		.name = "hop",
 		.help = "hop limit",
-		.next = NEXT(item_ipv6, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv6, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv6,
 					     hdr.hop_limits)),
 	},
-	[ITEM_IPV6_SRC] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_SRC] = {
 		.name = "src",
 		.help = "source address",
-		.next = NEXT(item_ipv6, NEXT_ENTRY(COMMON_IPV6_ADDR),
+		.next = NEXT(item_ipv6, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_IPV6_ADDR),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv6,
 					     hdr.src_addr)),
 	},
-	[ITEM_IPV6_DST] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_DST] = {
 		.name = "dst",
 		.help = "destination address",
-		.next = NEXT(item_ipv6, NEXT_ENTRY(COMMON_IPV6_ADDR),
+		.next = NEXT(item_ipv6, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_IPV6_ADDR),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv6,
 					     hdr.dst_addr)),
 	},
-	[ITEM_IPV6_HAS_FRAG_EXT] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_HAS_FRAG_EXT] = {
 		.name = "has_frag_ext",
 		.help = "fragment packet attribute",
-		.next = NEXT(item_ipv6, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv6, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_item_ipv6,
 					   has_frag_ext, 1)),
 	},
-	[ITEM_IPV6_ROUTING_EXT] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_ROUTING_EXT] = {
 		.name = "ipv6_routing_ext",
 		.help = "match IPv6 routing extension header",
 		.priv = PRIV_ITEM(IPV6_ROUTING_EXT,
@@ -7017,407 +6135,407 @@ static const struct token token_list[] = {
 		.next = NEXT(item_ipv6_routing_ext),
 		.call = parse_vc,
 	},
-	[ITEM_IPV6_ROUTING_EXT_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_ROUTING_EXT_TYPE] = {
 		.name = "ext_type",
 		.help = "match IPv6 routing extension header type",
-		.next = NEXT(item_ipv6_routing_ext, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv6_routing_ext, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv6_routing_ext,
 					     hdr.type)),
 	},
-	[ITEM_IPV6_ROUTING_EXT_NEXT_HDR] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_ROUTING_EXT_NEXT_HDR] = {
 		.name = "ext_next_hdr",
 		.help = "match IPv6 routing extension header next header type",
-		.next = NEXT(item_ipv6_routing_ext, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv6_routing_ext, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv6_routing_ext,
 					     hdr.next_hdr)),
 	},
-	[ITEM_IPV6_ROUTING_EXT_SEG_LEFT] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_ROUTING_EXT_SEG_LEFT] = {
 		.name = "ext_seg_left",
 		.help = "match IPv6 routing extension header segment left",
-		.next = NEXT(item_ipv6_routing_ext, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv6_routing_ext, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv6_routing_ext,
 					     hdr.segments_left)),
 	},
-	[ITEM_ICMP] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP] = {
 		.name = "icmp",
 		.help = "match ICMP header",
 		.priv = PRIV_ITEM(ICMP, sizeof(struct rte_flow_item_icmp)),
 		.next = NEXT(item_icmp),
 		.call = parse_vc,
 	},
-	[ITEM_ICMP_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP_TYPE] = {
 		.name = "type",
 		.help = "ICMP packet type",
-		.next = NEXT(item_icmp, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_icmp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_icmp,
 					     hdr.icmp_type)),
 	},
-	[ITEM_ICMP_CODE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP_CODE] = {
 		.name = "code",
 		.help = "ICMP packet code",
-		.next = NEXT(item_icmp, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_icmp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_icmp,
 					     hdr.icmp_code)),
 	},
-	[ITEM_ICMP_IDENT] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP_IDENT] = {
 		.name = "ident",
 		.help = "ICMP packet identifier",
-		.next = NEXT(item_icmp, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_icmp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_icmp,
 					     hdr.icmp_ident)),
 	},
-	[ITEM_ICMP_SEQ] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP_SEQ] = {
 		.name = "seq",
 		.help = "ICMP packet sequence number",
-		.next = NEXT(item_icmp, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_icmp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_icmp,
 					     hdr.icmp_seq_nb)),
 	},
-	[ITEM_UDP] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_UDP] = {
 		.name = "udp",
 		.help = "match UDP header",
 		.priv = PRIV_ITEM(UDP, sizeof(struct rte_flow_item_udp)),
 		.next = NEXT(item_udp),
 		.call = parse_vc,
 	},
-	[ITEM_UDP_SRC] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_UDP_SRC] = {
 		.name = "src",
 		.help = "UDP source port",
-		.next = NEXT(item_udp, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_udp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_udp,
 					     hdr.src_port)),
 	},
-	[ITEM_UDP_DST] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_UDP_DST] = {
 		.name = "dst",
 		.help = "UDP destination port",
-		.next = NEXT(item_udp, NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+		.next = NEXT(item_udp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_udp,
 					     hdr.dst_port)),
 	},
-	[ITEM_TCP] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_TCP] = {
 		.name = "tcp",
 		.help = "match TCP header",
 		.priv = PRIV_ITEM(TCP, sizeof(struct rte_flow_item_tcp)),
 		.next = NEXT(item_tcp),
 		.call = parse_vc,
 	},
-	[ITEM_TCP_SRC] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_TCP_SRC] = {
 		.name = "src",
 		.help = "TCP source port",
-		.next = NEXT(item_tcp, NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+		.next = NEXT(item_tcp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_tcp,
 					     hdr.src_port)),
 	},
-	[ITEM_TCP_DST] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_TCP_DST] = {
 		.name = "dst",
 		.help = "TCP destination port",
-		.next = NEXT(item_tcp, NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+		.next = NEXT(item_tcp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_tcp,
 					     hdr.dst_port)),
 	},
-	[ITEM_TCP_FLAGS] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_TCP_FLAGS] = {
 		.name = "flags",
 		.help = "TCP flags",
-		.next = NEXT(item_tcp, NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+		.next = NEXT(item_tcp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_tcp,
 					     hdr.tcp_flags)),
 	},
-	[ITEM_SCTP] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_SCTP] = {
 		.name = "sctp",
 		.help = "match SCTP header",
 		.priv = PRIV_ITEM(SCTP, sizeof(struct rte_flow_item_sctp)),
 		.next = NEXT(item_sctp),
 		.call = parse_vc,
 	},
-	[ITEM_SCTP_SRC] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_SCTP_SRC] = {
 		.name = "src",
 		.help = "SCTP source port",
-		.next = NEXT(item_sctp, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_sctp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_sctp,
 					     hdr.src_port)),
 	},
-	[ITEM_SCTP_DST] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_SCTP_DST] = {
 		.name = "dst",
 		.help = "SCTP destination port",
-		.next = NEXT(item_sctp, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_sctp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_sctp,
 					     hdr.dst_port)),
 	},
-	[ITEM_SCTP_TAG] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_SCTP_TAG] = {
 		.name = "tag",
 		.help = "validation tag",
-		.next = NEXT(item_sctp, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_sctp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_sctp,
 					     hdr.tag)),
 	},
-	[ITEM_SCTP_CKSUM] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_SCTP_CKSUM] = {
 		.name = "cksum",
 		.help = "checksum",
-		.next = NEXT(item_sctp, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_sctp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_sctp,
 					     hdr.cksum)),
 	},
-	[ITEM_VXLAN] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN] = {
 		.name = "vxlan",
 		.help = "match VXLAN header",
 		.priv = PRIV_ITEM(VXLAN, sizeof(struct rte_flow_item_vxlan)),
 		.next = NEXT(item_vxlan),
 		.call = parse_vc,
 	},
-	[ITEM_VXLAN_VNI] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_VNI] = {
 		.name = "vni",
 		.help = "VXLAN identifier",
-		.next = NEXT(item_vxlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_vxlan, hdr.vni)),
 	},
-	[ITEM_VXLAN_FLAG_G] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_FLAG_G] = {
 		.name = "flag_g",
 		.help = "VXLAN GBP bit",
-		.next = NEXT(item_vxlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_item_vxlan,
 					   hdr.flag_g, 1)),
 	},
-	[ITEM_VXLAN_FLAG_VER] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_FLAG_VER] = {
 		.name = "flag_ver",
 		.help = "VXLAN GPE version",
-		.next = NEXT(item_vxlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_item_vxlan,
 					   hdr.flag_ver, 2)),
 	},
-	[ITEM_VXLAN_FLAG_I] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_FLAG_I] = {
 		.name = "flag_i",
 		.help = "VXLAN Instance bit",
-		.next = NEXT(item_vxlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_item_vxlan,
 					   hdr.flag_i, 1)),
 	},
-	[ITEM_VXLAN_FLAG_P] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_FLAG_P] = {
 		.name = "flag_p",
 		.help = "VXLAN GPE Next Protocol bit",
-		.next = NEXT(item_vxlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_item_vxlan,
 					   hdr.flag_p, 1)),
 	},
-	[ITEM_VXLAN_FLAG_B] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_FLAG_B] = {
 		.name = "flag_b",
 		.help = "VXLAN GPE Ingress-Replicated BUM",
-		.next = NEXT(item_vxlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_item_vxlan,
 					   hdr.flag_b, 1)),
 	},
-	[ITEM_VXLAN_FLAG_O] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_FLAG_O] = {
 		.name = "flag_o",
 		.help = "VXLAN GPE OAM Packet bit",
-		.next = NEXT(item_vxlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_item_vxlan,
 					   hdr.flag_o, 1)),
 	},
-	[ITEM_VXLAN_FLAG_D] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_FLAG_D] = {
 		.name = "flag_d",
 		.help = "VXLAN GBP Don't Learn bit",
-		.next = NEXT(item_vxlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_item_vxlan,
 					   hdr.flag_d, 1)),
 	},
-	[ITEM_VXLAN_FLAG_A] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_FLAG_A] = {
 		.name = "flag_a",
 		.help = "VXLAN GBP Applied bit",
-		.next = NEXT(item_vxlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_item_vxlan,
 					   hdr.flag_a, 1)),
 	},
-	[ITEM_VXLAN_GBP_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_GBP_ID] = {
 		.name = "group_policy_id",
 		.help = "VXLAN GBP ID",
-		.next = NEXT(item_vxlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_vxlan,
 					     hdr.policy_id)),
 	},
-	[ITEM_VXLAN_GPE_PROTO] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_GPE_PROTO] = {
 		.name = "protocol",
 		.help = "VXLAN GPE next protocol",
-		.next = NEXT(item_vxlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_vxlan,
 					     hdr.proto)),
 	},
-	[ITEM_VXLAN_FIRST_RSVD] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_FIRST_RSVD] = {
 		.name = "first_rsvd",
 		.help = "VXLAN rsvd0 first byte",
-		.next = NEXT(item_vxlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_vxlan,
 					     hdr.rsvd0[0])),
 	},
-	[ITEM_VXLAN_SECND_RSVD] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_SECND_RSVD] = {
 		.name = "second_rsvd",
 		.help = "VXLAN rsvd0 second byte",
-		.next = NEXT(item_vxlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_vxlan,
 					     hdr.rsvd0[1])),
 	},
-	[ITEM_VXLAN_THIRD_RSVD] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_THIRD_RSVD] = {
 		.name = "third_rsvd",
 		.help = "VXLAN rsvd0 third byte",
-		.next = NEXT(item_vxlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_vxlan,
 					     hdr.rsvd0[2])),
 	},
-	[ITEM_VXLAN_LAST_RSVD] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_LAST_RSVD] = {
 		.name = "last_rsvd",
 		.help = "VXLAN last reserved byte",
-		.next = NEXT(item_vxlan, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_vxlan,
 					     hdr.last_rsvd)),
 	},
-	[ITEM_E_TAG] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_E_TAG] = {
 		.name = "e_tag",
 		.help = "match E-Tag header",
 		.priv = PRIV_ITEM(E_TAG, sizeof(struct rte_flow_item_e_tag)),
 		.next = NEXT(item_e_tag),
 		.call = parse_vc,
 	},
-	[ITEM_E_TAG_GRP_ECID_B] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_E_TAG_GRP_ECID_B] = {
 		.name = "grp_ecid_b",
 		.help = "GRP and E-CID base",
-		.next = NEXT(item_e_tag, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_e_tag, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_MASK_HTON(struct rte_flow_item_e_tag,
 						  rsvd_grp_ecid_b,
 						  "\x3f\xff")),
 	},
-	[ITEM_NVGRE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_NVGRE] = {
 		.name = "nvgre",
 		.help = "match NVGRE header",
 		.priv = PRIV_ITEM(NVGRE, sizeof(struct rte_flow_item_nvgre)),
 		.next = NEXT(item_nvgre),
 		.call = parse_vc,
 	},
-	[ITEM_NVGRE_TNI] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_NVGRE_TNI] = {
 		.name = "tni",
 		.help = "virtual subnet ID",
-		.next = NEXT(item_nvgre, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_nvgre, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_nvgre, tni)),
 	},
-	[ITEM_MPLS] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_MPLS] = {
 		.name = "mpls",
 		.help = "match MPLS header",
 		.priv = PRIV_ITEM(MPLS, sizeof(struct rte_flow_item_mpls)),
 		.next = NEXT(item_mpls),
 		.call = parse_vc,
 	},
-	[ITEM_MPLS_LABEL] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_MPLS_LABEL] = {
 		.name = "label",
 		.help = "MPLS label",
-		.next = NEXT(item_mpls, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_mpls, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_MASK_HTON(struct rte_flow_item_mpls,
 						  label_tc_s,
 						  "\xff\xff\xf0")),
 	},
-	[ITEM_MPLS_TC] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_MPLS_TC] = {
 		.name = "tc",
 		.help = "MPLS Traffic Class",
-		.next = NEXT(item_mpls, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_mpls, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_MASK_HTON(struct rte_flow_item_mpls,
 						  label_tc_s,
 						  "\x00\x00\x0e")),
 	},
-	[ITEM_MPLS_S] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_MPLS_S] = {
 		.name = "s",
 		.help = "MPLS Bottom-of-Stack",
-		.next = NEXT(item_mpls, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_mpls, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_MASK_HTON(struct rte_flow_item_mpls,
 						  label_tc_s,
 						  "\x00\x00\x01")),
 	},
-	[ITEM_MPLS_TTL] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_MPLS_TTL] = {
 		.name = "ttl",
 		.help = "MPLS Time-to-Live",
-		.next = NEXT(item_mpls, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_mpls, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_mpls, ttl)),
 	},
-	[ITEM_GRE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GRE] = {
 		.name = "gre",
 		.help = "match GRE header",
 		.priv = PRIV_ITEM(GRE, sizeof(struct rte_flow_item_gre)),
 		.next = NEXT(item_gre),
 		.call = parse_vc,
 	},
-	[ITEM_GRE_PROTO] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GRE_PROTO] = {
 		.name = "protocol",
 		.help = "GRE protocol type",
-		.next = NEXT(item_gre, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_gre, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_gre,
 					     protocol)),
 	},
-	[ITEM_GRE_C_RSVD0_VER] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GRE_C_RSVD0_VER] = {
 		.name = "c_rsvd0_ver",
 		.help =
 			"checksum (1b), undefined (1b), key bit (1b),"
 			" sequence number (1b), reserved 0 (9b),"
 			" version (3b)",
-		.next = NEXT(item_gre, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_gre, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_gre,
 					     c_rsvd0_ver)),
 	},
-	[ITEM_GRE_C_BIT] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GRE_C_BIT] = {
 		.name = "c_bit",
 		.help = "checksum bit (C)",
-		.next = NEXT(item_gre, NEXT_ENTRY(COMMON_BOOLEAN),
+		.next = NEXT(item_gre, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_MASK_HTON(struct rte_flow_item_gre,
 						  c_rsvd0_ver,
 						  "\x80\x00\x00\x00")),
 	},
-	[ITEM_GRE_S_BIT] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GRE_S_BIT] = {
 		.name = "s_bit",
 		.help = "sequence number bit (S)",
-		.next = NEXT(item_gre, NEXT_ENTRY(COMMON_BOOLEAN), item_param),
+		.next = NEXT(item_gre, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN), item_param),
 		.args = ARGS(ARGS_ENTRY_MASK_HTON(struct rte_flow_item_gre,
 						  c_rsvd0_ver,
 						  "\x10\x00\x00\x00")),
 	},
-	[ITEM_GRE_K_BIT] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GRE_K_BIT] = {
 		.name = "k_bit",
 		.help = "key bit (K)",
-		.next = NEXT(item_gre, NEXT_ENTRY(COMMON_BOOLEAN), item_param),
+		.next = NEXT(item_gre, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN), item_param),
 		.args = ARGS(ARGS_ENTRY_MASK_HTON(struct rte_flow_item_gre,
 						  c_rsvd0_ver,
 						  "\x20\x00\x00\x00")),
 	},
-	[ITEM_FUZZY] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_FUZZY] = {
 		.name = "fuzzy",
 		.help = "fuzzy pattern match, expect faster than default",
 		.priv = PRIV_ITEM(FUZZY,
@@ -7425,86 +6543,86 @@ static const struct token token_list[] = {
 		.next = NEXT(item_fuzzy),
 		.call = parse_vc,
 	},
-	[ITEM_FUZZY_THRESH] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_FUZZY_THRESH] = {
 		.name = "thresh",
 		.help = "match accuracy threshold",
-		.next = NEXT(item_fuzzy, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_fuzzy, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_fuzzy,
 					thresh)),
 	},
-	[ITEM_GTP] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GTP] = {
 		.name = "gtp",
 		.help = "match GTP header",
 		.priv = PRIV_ITEM(GTP, sizeof(struct rte_flow_item_gtp)),
 		.next = NEXT(item_gtp),
 		.call = parse_vc,
 	},
-	[ITEM_GTP_FLAGS] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GTP_FLAGS] = {
 		.name = "v_pt_rsv_flags",
 		.help = "GTP flags",
-		.next = NEXT(item_gtp, NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+		.next = NEXT(item_gtp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_gtp,
 					hdr.gtp_hdr_info)),
 	},
-	[ITEM_GTP_MSG_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GTP_MSG_TYPE] = {
 		.name = "msg_type",
 		.help = "GTP message type",
-		.next = NEXT(item_gtp, NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+		.next = NEXT(item_gtp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_gtp, hdr.msg_type)),
 	},
-	[ITEM_GTP_TEID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GTP_TEID] = {
 		.name = "teid",
 		.help = "tunnel endpoint identifier",
-		.next = NEXT(item_gtp, NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+		.next = NEXT(item_gtp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_gtp, hdr.teid)),
 	},
-	[ITEM_GTPC] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GTPC] = {
 		.name = "gtpc",
 		.help = "match GTP header",
 		.priv = PRIV_ITEM(GTPC, sizeof(struct rte_flow_item_gtp)),
 		.next = NEXT(item_gtp),
 		.call = parse_vc,
 	},
-	[ITEM_GTPU] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GTPU] = {
 		.name = "gtpu",
 		.help = "match GTP header",
 		.priv = PRIV_ITEM(GTPU, sizeof(struct rte_flow_item_gtp)),
 		.next = NEXT(item_gtp),
 		.call = parse_vc,
 	},
-	[ITEM_GENEVE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GENEVE] = {
 		.name = "geneve",
 		.help = "match GENEVE header",
 		.priv = PRIV_ITEM(GENEVE, sizeof(struct rte_flow_item_geneve)),
 		.next = NEXT(item_geneve),
 		.call = parse_vc,
 	},
-	[ITEM_GENEVE_VNI] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GENEVE_VNI] = {
 		.name = "vni",
 		.help = "virtual network identifier",
-		.next = NEXT(item_geneve, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_geneve, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_geneve, vni)),
 	},
-	[ITEM_GENEVE_PROTO] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GENEVE_PROTO] = {
 		.name = "protocol",
 		.help = "GENEVE protocol type",
-		.next = NEXT(item_geneve, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_geneve, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_geneve,
 					     protocol)),
 	},
-	[ITEM_GENEVE_OPTLEN] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GENEVE_OPTLEN] = {
 		.name = "optlen",
 		.help = "GENEVE options length in dwords",
-		.next = NEXT(item_geneve, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_geneve, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_MASK_HTON(struct rte_flow_item_geneve,
 						  ver_opt_len_o_c_rsvd0,
 						  "\x3f\x00")),
 	},
-	[ITEM_VXLAN_GPE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_GPE] = {
 		.name = "vxlan-gpe",
 		.help = "match VXLAN-GPE header",
 		.priv = PRIV_ITEM(VXLAN_GPE,
@@ -7512,47 +6630,47 @@ static const struct token token_list[] = {
 		.next = NEXT(item_vxlan_gpe),
 		.call = parse_vc,
 	},
-	[ITEM_VXLAN_GPE_VNI] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_GPE_VNI] = {
 		.name = "vni",
 		.help = "VXLAN-GPE identifier",
-		.next = NEXT(item_vxlan_gpe, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan_gpe, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_vxlan_gpe,
 					     hdr.vni)),
 	},
-	[ITEM_VXLAN_GPE_PROTO_IN_DEPRECATED_VXLAN_GPE_HDR] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_GPE_PROTO_IN_DEPRECATED_VXLAN_GPE_HDR] = {
 		.name = "protocol",
 		.help = "VXLAN-GPE next protocol",
-		.next = NEXT(item_vxlan_gpe, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan_gpe, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_vxlan_gpe,
 					     protocol)),
 	},
-	[ITEM_VXLAN_GPE_FLAGS] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_GPE_FLAGS] = {
 		.name = "flags",
 		.help = "VXLAN-GPE flags",
-		.next = NEXT(item_vxlan_gpe, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan_gpe, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_vxlan_gpe,
 					     flags)),
 	},
-	[ITEM_VXLAN_GPE_RSVD0] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_GPE_RSVD0] = {
 		.name = "rsvd0",
 		.help = "VXLAN-GPE rsvd0",
-		.next = NEXT(item_vxlan_gpe, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan_gpe, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_vxlan_gpe,
 					     rsvd0)),
 	},
-	[ITEM_VXLAN_GPE_RSVD1] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_VXLAN_GPE_RSVD1] = {
 		.name = "rsvd1",
 		.help = "VXLAN-GPE rsvd1",
-		.next = NEXT(item_vxlan_gpe, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_vxlan_gpe, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_vxlan_gpe,
 					     rsvd1)),
 	},
-	[ITEM_ARP_ETH_IPV4] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ARP_ETH_IPV4] = {
 		.name = "arp_eth_ipv4",
 		.help = "match ARP header for Ethernet/IPv4",
 		.priv = PRIV_ITEM(ARP_ETH_IPV4,
@@ -7560,39 +6678,39 @@ static const struct token token_list[] = {
 		.next = NEXT(item_arp_eth_ipv4),
 		.call = parse_vc,
 	},
-	[ITEM_ARP_ETH_IPV4_SHA] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ARP_ETH_IPV4_SHA] = {
 		.name = "sha",
 		.help = "sender hardware address",
-		.next = NEXT(item_arp_eth_ipv4, NEXT_ENTRY(COMMON_MAC_ADDR),
+		.next = NEXT(item_arp_eth_ipv4, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_MAC_ADDR),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_arp_eth_ipv4,
 					     hdr.arp_data.arp_sha)),
 	},
-	[ITEM_ARP_ETH_IPV4_SPA] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ARP_ETH_IPV4_SPA] = {
 		.name = "spa",
 		.help = "sender IPv4 address",
-		.next = NEXT(item_arp_eth_ipv4, NEXT_ENTRY(COMMON_IPV4_ADDR),
+		.next = NEXT(item_arp_eth_ipv4, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_IPV4_ADDR),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_arp_eth_ipv4,
 					     hdr.arp_data.arp_sip)),
 	},
-	[ITEM_ARP_ETH_IPV4_THA] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ARP_ETH_IPV4_THA] = {
 		.name = "tha",
 		.help = "target hardware address",
-		.next = NEXT(item_arp_eth_ipv4, NEXT_ENTRY(COMMON_MAC_ADDR),
+		.next = NEXT(item_arp_eth_ipv4, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_MAC_ADDR),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_arp_eth_ipv4,
 					     hdr.arp_data.arp_tha)),
 	},
-	[ITEM_ARP_ETH_IPV4_TPA] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ARP_ETH_IPV4_TPA] = {
 		.name = "tpa",
 		.help = "target IPv4 address",
-		.next = NEXT(item_arp_eth_ipv4, NEXT_ENTRY(COMMON_IPV4_ADDR),
+		.next = NEXT(item_arp_eth_ipv4, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_IPV4_ADDR),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_arp_eth_ipv4,
 					     hdr.arp_data.arp_tip)),
 	},
-	[ITEM_IPV6_EXT] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_EXT] = {
 		.name = "ipv6_ext",
 		.help = "match presence of any IPv6 extension header",
 		.priv = PRIV_ITEM(IPV6_EXT,
@@ -7600,15 +6718,15 @@ static const struct token token_list[] = {
 		.next = NEXT(item_ipv6_ext),
 		.call = parse_vc,
 	},
-	[ITEM_IPV6_EXT_NEXT_HDR] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_EXT_NEXT_HDR] = {
 		.name = "next_hdr",
 		.help = "next header",
-		.next = NEXT(item_ipv6_ext, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv6_ext, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv6_ext,
 					     next_hdr)),
 	},
-	[ITEM_IPV6_FRAG_EXT] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_FRAG_EXT] = {
 		.name = "ipv6_frag_ext",
 		.help = "match presence of IPv6 fragment extension header",
 		.priv = PRIV_ITEM(IPV6_FRAG_EXT,
@@ -7616,54 +6734,54 @@ static const struct token token_list[] = {
 		.next = NEXT(item_ipv6_frag_ext),
 		.call = parse_vc,
 	},
-	[ITEM_IPV6_FRAG_EXT_NEXT_HDR] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_FRAG_EXT_NEXT_HDR] = {
 		.name = "next_hdr",
 		.help = "next header",
-		.next = NEXT(item_ipv6_frag_ext, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv6_frag_ext, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_ipv6_frag_ext,
 					hdr.next_header)),
 	},
-	[ITEM_IPV6_FRAG_EXT_FRAG_DATA] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_FRAG_EXT_FRAG_DATA] = {
 		.name = "frag_data",
 		.help = "fragment flags and offset",
-		.next = NEXT(item_ipv6_frag_ext, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv6_frag_ext, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv6_frag_ext,
 					     hdr.frag_data)),
 	},
-	[ITEM_IPV6_FRAG_EXT_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_FRAG_EXT_ID] = {
 		.name = "packet_id",
 		.help = "fragment packet id",
-		.next = NEXT(item_ipv6_frag_ext, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv6_frag_ext, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv6_frag_ext,
 					     hdr.id)),
 	},
-	[ITEM_ICMP6] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6] = {
 		.name = "icmp6",
 		.help = "match any ICMPv6 header",
 		.priv = PRIV_ITEM(ICMP6, sizeof(struct rte_flow_item_icmp6)),
 		.next = NEXT(item_icmp6),
 		.call = parse_vc,
 	},
-	[ITEM_ICMP6_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6_TYPE] = {
 		.name = "type",
 		.help = "ICMPv6 type",
-		.next = NEXT(item_icmp6, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_icmp6, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_icmp6,
 					     type)),
 	},
-	[ITEM_ICMP6_CODE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6_CODE] = {
 		.name = "code",
 		.help = "ICMPv6 code",
-		.next = NEXT(item_icmp6, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_icmp6, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_icmp6,
 					     code)),
 	},
-	[ITEM_ICMP6_ECHO_REQUEST] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ECHO_REQUEST] = {
 		.name = "icmp6_echo_request",
 		.help = "match ICMPv6 echo request",
 		.priv = PRIV_ITEM(ICMP6_ECHO_REQUEST,
@@ -7671,23 +6789,23 @@ static const struct token token_list[] = {
 		.next = NEXT(item_icmp6_echo_request),
 		.call = parse_vc,
 	},
-	[ITEM_ICMP6_ECHO_REQUEST_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ECHO_REQUEST_ID] = {
 		.name = "ident",
 		.help = "ICMPv6 echo request identifier",
-		.next = NEXT(item_icmp6_echo_request, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_icmp6_echo_request, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_icmp6_echo,
 					     hdr.identifier)),
 	},
-	[ITEM_ICMP6_ECHO_REQUEST_SEQ] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ECHO_REQUEST_SEQ] = {
 		.name = "seq",
 		.help = "ICMPv6 echo request sequence",
-		.next = NEXT(item_icmp6_echo_request, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_icmp6_echo_request, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_icmp6_echo,
 					     hdr.sequence)),
 	},
-	[ITEM_ICMP6_ECHO_REPLY] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ECHO_REPLY] = {
 		.name = "icmp6_echo_reply",
 		.help = "match ICMPv6 echo reply",
 		.priv = PRIV_ITEM(ICMP6_ECHO_REPLY,
@@ -7695,23 +6813,23 @@ static const struct token token_list[] = {
 		.next = NEXT(item_icmp6_echo_reply),
 		.call = parse_vc,
 	},
-	[ITEM_ICMP6_ECHO_REPLY_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ECHO_REPLY_ID] = {
 		.name = "ident",
 		.help = "ICMPv6 echo reply identifier",
-		.next = NEXT(item_icmp6_echo_reply, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_icmp6_echo_reply, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_icmp6_echo,
 					     hdr.identifier)),
 	},
-	[ITEM_ICMP6_ECHO_REPLY_SEQ] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ECHO_REPLY_SEQ] = {
 		.name = "seq",
 		.help = "ICMPv6 echo reply sequence",
-		.next = NEXT(item_icmp6_echo_reply, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_icmp6_echo_reply, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_icmp6_echo,
 					     hdr.sequence)),
 	},
-	[ITEM_ICMP6_ND_NS] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_NS] = {
 		.name = "icmp6_nd_ns",
 		.help = "match ICMPv6 neighbor discovery solicitation",
 		.priv = PRIV_ITEM(ICMP6_ND_NS,
@@ -7719,15 +6837,15 @@ static const struct token token_list[] = {
 		.next = NEXT(item_icmp6_nd_ns),
 		.call = parse_vc,
 	},
-	[ITEM_ICMP6_ND_NS_TARGET_ADDR] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_NS_TARGET_ADDR] = {
 		.name = "target_addr",
 		.help = "target address",
-		.next = NEXT(item_icmp6_nd_ns, NEXT_ENTRY(COMMON_IPV6_ADDR),
+		.next = NEXT(item_icmp6_nd_ns, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_IPV6_ADDR),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_icmp6_nd_ns,
 					     target_addr)),
 	},
-	[ITEM_ICMP6_ND_NA] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_NA] = {
 		.name = "icmp6_nd_na",
 		.help = "match ICMPv6 neighbor discovery advertisement",
 		.priv = PRIV_ITEM(ICMP6_ND_NA,
@@ -7735,15 +6853,15 @@ static const struct token token_list[] = {
 		.next = NEXT(item_icmp6_nd_na),
 		.call = parse_vc,
 	},
-	[ITEM_ICMP6_ND_NA_TARGET_ADDR] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_NA_TARGET_ADDR] = {
 		.name = "target_addr",
 		.help = "target address",
-		.next = NEXT(item_icmp6_nd_na, NEXT_ENTRY(COMMON_IPV6_ADDR),
+		.next = NEXT(item_icmp6_nd_na, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_IPV6_ADDR),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_icmp6_nd_na,
 					     target_addr)),
 	},
-	[ITEM_ICMP6_ND_OPT] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_OPT] = {
 		.name = "icmp6_nd_opt",
 		.help = "match presence of any ICMPv6 neighbor discovery"
 			" option",
@@ -7752,15 +6870,15 @@ static const struct token token_list[] = {
 		.next = NEXT(item_icmp6_nd_opt),
 		.call = parse_vc,
 	},
-	[ITEM_ICMP6_ND_OPT_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_OPT_TYPE] = {
 		.name = "type",
 		.help = "ND option type",
-		.next = NEXT(item_icmp6_nd_opt, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_icmp6_nd_opt, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_icmp6_nd_opt,
 					     type)),
 	},
-	[ITEM_ICMP6_ND_OPT_SLA_ETH] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_OPT_SLA_ETH] = {
 		.name = "icmp6_nd_opt_sla_eth",
 		.help = "match ICMPv6 neighbor discovery source Ethernet"
 			" link-layer address option",
@@ -7770,15 +6888,15 @@ static const struct token token_list[] = {
 		.next = NEXT(item_icmp6_nd_opt_sla_eth),
 		.call = parse_vc,
 	},
-	[ITEM_ICMP6_ND_OPT_SLA_ETH_SLA] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_OPT_SLA_ETH_SLA] = {
 		.name = "sla",
 		.help = "source Ethernet LLA",
 		.next = NEXT(item_icmp6_nd_opt_sla_eth,
-			     NEXT_ENTRY(COMMON_MAC_ADDR), item_param),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_MAC_ADDR), item_param),
 		.args = ARGS(ARGS_ENTRY_HTON
 			     (struct rte_flow_item_icmp6_nd_opt_sla_eth, sla)),
 	},
-	[ITEM_ICMP6_ND_OPT_TLA_ETH] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_OPT_TLA_ETH] = {
 		.name = "icmp6_nd_opt_tla_eth",
 		.help = "match ICMPv6 neighbor discovery target Ethernet"
 			" link-layer address option",
@@ -7788,59 +6906,59 @@ static const struct token token_list[] = {
 		.next = NEXT(item_icmp6_nd_opt_tla_eth),
 		.call = parse_vc,
 	},
-	[ITEM_ICMP6_ND_OPT_TLA_ETH_TLA] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ICMP6_ND_OPT_TLA_ETH_TLA] = {
 		.name = "tla",
 		.help = "target Ethernet LLA",
 		.next = NEXT(item_icmp6_nd_opt_tla_eth,
-			     NEXT_ENTRY(COMMON_MAC_ADDR), item_param),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_MAC_ADDR), item_param),
 		.args = ARGS(ARGS_ENTRY_HTON
 			     (struct rte_flow_item_icmp6_nd_opt_tla_eth, tla)),
 	},
-	[ITEM_META] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_META] = {
 		.name = "meta",
 		.help = "match metadata header",
 		.priv = PRIV_ITEM(META, sizeof(struct rte_flow_item_meta)),
 		.next = NEXT(item_meta),
 		.call = parse_vc,
 	},
-	[ITEM_META_DATA] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_META_DATA] = {
 		.name = "data",
 		.help = "metadata value",
-		.next = NEXT(item_meta, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_meta, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_MASK(struct rte_flow_item_meta,
 					     data, "\xff\xff\xff\xff")),
 	},
-	[ITEM_RANDOM] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_RANDOM] = {
 		.name = "random",
 		.help = "match random value",
 		.priv = PRIV_ITEM(RANDOM, sizeof(struct rte_flow_item_random)),
 		.next = NEXT(item_random),
 		.call = parse_vc,
 	},
-	[ITEM_RANDOM_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_RANDOM_VALUE] = {
 		.name = "value",
 		.help = "random value",
-		.next = NEXT(item_random, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_random, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_MASK(struct rte_flow_item_random,
 					     value, "\xff\xff\xff\xff")),
 	},
-	[ITEM_GRE_KEY] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GRE_KEY] = {
 		.name = "gre_key",
 		.help = "match GRE key",
 		.priv = PRIV_ITEM(GRE_KEY, sizeof(rte_be32_t)),
 		.next = NEXT(item_gre_key),
 		.call = parse_vc,
 	},
-	[ITEM_GRE_KEY_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GRE_KEY_VALUE] = {
 		.name = "value",
 		.help = "key value",
-		.next = NEXT(item_gre_key, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_gre_key, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARG_ENTRY_HTON(rte_be32_t)),
 	},
-	[ITEM_GRE_OPTION] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GRE_OPTION] = {
 		.name = "gre_option",
 		.help = "match GRE optional fields",
 		.priv = PRIV_ITEM(GRE_OPTION,
@@ -7848,31 +6966,31 @@ static const struct token token_list[] = {
 		.next = NEXT(item_gre_option),
 		.call = parse_vc,
 	},
-	[ITEM_GRE_OPTION_CHECKSUM] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GRE_OPTION_CHECKSUM] = {
 		.name = "checksum",
 		.help = "match GRE checksum",
-		.next = NEXT(item_gre_option, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_gre_option, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_gre_opt,
 					     checksum_rsvd.checksum)),
 	},
-	[ITEM_GRE_OPTION_KEY] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GRE_OPTION_KEY] = {
 		.name = "key",
 		.help = "match GRE key",
-		.next = NEXT(item_gre_option, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_gre_option, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_gre_opt,
 					     key.key)),
 	},
-	[ITEM_GRE_OPTION_SEQUENCE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GRE_OPTION_SEQUENCE] = {
 		.name = "sequence",
 		.help = "match GRE sequence",
-		.next = NEXT(item_gre_option, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_gre_option, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_gre_opt,
 					     sequence.sequence)),
 	},
-	[ITEM_GTP_PSC] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GTP_PSC] = {
 		.name = "gtp_psc",
 		.help = "match GTP extension header with type 0x85",
 		.priv = PRIV_ITEM(GTP_PSC,
@@ -7880,56 +6998,56 @@ static const struct token token_list[] = {
 		.next = NEXT(item_gtp_psc),
 		.call = parse_vc,
 	},
-	[ITEM_GTP_PSC_QFI] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GTP_PSC_QFI] = {
 		.name = "qfi",
 		.help = "QoS flow identifier",
-		.next = NEXT(item_gtp_psc, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_gtp_psc, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_item_gtp_psc,
 					hdr.qfi, 6)),
 	},
-	[ITEM_GTP_PSC_PDU_T] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GTP_PSC_PDU_T] = {
 		.name = "pdu_t",
 		.help = "PDU type",
-		.next = NEXT(item_gtp_psc, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_gtp_psc, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_item_gtp_psc,
 					hdr.type, 4)),
 	},
-	[ITEM_PPPOES] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PPPOES] = {
 		.name = "pppoes",
 		.help = "match PPPoE session header",
 		.priv = PRIV_ITEM(PPPOES, sizeof(struct rte_flow_item_pppoe)),
 		.next = NEXT(item_pppoes),
 		.call = parse_vc,
 	},
-	[ITEM_PPPOED] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PPPOED] = {
 		.name = "pppoed",
 		.help = "match PPPoE discovery header",
 		.priv = PRIV_ITEM(PPPOED, sizeof(struct rte_flow_item_pppoe)),
 		.next = NEXT(item_pppoed),
 		.call = parse_vc,
 	},
-	[ITEM_PPPOE_SEID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PPPOE_SEID] = {
 		.name = "seid",
 		.help = "session identifier",
-		.next = NEXT(item_pppoes, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_pppoes, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_pppoe,
 					session_id)),
 	},
-	[ITEM_PPPOE_PROTO_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PPPOE_PROTO_ID] = {
 		.name = "pppoe_proto_id",
 		.help = "match PPPoE session protocol identifier",
 		.priv = PRIV_ITEM(PPPOE_PROTO_ID,
 				sizeof(struct rte_flow_item_pppoe_proto_id)),
-		.next = NEXT(item_pppoe_proto_id, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_pppoe_proto_id, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON
 			     (struct rte_flow_item_pppoe_proto_id, proto_id)),
 		.call = parse_vc,
 	},
-	[ITEM_HIGIG2] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_HIGIG2] = {
 		.name = "higig2",
 		.help = "matches higig2 header",
 		.priv = PRIV_ITEM(HIGIG2,
@@ -7937,43 +7055,43 @@ static const struct token token_list[] = {
 		.next = NEXT(item_higig2),
 		.call = parse_vc,
 	},
-	[ITEM_HIGIG2_CLASSIFICATION] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_HIGIG2_CLASSIFICATION] = {
 		.name = "classification",
 		.help = "matches classification of higig2 header",
-		.next = NEXT(item_higig2, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_higig2, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_higig2_hdr,
 					hdr.ppt1.classification)),
 	},
-	[ITEM_HIGIG2_VID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_HIGIG2_VID] = {
 		.name = "vid",
 		.help = "matches vid of higig2 header",
-		.next = NEXT(item_higig2, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_higig2, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_higig2_hdr,
 					hdr.ppt1.vid)),
 	},
-	[ITEM_TAG] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_TAG] = {
 		.name = "tag",
 		.help = "match tag value",
 		.priv = PRIV_ITEM(TAG, sizeof(struct rte_flow_item_tag)),
 		.next = NEXT(item_tag),
 		.call = parse_vc,
 	},
-	[ITEM_TAG_DATA] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_TAG_DATA] = {
 		.name = "data",
 		.help = "tag value to match",
-		.next = NEXT(item_tag, NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+		.next = NEXT(item_tag, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_tag, data)),
 	},
-	[ITEM_TAG_INDEX] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_TAG_INDEX] = {
 		.name = "index",
 		.help = "index of tag array to match",
-		.next = NEXT(item_tag, NEXT_ENTRY(COMMON_UNSIGNED),
-			     NEXT_ENTRY(ITEM_PARAM_IS)),
+		.next = NEXT(item_tag, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_PARAM_IS)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_tag, index)),
 	},
-	[ITEM_L2TPV3OIP] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV3OIP] = {
 		.name = "l2tpv3oip",
 		.help = "match L2TPv3 over IP header",
 		.priv = PRIV_ITEM(L2TPV3OIP,
@@ -7981,130 +7099,130 @@ static const struct token token_list[] = {
 		.next = NEXT(item_l2tpv3oip),
 		.call = parse_vc,
 	},
-	[ITEM_L2TPV3OIP_SESSION_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV3OIP_SESSION_ID] = {
 		.name = "session_id",
 		.help = "session identifier",
-		.next = NEXT(item_l2tpv3oip, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_l2tpv3oip, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv3oip,
 					     session_id)),
 	},
-	[ITEM_ESP] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ESP] = {
 		.name = "esp",
 		.help = "match ESP header",
 		.priv = PRIV_ITEM(ESP, sizeof(struct rte_flow_item_esp)),
 		.next = NEXT(item_esp),
 		.call = parse_vc,
 	},
-	[ITEM_ESP_SPI] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ESP_SPI] = {
 		.name = "spi",
 		.help = "security policy index",
-		.next = NEXT(item_esp, NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+		.next = NEXT(item_esp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_esp,
 				hdr.spi)),
 	},
-	[ITEM_AH] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_AH] = {
 		.name = "ah",
 		.help = "match AH header",
 		.priv = PRIV_ITEM(AH, sizeof(struct rte_flow_item_ah)),
 		.next = NEXT(item_ah),
 		.call = parse_vc,
 	},
-	[ITEM_AH_SPI] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_AH_SPI] = {
 		.name = "spi",
 		.help = "security parameters index",
-		.next = NEXT(item_ah, NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+		.next = NEXT(item_ah, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ah, spi)),
 	},
-	[ITEM_PFCP] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PFCP] = {
 		.name = "pfcp",
 		.help = "match pfcp header",
 		.priv = PRIV_ITEM(PFCP, sizeof(struct rte_flow_item_pfcp)),
 		.next = NEXT(item_pfcp),
 		.call = parse_vc,
 	},
-	[ITEM_PFCP_S_FIELD] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PFCP_S_FIELD] = {
 		.name = "s_field",
 		.help = "S field",
-		.next = NEXT(item_pfcp, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_pfcp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_pfcp,
 				s_field)),
 	},
-	[ITEM_PFCP_SEID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PFCP_SEID] = {
 		.name = "seid",
 		.help = "session endpoint identifier",
-		.next = NEXT(item_pfcp, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_pfcp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_pfcp, seid)),
 	},
-	[ITEM_ECPRI] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ECPRI] = {
 		.name = "ecpri",
 		.help = "match eCPRI header",
 		.priv = PRIV_ITEM(ECPRI, sizeof(struct rte_flow_item_ecpri)),
 		.next = NEXT(item_ecpri),
 		.call = parse_vc,
 	},
-	[ITEM_ECPRI_COMMON] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ECPRI_COMMON] = {
 		.name = "common",
 		.help = "eCPRI common header",
 		.next = NEXT(item_ecpri_common),
 	},
-	[ITEM_ECPRI_COMMON_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ECPRI_COMMON_TYPE] = {
 		.name = "type",
 		.help = "type of common header",
 		.next = NEXT(item_ecpri_common_type),
 		.args = ARGS(ARG_ENTRY_HTON(struct rte_flow_item_ecpri)),
 	},
-	[ITEM_ECPRI_COMMON_TYPE_IQ_DATA] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ECPRI_COMMON_TYPE_IQ_DATA] = {
 		.name = "iq_data",
 		.help = "Type #0: IQ Data",
-		.next = NEXT(NEXT_ENTRY(ITEM_ECPRI_MSG_IQ_DATA_PCID,
-					ITEM_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_ECPRI_MSG_IQ_DATA_PCID,
+					RTE_FLOW_PARSER_CMD_ITEM_NEXT)),
 		.call = parse_vc_item_ecpri_type,
 	},
-	[ITEM_ECPRI_MSG_IQ_DATA_PCID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ECPRI_MSG_IQ_DATA_PCID] = {
 		.name = "pc_id",
 		.help = "Physical Channel ID",
-		.next = NEXT(NEXT_ENTRY(ITEM_ECPRI_MSG_IQ_DATA_PCID,
-				ITEM_ECPRI_COMMON, ITEM_NEXT),
-				NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_ECPRI_MSG_IQ_DATA_PCID,
+				RTE_FLOW_PARSER_CMD_ITEM_ECPRI_COMMON, RTE_FLOW_PARSER_CMD_ITEM_NEXT),
+				NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ecpri,
 				hdr.type0.pc_id)),
 	},
-	[ITEM_ECPRI_COMMON_TYPE_RTC_CTRL] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ECPRI_COMMON_TYPE_RTC_CTRL] = {
 		.name = "rtc_ctrl",
 		.help = "Type #2: Real-Time Control Data",
-		.next = NEXT(NEXT_ENTRY(ITEM_ECPRI_MSG_RTC_CTRL_RTCID,
-					ITEM_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_ECPRI_MSG_RTC_CTRL_RTCID,
+					RTE_FLOW_PARSER_CMD_ITEM_NEXT)),
 		.call = parse_vc_item_ecpri_type,
 	},
-	[ITEM_ECPRI_MSG_RTC_CTRL_RTCID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ECPRI_MSG_RTC_CTRL_RTCID] = {
 		.name = "rtc_id",
 		.help = "Real-Time Control Data ID",
-		.next = NEXT(NEXT_ENTRY(ITEM_ECPRI_MSG_RTC_CTRL_RTCID,
-				ITEM_ECPRI_COMMON, ITEM_NEXT),
-				NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_ECPRI_MSG_RTC_CTRL_RTCID,
+				RTE_FLOW_PARSER_CMD_ITEM_ECPRI_COMMON, RTE_FLOW_PARSER_CMD_ITEM_NEXT),
+				NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ecpri,
 				hdr.type2.rtc_id)),
 	},
-	[ITEM_ECPRI_COMMON_TYPE_DLY_MSR] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ECPRI_COMMON_TYPE_DLY_MSR] = {
 		.name = "delay_measure",
 		.help = "Type #5: One-Way Delay Measurement",
-		.next = NEXT(NEXT_ENTRY(ITEM_ECPRI_MSG_DLY_MSR_MSRID,
-					ITEM_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_ECPRI_MSG_DLY_MSR_MSRID,
+					RTE_FLOW_PARSER_CMD_ITEM_NEXT)),
 		.call = parse_vc_item_ecpri_type,
 	},
-	[ITEM_ECPRI_MSG_DLY_MSR_MSRID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_ECPRI_MSG_DLY_MSR_MSRID] = {
 		.name = "msr_id",
 		.help = "Measurement ID",
-		.next = NEXT(NEXT_ENTRY(ITEM_ECPRI_MSG_DLY_MSR_MSRID,
-				ITEM_ECPRI_COMMON, ITEM_NEXT),
-				NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_ECPRI_MSG_DLY_MSR_MSRID,
+				RTE_FLOW_PARSER_CMD_ITEM_ECPRI_COMMON, RTE_FLOW_PARSER_CMD_ITEM_NEXT),
+				NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ecpri,
 				hdr.type5.msr_id)),
 	},
-	[ITEM_GENEVE_OPT] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GENEVE_OPT] = {
 		.name = "geneve-opt",
 		.help = "GENEVE header option",
 		.priv = PRIV_ITEM(GENEVE_OPT,
@@ -8113,35 +7231,35 @@ static const struct token token_list[] = {
 		.next = NEXT(item_geneve_opt),
 		.call = parse_vc,
 	},
-	[ITEM_GENEVE_OPT_CLASS]	= {
+	[RTE_FLOW_PARSER_CMD_ITEM_GENEVE_OPT_CLASS]	= {
 		.name = "class",
 		.help = "GENEVE option class",
-		.next = NEXT(item_geneve_opt, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_geneve_opt, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_geneve_opt,
 					     option_class)),
 	},
-	[ITEM_GENEVE_OPT_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GENEVE_OPT_TYPE] = {
 		.name = "type",
 		.help = "GENEVE option type",
-		.next = NEXT(item_geneve_opt, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_geneve_opt, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_geneve_opt,
 					option_type)),
 	},
-	[ITEM_GENEVE_OPT_LENGTH] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GENEVE_OPT_LENGTH] = {
 		.name = "length",
 		.help = "GENEVE option data length (in 32b words)",
-		.next = NEXT(item_geneve_opt, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_geneve_opt, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_BOUNDED(
 				struct rte_flow_item_geneve_opt, option_len,
 				0, 31)),
 	},
-	[ITEM_GENEVE_OPT_DATA] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_GENEVE_OPT_DATA] = {
 		.name = "data",
 		.help = "GENEVE option data pattern",
-		.next = NEXT(item_geneve_opt, NEXT_ENTRY(COMMON_HEX),
+		.next = NEXT(item_geneve_opt, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_HEX),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_geneve_opt, data),
 			     ARGS_ENTRY_ARB(0, 0),
@@ -8149,7 +7267,7 @@ static const struct token token_list[] = {
 				(sizeof(struct rte_flow_item_geneve_opt),
 				ITEM_GENEVE_OPT_DATA_SIZE)),
 	},
-	[ITEM_INTEGRITY] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_INTEGRITY] = {
 		.name = "integrity",
 		.help = "match packet integrity",
 		.priv = PRIV_ITEM(INTEGRITY,
@@ -8157,31 +7275,31 @@ static const struct token token_list[] = {
 		.next = NEXT(item_integrity),
 		.call = parse_vc,
 	},
-	[ITEM_INTEGRITY_LEVEL] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_INTEGRITY_LEVEL] = {
 		.name = "level",
 		.help = "integrity level",
-		.next = NEXT(item_integrity_lv, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_integrity_lv, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_integrity, level)),
 	},
-	[ITEM_INTEGRITY_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_INTEGRITY_VALUE] = {
 		.name = "value",
 		.help = "integrity value",
-		.next = NEXT(item_integrity_lv, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_integrity_lv, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_integrity, value)),
 	},
-	[ITEM_CONNTRACK] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_CONNTRACK] = {
 		.name = "conntrack",
 		.help = "conntrack state",
 		.priv = PRIV_ITEM(CONNTRACK,
 				  sizeof(struct rte_flow_item_conntrack)),
-		.next = NEXT(NEXT_ENTRY(ITEM_NEXT), NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_NEXT), NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_conntrack, flags)),
 		.call = parse_vc,
 	},
-	[ITEM_PORT_REPRESENTOR] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PORT_REPRESENTOR] = {
 		.name = "port_representor",
 		.help = "match traffic entering the embedded switch from the given ethdev",
 		.priv = PRIV_ITEM(PORT_REPRESENTOR,
@@ -8189,14 +7307,14 @@ static const struct token token_list[] = {
 		.next = NEXT(item_port_representor),
 		.call = parse_vc,
 	},
-	[ITEM_PORT_REPRESENTOR_PORT_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PORT_REPRESENTOR_PORT_ID] = {
 		.name = "port_id",
 		.help = "ethdev port ID",
-		.next = NEXT(item_port_representor, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_port_representor, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_ethdev, port_id)),
 	},
-	[ITEM_REPRESENTED_PORT] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_REPRESENTED_PORT] = {
 		.name = "represented_port",
 		.help = "match traffic entering the embedded switch from the entity represented by the given ethdev",
 		.priv = PRIV_ITEM(REPRESENTED_PORT,
@@ -8204,313 +7322,313 @@ static const struct token token_list[] = {
 		.next = NEXT(item_represented_port),
 		.call = parse_vc,
 	},
-	[ITEM_REPRESENTED_PORT_ETHDEV_PORT_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_REPRESENTED_PORT_ETHDEV_PORT_ID] = {
 		.name = "ethdev_port_id",
 		.help = "ethdev port ID",
-		.next = NEXT(item_represented_port, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_represented_port, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_ethdev, port_id)),
 	},
-	[ITEM_FLEX] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_FLEX] = {
 		.name = "flex",
 		.help = "match flex header",
 		.priv = PRIV_ITEM(FLEX, sizeof(struct rte_flow_item_flex)),
 		.next = NEXT(item_flex),
 		.call = parse_vc,
 	},
-	[ITEM_FLEX_ITEM_HANDLE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_FLEX_ITEM_HANDLE] = {
 		.name = "item",
 		.help = "flex item handle",
-		.next = NEXT(item_flex, NEXT_ENTRY(COMMON_FLEX_HANDLE),
-			     NEXT_ENTRY(ITEM_PARAM_IS)),
+		.next = NEXT(item_flex, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_FLEX_HANDLE),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_PARAM_IS)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_flex, handle)),
 	},
-	[ITEM_FLEX_PATTERN_HANDLE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_FLEX_PATTERN_HANDLE] = {
 		.name = "pattern",
 		.help = "flex pattern handle",
-		.next = NEXT(item_flex, NEXT_ENTRY(COMMON_FLEX_HANDLE),
-			     NEXT_ENTRY(ITEM_PARAM_IS)),
+		.next = NEXT(item_flex, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_FLEX_HANDLE),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_PARAM_IS)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_flex, pattern)),
 	},
-	[ITEM_L2TPV2] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2] = {
 		.name = "l2tpv2",
 		.help = "match L2TPv2 header",
 		.priv = PRIV_ITEM(L2TPV2, sizeof(struct rte_flow_item_l2tpv2)),
 		.next = NEXT(item_l2tpv2),
 		.call = parse_vc,
 	},
-	[ITEM_L2TPV2_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE] = {
 		.name = "type",
 		.help = "type of l2tpv2",
 		.next = NEXT(item_l2tpv2_type),
 		.args = ARGS(ARG_ENTRY_HTON(struct rte_flow_item_l2tpv2)),
 	},
-	[ITEM_L2TPV2_TYPE_DATA] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE_DATA] = {
 		.name = "data",
 		.help = "Type #7: data message without any options",
 		.next = NEXT(item_l2tpv2_type_data),
 		.call = parse_vc_item_l2tpv2_type,
 	},
-	[ITEM_L2TPV2_MSG_DATA_TUNNEL_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_TUNNEL_ID] = {
 		.name = "tunnel_id",
 		.help = "tunnel identifier",
 		.next = NEXT(item_l2tpv2_type_data,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type7.tunnel_id)),
 	},
-	[ITEM_L2TPV2_MSG_DATA_SESSION_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_SESSION_ID] = {
 		.name = "session_id",
 		.help = "session identifier",
 		.next = NEXT(item_l2tpv2_type_data,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type7.session_id)),
 	},
-	[ITEM_L2TPV2_TYPE_DATA_L] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE_DATA_L] = {
 		.name = "data_l",
 		.help = "Type #6: data message with length option",
 		.next = NEXT(item_l2tpv2_type_data_l),
 		.call = parse_vc_item_l2tpv2_type,
 	},
-	[ITEM_L2TPV2_MSG_DATA_L_LENGTH] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_L_LENGTH] = {
 		.name = "length",
 		.help = "message length",
 		.next = NEXT(item_l2tpv2_type_data_l,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type6.length)),
 	},
-	[ITEM_L2TPV2_MSG_DATA_L_TUNNEL_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_L_TUNNEL_ID] = {
 		.name = "tunnel_id",
 		.help = "tunnel identifier",
 		.next = NEXT(item_l2tpv2_type_data_l,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type6.tunnel_id)),
 	},
-	[ITEM_L2TPV2_MSG_DATA_L_SESSION_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_L_SESSION_ID] = {
 		.name = "session_id",
 		.help = "session identifier",
 		.next = NEXT(item_l2tpv2_type_data_l,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type6.session_id)),
 	},
-	[ITEM_L2TPV2_TYPE_DATA_S] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE_DATA_S] = {
 		.name = "data_s",
 		.help = "Type #5: data message with ns, nr option",
 		.next = NEXT(item_l2tpv2_type_data_s),
 		.call = parse_vc_item_l2tpv2_type,
 	},
-	[ITEM_L2TPV2_MSG_DATA_S_TUNNEL_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_S_TUNNEL_ID] = {
 		.name = "tunnel_id",
 		.help = "tunnel identifier",
 		.next = NEXT(item_l2tpv2_type_data_s,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type5.tunnel_id)),
 	},
-	[ITEM_L2TPV2_MSG_DATA_S_SESSION_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_S_SESSION_ID] = {
 		.name = "session_id",
 		.help = "session identifier",
 		.next = NEXT(item_l2tpv2_type_data_s,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type5.session_id)),
 	},
-	[ITEM_L2TPV2_MSG_DATA_S_NS] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_S_NS] = {
 		.name = "ns",
 		.help = "sequence number for message",
 		.next = NEXT(item_l2tpv2_type_data_s,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type5.ns)),
 	},
-	[ITEM_L2TPV2_MSG_DATA_S_NR] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_S_NR] = {
 		.name = "nr",
 		.help = "sequence number for next receive message",
 		.next = NEXT(item_l2tpv2_type_data_s,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type5.nr)),
 	},
-	[ITEM_L2TPV2_TYPE_DATA_O] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE_DATA_O] = {
 		.name = "data_o",
 		.help = "Type #4: data message with offset option",
 		.next = NEXT(item_l2tpv2_type_data_o),
 		.call = parse_vc_item_l2tpv2_type,
 	},
-	[ITEM_L2TPV2_MSG_DATA_O_TUNNEL_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_O_TUNNEL_ID] = {
 		.name = "tunnel_id",
 		.help = "tunnel identifier",
 		.next = NEXT(item_l2tpv2_type_data_o,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type4.tunnel_id)),
 	},
-	[ITEM_L2TPV2_MSG_DATA_O_SESSION_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_O_SESSION_ID] = {
 		.name = "session_id",
 		.help = "session identifier",
 		.next = NEXT(item_l2tpv2_type_data_o,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type5.session_id)),
 	},
-	[ITEM_L2TPV2_MSG_DATA_O_OFFSET] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_O_OFFSET] = {
 		.name = "offset_size",
 		.help = "the size of offset padding",
 		.next = NEXT(item_l2tpv2_type_data_o,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type4.offset_size)),
 	},
-	[ITEM_L2TPV2_TYPE_DATA_L_S] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE_DATA_L_S] = {
 		.name = "data_l_s",
 		.help = "Type #3: data message contains length, ns, nr "
 			"options",
 		.next = NEXT(item_l2tpv2_type_data_l_s),
 		.call = parse_vc_item_l2tpv2_type,
 	},
-	[ITEM_L2TPV2_MSG_DATA_L_S_LENGTH] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_L_S_LENGTH] = {
 		.name = "length",
 		.help = "message length",
 		.next = NEXT(item_l2tpv2_type_data_l_s,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type3.length)),
 	},
-	[ITEM_L2TPV2_MSG_DATA_L_S_TUNNEL_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_L_S_TUNNEL_ID] = {
 		.name = "tunnel_id",
 		.help = "tunnel identifier",
 		.next = NEXT(item_l2tpv2_type_data_l_s,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type3.tunnel_id)),
 	},
-	[ITEM_L2TPV2_MSG_DATA_L_S_SESSION_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_L_S_SESSION_ID] = {
 		.name = "session_id",
 		.help = "session identifier",
 		.next = NEXT(item_l2tpv2_type_data_l_s,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type3.session_id)),
 	},
-	[ITEM_L2TPV2_MSG_DATA_L_S_NS] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_L_S_NS] = {
 		.name = "ns",
 		.help = "sequence number for message",
 		.next = NEXT(item_l2tpv2_type_data_l_s,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type3.ns)),
 	},
-	[ITEM_L2TPV2_MSG_DATA_L_S_NR] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_DATA_L_S_NR] = {
 		.name = "nr",
 		.help = "sequence number for next receive message",
 		.next = NEXT(item_l2tpv2_type_data_l_s,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type3.nr)),
 	},
-	[ITEM_L2TPV2_TYPE_CTRL] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE_CTRL] = {
 		.name = "control",
 		.help = "Type #3: conrtol message contains length, ns, nr "
 			"options",
 		.next = NEXT(item_l2tpv2_type_ctrl),
 		.call = parse_vc_item_l2tpv2_type,
 	},
-	[ITEM_L2TPV2_MSG_CTRL_LENGTH] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_CTRL_LENGTH] = {
 		.name = "length",
 		.help = "message length",
 		.next = NEXT(item_l2tpv2_type_ctrl,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type3.length)),
 	},
-	[ITEM_L2TPV2_MSG_CTRL_TUNNEL_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_CTRL_TUNNEL_ID] = {
 		.name = "tunnel_id",
 		.help = "tunnel identifier",
 		.next = NEXT(item_l2tpv2_type_ctrl,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type3.tunnel_id)),
 	},
-	[ITEM_L2TPV2_MSG_CTRL_SESSION_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_CTRL_SESSION_ID] = {
 		.name = "session_id",
 		.help = "session identifier",
 		.next = NEXT(item_l2tpv2_type_ctrl,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type3.session_id)),
 	},
-	[ITEM_L2TPV2_MSG_CTRL_NS] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_CTRL_NS] = {
 		.name = "ns",
 		.help = "sequence number for message",
 		.next = NEXT(item_l2tpv2_type_ctrl,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type3.ns)),
 	},
-	[ITEM_L2TPV2_MSG_CTRL_NR] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_MSG_CTRL_NR] = {
 		.name = "nr",
 		.help = "sequence number for next receive message",
 		.next = NEXT(item_l2tpv2_type_ctrl,
-			     NEXT_ENTRY(COMMON_UNSIGNED),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_l2tpv2,
 					     hdr.type3.nr)),
 	},
-	[ITEM_PPP] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PPP] = {
 		.name = "ppp",
 		.help = "match PPP header",
 		.priv = PRIV_ITEM(PPP, sizeof(struct rte_flow_item_ppp)),
 		.next = NEXT(item_ppp),
 		.call = parse_vc,
 	},
-	[ITEM_PPP_ADDR] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PPP_ADDR] = {
 		.name = "addr",
 		.help = "PPP address",
-		.next = NEXT(item_ppp, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ppp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_ppp, hdr.addr)),
 	},
-	[ITEM_PPP_CTRL] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PPP_CTRL] = {
 		.name = "ctrl",
 		.help = "PPP control",
-		.next = NEXT(item_ppp, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ppp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_ppp, hdr.ctrl)),
 	},
-	[ITEM_PPP_PROTO_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PPP_PROTO_ID] = {
 		.name = "proto_id",
 		.help = "PPP protocol identifier",
-		.next = NEXT(item_ppp, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ppp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_ppp,
 					hdr.proto_id)),
 	},
-	[ITEM_METER] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_METER] = {
 		.name = "meter",
 		.help = "match meter color",
 		.priv = PRIV_ITEM(METER_COLOR,
@@ -8518,36 +7636,36 @@ static const struct token token_list[] = {
 		.next = NEXT(item_meter),
 		.call = parse_vc,
 	},
-	[ITEM_METER_COLOR] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_METER_COLOR] = {
 		.name = "color",
 		.help = "meter color",
 		.next = NEXT(item_meter,
-			     NEXT_ENTRY(COMMON_METER_COLOR_NAME),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_METER_COLOR_NAME),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_meter_color,
 					color)),
 	},
-	[ITEM_QUOTA] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_QUOTA] = {
 		.name = "quota",
 		.help = "match quota",
 		.priv = PRIV_ITEM(QUOTA, sizeof(struct rte_flow_item_quota)),
 		.next = NEXT(item_quota),
 		.call = parse_vc
 	},
-	[ITEM_QUOTA_STATE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_QUOTA_STATE] = {
 		.name = "quota_state",
 		.help = "quota state",
-		.next = NEXT(item_quota, NEXT_ENTRY(ITEM_QUOTA_STATE_NAME),
-			     NEXT_ENTRY(ITEM_PARAM_SPEC, ITEM_PARAM_MASK)),
+		.next = NEXT(item_quota, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_QUOTA_STATE_NAME),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_PARAM_SPEC, RTE_FLOW_PARSER_CMD_ITEM_PARAM_MASK)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_quota, state))
 	},
-	[ITEM_QUOTA_STATE_NAME] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_QUOTA_STATE_NAME] = {
 		.name = "state_name",
 		.help = "quota state name",
 		.call = parse_quota_state_name,
 		.comp = comp_quota_state_name
 	},
-	[ITEM_IB_BTH] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IB_BTH] = {
 		.name = "ib_bth",
 		.help = "match ib bth fields",
 		.priv = PRIV_ITEM(IB_BTH,
@@ -8555,39 +7673,39 @@ static const struct token token_list[] = {
 		.next = NEXT(item_ib_bth),
 		.call = parse_vc,
 	},
-	[ITEM_IB_BTH_OPCODE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IB_BTH_OPCODE] = {
 		.name = "opcode",
 		.help = "match ib bth opcode",
-		.next = NEXT(item_ib_bth, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ib_bth, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 				 item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ib_bth,
 						 hdr.opcode)),
 	},
-	[ITEM_IB_BTH_PKEY] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IB_BTH_PKEY] = {
 		.name = "pkey",
 		.help = "partition key",
-		.next = NEXT(item_ib_bth, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ib_bth, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 				 item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ib_bth,
 						 hdr.pkey)),
 	},
-	[ITEM_IB_BTH_DST_QPN] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IB_BTH_DST_QPN] = {
 		.name = "dst_qp",
 		.help = "destination qp",
-		.next = NEXT(item_ib_bth, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ib_bth, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 				 item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ib_bth,
 						 hdr.dst_qp)),
 	},
-	[ITEM_IB_BTH_PSN] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IB_BTH_PSN] = {
 		.name = "psn",
 		.help = "packet sequence number",
-		.next = NEXT(item_ib_bth, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ib_bth, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 				 item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ib_bth,
 						 hdr.psn)),
 	},
-	[ITEM_PTYPE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PTYPE] = {
 		.name = "ptype",
 		.help = "match L2/L3/L4 and tunnel information",
 		.priv = PRIV_ITEM(PTYPE,
@@ -8595,14 +7713,14 @@ static const struct token token_list[] = {
 		.next = NEXT(item_ptype),
 		.call = parse_vc,
 	},
-	[ITEM_PTYPE_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_PTYPE_VALUE] = {
 		.name = "packet_type",
 		.help = "packet type as defined in rte_mbuf_ptype",
-		.next = NEXT(item_ptype, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ptype, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_ptype, packet_type)),
 	},
-	[ITEM_NSH] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_NSH] = {
 		.name = "nsh",
 		.help = "match NSH header",
 		.priv = PRIV_ITEM(NSH,
@@ -8610,159 +7728,159 @@ static const struct token token_list[] = {
 		.next = NEXT(item_nsh),
 		.call = parse_vc,
 	},
-	[ITEM_COMPARE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE] = {
 		.name = "compare",
 		.help = "match with the comparison result",
 		.priv = PRIV_ITEM(COMPARE, sizeof(struct rte_flow_item_compare)),
-		.next = NEXT(NEXT_ENTRY(ITEM_COMPARE_OP)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_COMPARE_OP)),
 		.call = parse_vc,
 	},
-	[ITEM_COMPARE_OP] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_OP] = {
 		.name = "op",
 		.help = "operation type",
 		.next = NEXT(item_compare_field,
-			NEXT_ENTRY(ITEM_COMPARE_OP_VALUE), item_param),
+			NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_COMPARE_OP_VALUE), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_compare, operation)),
 	},
-	[ITEM_COMPARE_OP_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_OP_VALUE] = {
 		.name = "{operation}",
 		.help = "operation type value",
 		.call = parse_vc_compare_op,
 		.comp = comp_set_compare_op,
 	},
-	[ITEM_COMPARE_FIELD_A_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_TYPE] = {
 		.name = "a_type",
 		.help = "compared field type",
 		.next = NEXT(compare_field_a,
-			NEXT_ENTRY(ITEM_COMPARE_FIELD_A_TYPE_VALUE), item_param),
+			NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_TYPE_VALUE), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_compare, a.field)),
 	},
-	[ITEM_COMPARE_FIELD_A_TYPE_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_TYPE_VALUE] = {
 		.name = "{a_type}",
 		.help = "compared field type value",
 		.call = parse_vc_compare_field_id,
 		.comp = comp_set_compare_field_id,
 	},
-	[ITEM_COMPARE_FIELD_A_LEVEL] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_LEVEL] = {
 		.name = "a_level",
 		.help = "compared field level",
 		.next = NEXT(compare_field_a,
-			     NEXT_ENTRY(ITEM_COMPARE_FIELD_A_LEVEL_VALUE), item_param),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_LEVEL_VALUE), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_compare, a.level)),
 	},
-	[ITEM_COMPARE_FIELD_A_LEVEL_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_LEVEL_VALUE] = {
 		.name = "{a_level}",
 		.help = "compared field level value",
 		.call = parse_vc_compare_field_level,
 		.comp = comp_none,
 	},
-	[ITEM_COMPARE_FIELD_A_TAG_INDEX] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_TAG_INDEX] = {
 		.name = "a_tag_index",
 		.help = "compared field tag array",
 		.next = NEXT(compare_field_a,
-			     NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_compare,
 					a.tag_index)),
 	},
-	[ITEM_COMPARE_FIELD_A_TYPE_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_TYPE_ID] = {
 		.name = "a_type_id",
 		.help = "compared field type ID",
 		.next = NEXT(compare_field_a,
-			     NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_compare,
 					a.type)),
 	},
-	[ITEM_COMPARE_FIELD_A_CLASS_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_CLASS_ID] = {
 		.name = "a_class",
 		.help = "compared field class ID",
 		.next = NEXT(compare_field_a,
-			     NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_compare,
 					     a.class_id)),
 	},
-	[ITEM_COMPARE_FIELD_A_OFFSET] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_OFFSET] = {
 		.name = "a_offset",
 		.help = "compared field bit offset",
 		.next = NEXT(compare_field_a,
-			     NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_compare,
 					a.offset)),
 	},
-	[ITEM_COMPARE_FIELD_B_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_TYPE] = {
 		.name = "b_type",
 		.help = "comparator field type",
 		.next = NEXT(compare_field_b,
-			NEXT_ENTRY(ITEM_COMPARE_FIELD_B_TYPE_VALUE), item_param),
+			NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_TYPE_VALUE), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_compare,
 					b.field)),
 	},
-	[ITEM_COMPARE_FIELD_B_TYPE_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_TYPE_VALUE] = {
 		.name = "{b_type}",
 		.help = "comparator field type value",
 		.call = parse_vc_compare_field_id,
 		.comp = comp_set_compare_field_id,
 	},
-	[ITEM_COMPARE_FIELD_B_LEVEL] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_LEVEL] = {
 		.name = "b_level",
 		.help = "comparator field level",
 		.next = NEXT(compare_field_b,
-			     NEXT_ENTRY(ITEM_COMPARE_FIELD_B_LEVEL_VALUE), item_param),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_LEVEL_VALUE), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_compare,
 					b.level)),
 	},
-	[ITEM_COMPARE_FIELD_B_LEVEL_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_LEVEL_VALUE] = {
 		.name = "{b_level}",
 		.help = "comparator field level value",
 		.call = parse_vc_compare_field_level,
 		.comp = comp_none,
 	},
-	[ITEM_COMPARE_FIELD_B_TAG_INDEX] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_TAG_INDEX] = {
 		.name = "b_tag_index",
 		.help = "comparator field tag array",
 		.next = NEXT(compare_field_b,
-			     NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_compare,
 					b.tag_index)),
 	},
-	[ITEM_COMPARE_FIELD_B_TYPE_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_TYPE_ID] = {
 		.name = "b_type_id",
 		.help = "comparator field type ID",
 		.next = NEXT(compare_field_b,
-			     NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_compare,
 					b.type)),
 	},
-	[ITEM_COMPARE_FIELD_B_CLASS_ID] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_CLASS_ID] = {
 		.name = "b_class",
 		.help = "comparator field class ID",
 		.next = NEXT(compare_field_b,
-			     NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_compare,
 					     b.class_id)),
 	},
-	[ITEM_COMPARE_FIELD_B_OFFSET] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_OFFSET] = {
 		.name = "b_offset",
 		.help = "comparator field bit offset",
 		.next = NEXT(compare_field_b,
-			     NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_compare,
 					b.offset)),
 	},
-	[ITEM_COMPARE_FIELD_B_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_VALUE] = {
 		.name = "b_value",
 		.help = "comparator immediate value",
 		.next = NEXT(compare_field_b,
-			     NEXT_ENTRY(COMMON_HEX), item_param),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_HEX), item_param),
 		.args = ARGS(ARGS_ENTRY_ARB(0, 0),
 			     ARGS_ENTRY_ARB(0, 0),
 			     ARGS_ENTRY(struct rte_flow_item_compare,
 					b.value)),
 	},
-	[ITEM_COMPARE_FIELD_B_POINTER] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_POINTER] = {
 		.name = "b_ptr",
 		.help = "pointer to comparator immediate value",
 		.next = NEXT(compare_field_b,
-			     NEXT_ENTRY(COMMON_HEX), item_param),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_HEX), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_compare,
 					b.pvalue),
 			     ARGS_ENTRY_ARB(0, 0),
@@ -8770,90 +7888,90 @@ static const struct token token_list[] = {
 				(sizeof(struct rte_flow_item_compare),
 				 FLOW_FIELD_PATTERN_SIZE)),
 	},
-	[ITEM_COMPARE_FIELD_WIDTH] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_WIDTH] = {
 		.name = "width",
 		.help = "number of bits to compare",
 		.next = NEXT(item_compare_field,
-			NEXT_ENTRY(COMMON_UNSIGNED), item_param),
+			NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED), item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_compare,
 					width)),
 	},
 
 	/* Validate/create actions. */
-	[ACTIONS] = {
+	[RTE_FLOW_PARSER_CMD_ACTIONS] = {
 		.name = "actions",
 		.help = "submit a list of associated actions",
 		.next = NEXT(next_action),
 		.call = parse_vc,
 	},
-	[ACTION_NEXT] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_NEXT] = {
 		.name = "/",
 		.help = "specify next action",
 		.next = NEXT(next_action),
 	},
-	[ACTION_END] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_END] = {
 		.name = "end",
 		.help = "end list of actions",
 		.priv = PRIV_ACTION(END, 0),
 		.call = parse_vc,
 	},
-	[ACTION_VOID] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_VOID] = {
 		.name = "void",
 		.help = "no-op action",
 		.priv = PRIV_ACTION(VOID, 0),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc,
 	},
-	[ACTION_PASSTHRU] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_PASSTHRU] = {
 		.name = "passthru",
 		.help = "let subsequent rule process matched packets",
 		.priv = PRIV_ACTION(PASSTHRU, 0),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc,
 	},
-	[ACTION_SKIP_CMAN] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SKIP_CMAN] = {
 		.name = "skip_cman",
 		.help = "bypass cman on received packets",
 		.priv = PRIV_ACTION(SKIP_CMAN, 0),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc,
 	},
-	[ACTION_JUMP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_JUMP] = {
 		.name = "jump",
 		.help = "redirect traffic to a given group",
 		.priv = PRIV_ACTION(JUMP, sizeof(struct rte_flow_action_jump)),
 		.next = NEXT(action_jump),
 		.call = parse_vc,
 	},
-	[ACTION_JUMP_GROUP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_JUMP_GROUP] = {
 		.name = "group",
 		.help = "group to redirect traffic to",
-		.next = NEXT(action_jump, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_jump, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_jump, group)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_MARK] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MARK] = {
 		.name = "mark",
 		.help = "attach 32 bit value to packets",
 		.priv = PRIV_ACTION(MARK, sizeof(struct rte_flow_action_mark)),
 		.next = NEXT(action_mark),
 		.call = parse_vc,
 	},
-	[ACTION_MARK_ID] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MARK_ID] = {
 		.name = "id",
 		.help = "32 bit value to return with packets",
-		.next = NEXT(action_mark, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_mark, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_mark, id)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_FLAG] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_FLAG] = {
 		.name = "flag",
 		.help = "flag packets",
 		.priv = PRIV_ACTION(FLAG, 0),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc,
 	},
-	[ACTION_QUEUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_QUEUE] = {
 		.name = "queue",
 		.help = "assign packets to a given queue index",
 		.priv = PRIV_ACTION(QUEUE,
@@ -8861,21 +7979,21 @@ static const struct token token_list[] = {
 		.next = NEXT(action_queue),
 		.call = parse_vc,
 	},
-	[ACTION_QUEUE_INDEX] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_QUEUE_INDEX] = {
 		.name = "index",
 		.help = "queue index to use",
-		.next = NEXT(action_queue, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_queue, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_queue, index)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_DROP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_DROP] = {
 		.name = "drop",
 		.help = "drop packets (note: passthru has priority)",
 		.priv = PRIV_ACTION(DROP, 0),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc,
 	},
-	[ACTION_COUNT] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_COUNT] = {
 		.name = "count",
 		.help = "enable counters for this rule",
 		.priv = PRIV_ACTION(COUNT,
@@ -8883,74 +8001,74 @@ static const struct token token_list[] = {
 		.next = NEXT(action_count),
 		.call = parse_vc,
 	},
-	[ACTION_COUNT_ID] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_COUNT_ID] = {
 		.name = "identifier",
 		.help = "counter identifier to use",
-		.next = NEXT(action_count, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_count, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_count, id)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_RSS] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RSS] = {
 		.name = "rss",
 		.help = "spread packets among several queues",
 		.priv = PRIV_ACTION(RSS, sizeof(struct action_rss_data)),
 		.next = NEXT(action_rss),
 		.call = parse_vc_action_rss,
 	},
-	[ACTION_RSS_FUNC] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RSS_FUNC] = {
 		.name = "func",
 		.help = "RSS hash function to apply",
 		.next = NEXT(action_rss,
-			     NEXT_ENTRY(ACTION_RSS_FUNC_DEFAULT,
-					ACTION_RSS_FUNC_TOEPLITZ,
-					ACTION_RSS_FUNC_SIMPLE_XOR,
-					ACTION_RSS_FUNC_SYMMETRIC_TOEPLITZ)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_RSS_FUNC_DEFAULT,
+					RTE_FLOW_PARSER_CMD_ACTION_RSS_FUNC_TOEPLITZ,
+					RTE_FLOW_PARSER_CMD_ACTION_RSS_FUNC_SIMPLE_XOR,
+					RTE_FLOW_PARSER_CMD_ACTION_RSS_FUNC_SYMMETRIC_TOEPLITZ)),
 	},
-	[ACTION_RSS_FUNC_DEFAULT] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RSS_FUNC_DEFAULT] = {
 		.name = "default",
 		.help = "default hash function",
 		.call = parse_vc_action_rss_func,
 	},
-	[ACTION_RSS_FUNC_TOEPLITZ] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RSS_FUNC_TOEPLITZ] = {
 		.name = "toeplitz",
 		.help = "Toeplitz hash function",
 		.call = parse_vc_action_rss_func,
 	},
-	[ACTION_RSS_FUNC_SIMPLE_XOR] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RSS_FUNC_SIMPLE_XOR] = {
 		.name = "simple_xor",
 		.help = "simple XOR hash function",
 		.call = parse_vc_action_rss_func,
 	},
-	[ACTION_RSS_FUNC_SYMMETRIC_TOEPLITZ] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RSS_FUNC_SYMMETRIC_TOEPLITZ] = {
 		.name = "symmetric_toeplitz",
 		.help = "Symmetric Toeplitz hash function",
 		.call = parse_vc_action_rss_func,
 	},
-	[ACTION_RSS_LEVEL] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RSS_LEVEL] = {
 		.name = "level",
 		.help = "encapsulation level for \"types\"",
-		.next = NEXT(action_rss, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_rss, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY_ARB
 			     (offsetof(struct action_rss_data, conf) +
 			      offsetof(struct rte_flow_action_rss, level),
 			      sizeof(((struct rte_flow_action_rss *)0)->
 				     level))),
 	},
-	[ACTION_RSS_TYPES] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RSS_TYPES] = {
 		.name = "types",
 		.help = "specific RSS hash types",
-		.next = NEXT(action_rss, NEXT_ENTRY(ACTION_RSS_TYPE)),
+		.next = NEXT(action_rss, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_RSS_TYPE)),
 	},
-	[ACTION_RSS_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RSS_TYPE] = {
 		.name = "{type}",
 		.help = "RSS hash type",
 		.call = parse_vc_action_rss_type,
 		.comp = comp_vc_action_rss_type,
 	},
-	[ACTION_RSS_KEY] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RSS_KEY] = {
 		.name = "key",
 		.help = "RSS hash key",
-		.next = NEXT(action_rss, NEXT_ENTRY(COMMON_HEX)),
+		.next = NEXT(action_rss, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_HEX)),
 		.args = ARGS(ARGS_ENTRY_ARB
 			     (offsetof(struct action_rss_data, conf) +
 			      offsetof(struct rte_flow_action_rss, key),
@@ -8962,10 +8080,10 @@ static const struct token token_list[] = {
 				     key_len)),
 			     ARGS_ENTRY(struct action_rss_data, key)),
 	},
-	[ACTION_RSS_KEY_LEN] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RSS_KEY_LEN] = {
 		.name = "key_len",
 		.help = "RSS hash key length in bytes",
-		.next = NEXT(action_rss, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_rss, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY_ARB_BOUNDED
 			     (offsetof(struct action_rss_data, conf) +
 			      offsetof(struct rte_flow_action_rss, key_len),
@@ -8974,48 +8092,48 @@ static const struct token token_list[] = {
 			      0,
 			      RSS_HASH_KEY_LENGTH)),
 	},
-	[ACTION_RSS_QUEUES] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RSS_QUEUES] = {
 		.name = "queues",
 		.help = "queue indices to use",
-		.next = NEXT(action_rss, NEXT_ENTRY(ACTION_RSS_QUEUE)),
+		.next = NEXT(action_rss, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_RSS_QUEUE)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_RSS_QUEUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RSS_QUEUE] = {
 		.name = "{queue}",
 		.help = "queue index",
 		.call = parse_vc_action_rss_queue,
 		.comp = comp_vc_action_rss_queue,
 	},
-	[ACTION_PF] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_PF] = {
 		.name = "pf",
 		.help = "direct traffic to physical function",
 		.priv = PRIV_ACTION(PF, 0),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc,
 	},
-	[ACTION_VF] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_VF] = {
 		.name = "vf",
 		.help = "direct traffic to a virtual function ID",
 		.priv = PRIV_ACTION(VF, sizeof(struct rte_flow_action_vf)),
 		.next = NEXT(action_vf),
 		.call = parse_vc,
 	},
-	[ACTION_VF_ORIGINAL] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_VF_ORIGINAL] = {
 		.name = "original",
 		.help = "use original VF ID if possible",
-		.next = NEXT(action_vf, NEXT_ENTRY(COMMON_BOOLEAN)),
+		.next = NEXT(action_vf, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN)),
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_action_vf,
 					   original, 1)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_VF_ID] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_VF_ID] = {
 		.name = "id",
 		.help = "VF ID",
-		.next = NEXT(action_vf, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_vf, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_vf, id)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_PORT_ID] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_PORT_ID] = {
 		.name = "port_id",
 		.help = "direct matching traffic to a given DPDK port ID",
 		.priv = PRIV_ACTION(PORT_ID,
@@ -9023,22 +8141,22 @@ static const struct token token_list[] = {
 		.next = NEXT(action_port_id),
 		.call = parse_vc,
 	},
-	[ACTION_PORT_ID_ORIGINAL] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_PORT_ID_ORIGINAL] = {
 		.name = "original",
 		.help = "use original DPDK port ID if possible",
-		.next = NEXT(action_port_id, NEXT_ENTRY(COMMON_BOOLEAN)),
+		.next = NEXT(action_port_id, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN)),
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_action_port_id,
 					   original, 1)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_PORT_ID_ID] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_PORT_ID_ID] = {
 		.name = "id",
 		.help = "DPDK port ID",
-		.next = NEXT(action_port_id, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_port_id, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_port_id, id)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_METER] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_METER] = {
 		.name = "meter",
 		.help = "meter the directed packets at given id",
 		.priv = PRIV_ACTION(METER,
@@ -9046,7 +8164,7 @@ static const struct token token_list[] = {
 		.next = NEXT(action_meter),
 		.call = parse_vc,
 	},
-	[ACTION_METER_COLOR] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_METER_COLOR] = {
 		.name = "color",
 		.help = "meter color for the packets",
 		.priv = PRIV_ACTION(METER_COLOR,
@@ -9054,37 +8172,37 @@ static const struct token token_list[] = {
 		.next = NEXT(action_meter_color),
 		.call = parse_vc,
 	},
-	[ACTION_METER_COLOR_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_METER_COLOR_TYPE] = {
 		.name = "type",
 		.help = "specific meter color",
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT),
-				NEXT_ENTRY(ACTION_METER_COLOR_GREEN,
-					ACTION_METER_COLOR_YELLOW,
-					ACTION_METER_COLOR_RED)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT),
+				NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_METER_COLOR_GREEN,
+					RTE_FLOW_PARSER_CMD_ACTION_METER_COLOR_YELLOW,
+					RTE_FLOW_PARSER_CMD_ACTION_METER_COLOR_RED)),
 	},
-	[ACTION_METER_COLOR_GREEN] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_METER_COLOR_GREEN] = {
 		.name = "green",
 		.help = "meter color green",
 		.call = parse_vc_action_meter_color_type,
 	},
-	[ACTION_METER_COLOR_YELLOW] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_METER_COLOR_YELLOW] = {
 		.name = "yellow",
 		.help = "meter color yellow",
 		.call = parse_vc_action_meter_color_type,
 	},
-	[ACTION_METER_COLOR_RED] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_METER_COLOR_RED] = {
 		.name = "red",
 		.help = "meter color red",
 		.call = parse_vc_action_meter_color_type,
 	},
-	[ACTION_METER_ID] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_METER_ID] = {
 		.name = "mtr_id",
 		.help = "meter id to use",
-		.next = NEXT(action_meter, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_meter, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_meter, mtr_id)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_METER_MARK] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_METER_MARK] = {
 		.name = "meter_mark",
 		.help = "meter the directed packets using profile and policy",
 		.priv = PRIV_ACTION(METER_MARK,
@@ -9092,30 +8210,30 @@ static const struct token token_list[] = {
 		.next = NEXT(action_meter_mark),
 		.call = parse_vc,
 	},
-	[ACTION_METER_MARK_CONF] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_METER_MARK_CONF] = {
 		.name = "meter_mark_conf",
 		.help = "meter mark configuration",
 		.priv = PRIV_ACTION(METER_MARK,
 				    sizeof(struct rte_flow_action_meter_mark)),
-		.next = NEXT(NEXT_ENTRY(ACTION_METER_MARK_CONF_COLOR)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_METER_MARK_CONF_COLOR)),
 		.call = parse_vc,
 	},
-	[ACTION_METER_MARK_CONF_COLOR] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_METER_MARK_CONF_COLOR] = {
 		.name = "mtr_update_init_color",
 		.help = "meter update init color",
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT),
-			     NEXT_ENTRY(COMMON_METER_COLOR_NAME)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_METER_COLOR_NAME)),
 		.args = ARGS(ARGS_ENTRY
 			     (struct rte_flow_indirect_update_flow_meter_mark,
 			      init_color)),
 	},
-	[ACTION_METER_PROFILE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_METER_PROFILE] = {
 		.name = "mtr_profile",
 		.help = "meter profile id to use",
-		.next = NEXT(NEXT_ENTRY(ACTION_METER_PROFILE_ID2PTR)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_METER_PROFILE_ID2PTR)),
 		.args = ARGS(ARGS_ENTRY_ARB(0, sizeof(uint32_t))),
 	},
-	[ACTION_METER_PROFILE_ID2PTR] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_METER_PROFILE_ID2PTR] = {
 		.name = "{mtr_profile_id}",
 		.type = "PROFILE_ID",
 		.help = "meter profile id",
@@ -9123,13 +8241,13 @@ static const struct token token_list[] = {
 		.call = parse_meter_profile_id2ptr,
 		.comp = comp_none,
 	},
-	[ACTION_METER_POLICY] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_METER_POLICY] = {
 		.name = "mtr_policy",
 		.help = "meter policy id to use",
-		.next = NEXT(NEXT_ENTRY(ACTION_METER_POLICY_ID2PTR)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_METER_POLICY_ID2PTR)),
 		ARGS(ARGS_ENTRY_ARB(0, sizeof(uint32_t))),
 	},
-	[ACTION_METER_POLICY_ID2PTR] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_METER_POLICY_ID2PTR] = {
 		.name = "{mtr_policy_id}",
 		.type = "POLICY_ID",
 		.help = "meter policy id",
@@ -9137,35 +8255,35 @@ static const struct token token_list[] = {
 		.call = parse_meter_policy_id2ptr,
 		.comp = comp_none,
 	},
-	[ACTION_METER_COLOR_MODE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_METER_COLOR_MODE] = {
 		.name = "mtr_color_mode",
 		.help = "meter color awareness mode",
-		.next = NEXT(action_meter_mark, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_meter_mark, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_meter_mark, color_mode)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_METER_STATE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_METER_STATE] = {
 		.name = "mtr_state",
 		.help = "meter state",
-		.next = NEXT(action_meter_mark, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_meter_mark, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_meter_mark, state)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_OF_DEC_NW_TTL] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_OF_DEC_NW_TTL] = {
 		.name = "of_dec_nw_ttl",
 		.help = "OpenFlow's OFPAT_DEC_NW_TTL",
 		.priv = PRIV_ACTION(OF_DEC_NW_TTL, 0),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc,
 	},
-	[ACTION_OF_POP_VLAN] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_OF_POP_VLAN] = {
 		.name = "of_pop_vlan",
 		.help = "OpenFlow's OFPAT_POP_VLAN",
 		.priv = PRIV_ACTION(OF_POP_VLAN, 0),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc,
 	},
-	[ACTION_OF_PUSH_VLAN] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_OF_PUSH_VLAN] = {
 		.name = "of_push_vlan",
 		.help = "OpenFlow's OFPAT_PUSH_VLAN",
 		.priv = PRIV_ACTION
@@ -9174,16 +8292,16 @@ static const struct token token_list[] = {
 		.next = NEXT(action_of_push_vlan),
 		.call = parse_vc,
 	},
-	[ACTION_OF_PUSH_VLAN_ETHERTYPE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_OF_PUSH_VLAN_ETHERTYPE] = {
 		.name = "ethertype",
 		.help = "EtherType",
-		.next = NEXT(action_of_push_vlan, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_of_push_vlan, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY_HTON
 			     (struct rte_flow_action_of_push_vlan,
 			      ethertype)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_OF_SET_VLAN_VID] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_OF_SET_VLAN_VID] = {
 		.name = "of_set_vlan_vid",
 		.help = "OpenFlow's OFPAT_SET_VLAN_VID",
 		.priv = PRIV_ACTION
@@ -9192,17 +8310,17 @@ static const struct token token_list[] = {
 		.next = NEXT(action_of_set_vlan_vid),
 		.call = parse_vc,
 	},
-	[ACTION_OF_SET_VLAN_VID_VLAN_VID] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_OF_SET_VLAN_VID_VLAN_VID] = {
 		.name = "vlan_vid",
 		.help = "VLAN id",
 		.next = NEXT(action_of_set_vlan_vid,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY_HTON
 			     (struct rte_flow_action_of_set_vlan_vid,
 			      vlan_vid)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_OF_SET_VLAN_PCP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_OF_SET_VLAN_PCP] = {
 		.name = "of_set_vlan_pcp",
 		.help = "OpenFlow's OFPAT_SET_VLAN_PCP",
 		.priv = PRIV_ACTION
@@ -9211,17 +8329,17 @@ static const struct token token_list[] = {
 		.next = NEXT(action_of_set_vlan_pcp),
 		.call = parse_vc,
 	},
-	[ACTION_OF_SET_VLAN_PCP_VLAN_PCP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_OF_SET_VLAN_PCP_VLAN_PCP] = {
 		.name = "vlan_pcp",
 		.help = "VLAN priority",
 		.next = NEXT(action_of_set_vlan_pcp,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY_HTON
 			     (struct rte_flow_action_of_set_vlan_pcp,
 			      vlan_pcp)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_OF_POP_MPLS] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_OF_POP_MPLS] = {
 		.name = "of_pop_mpls",
 		.help = "OpenFlow's OFPAT_POP_MPLS",
 		.priv = PRIV_ACTION(OF_POP_MPLS,
@@ -9229,16 +8347,16 @@ static const struct token token_list[] = {
 		.next = NEXT(action_of_pop_mpls),
 		.call = parse_vc,
 	},
-	[ACTION_OF_POP_MPLS_ETHERTYPE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_OF_POP_MPLS_ETHERTYPE] = {
 		.name = "ethertype",
 		.help = "EtherType",
-		.next = NEXT(action_of_pop_mpls, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_of_pop_mpls, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY_HTON
 			     (struct rte_flow_action_of_pop_mpls,
 			      ethertype)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_OF_PUSH_MPLS] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_OF_PUSH_MPLS] = {
 		.name = "of_push_mpls",
 		.help = "OpenFlow's OFPAT_PUSH_MPLS",
 		.priv = PRIV_ACTION
@@ -9247,106 +8365,106 @@ static const struct token token_list[] = {
 		.next = NEXT(action_of_push_mpls),
 		.call = parse_vc,
 	},
-	[ACTION_OF_PUSH_MPLS_ETHERTYPE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_OF_PUSH_MPLS_ETHERTYPE] = {
 		.name = "ethertype",
 		.help = "EtherType",
-		.next = NEXT(action_of_push_mpls, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_of_push_mpls, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY_HTON
 			     (struct rte_flow_action_of_push_mpls,
 			      ethertype)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_VXLAN_ENCAP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_VXLAN_ENCAP] = {
 		.name = "vxlan_encap",
 		.help = "VXLAN encapsulation, uses configuration set by \"set"
 			" vxlan\"",
 		.priv = PRIV_ACTION(VXLAN_ENCAP,
 				    sizeof(struct action_vxlan_encap_data)),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc_action_vxlan_encap,
 	},
-	[ACTION_VXLAN_DECAP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_VXLAN_DECAP] = {
 		.name = "vxlan_decap",
 		.help = "Performs a decapsulation action by stripping all"
 			" headers of the VXLAN tunnel network overlay from the"
 			" matched flow.",
 		.priv = PRIV_ACTION(VXLAN_DECAP, 0),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc,
 	},
-	[ACTION_NVGRE_ENCAP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_NVGRE_ENCAP] = {
 		.name = "nvgre_encap",
 		.help = "NVGRE encapsulation, uses configuration set by \"set"
 			" nvgre\"",
 		.priv = PRIV_ACTION(NVGRE_ENCAP,
 				    sizeof(struct action_nvgre_encap_data)),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc_action_nvgre_encap,
 	},
-	[ACTION_NVGRE_DECAP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_NVGRE_DECAP] = {
 		.name = "nvgre_decap",
 		.help = "Performs a decapsulation action by stripping all"
 			" headers of the NVGRE tunnel network overlay from the"
 			" matched flow.",
 		.priv = PRIV_ACTION(NVGRE_DECAP, 0),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc,
 	},
-	[ACTION_L2_ENCAP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_L2_ENCAP] = {
 		.name = "l2_encap",
 		.help = "l2 encap, uses configuration set by"
 			" \"set l2_encap\"",
 		.priv = PRIV_ACTION(RAW_ENCAP,
 				    sizeof(struct action_raw_encap_data)),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc_action_l2_encap,
 	},
-	[ACTION_L2_DECAP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_L2_DECAP] = {
 		.name = "l2_decap",
 		.help = "l2 decap, uses configuration set by"
 			" \"set l2_decap\"",
 		.priv = PRIV_ACTION(RAW_DECAP,
 				    sizeof(struct action_raw_decap_data)),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc_action_l2_decap,
 	},
-	[ACTION_MPLSOGRE_ENCAP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MPLSOGRE_ENCAP] = {
 		.name = "mplsogre_encap",
 		.help = "mplsogre encapsulation, uses configuration set by"
 			" \"set mplsogre_encap\"",
 		.priv = PRIV_ACTION(RAW_ENCAP,
 				    sizeof(struct action_raw_encap_data)),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc_action_mplsogre_encap,
 	},
-	[ACTION_MPLSOGRE_DECAP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MPLSOGRE_DECAP] = {
 		.name = "mplsogre_decap",
 		.help = "mplsogre decapsulation, uses configuration set by"
 			" \"set mplsogre_decap\"",
 		.priv = PRIV_ACTION(RAW_DECAP,
 				    sizeof(struct action_raw_decap_data)),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc_action_mplsogre_decap,
 	},
-	[ACTION_MPLSOUDP_ENCAP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MPLSOUDP_ENCAP] = {
 		.name = "mplsoudp_encap",
 		.help = "mplsoudp encapsulation, uses configuration set by"
 			" \"set mplsoudp_encap\"",
 		.priv = PRIV_ACTION(RAW_ENCAP,
 				    sizeof(struct action_raw_encap_data)),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc_action_mplsoudp_encap,
 	},
-	[ACTION_MPLSOUDP_DECAP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MPLSOUDP_DECAP] = {
 		.name = "mplsoudp_decap",
 		.help = "mplsoudp decapsulation, uses configuration set by"
 			" \"set mplsoudp_decap\"",
 		.priv = PRIV_ACTION(RAW_DECAP,
 				    sizeof(struct action_raw_decap_data)),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc_action_mplsoudp_decap,
 	},
-	[ACTION_SET_IPV4_SRC] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_IPV4_SRC] = {
 		.name = "set_ipv4_src",
 		.help = "Set a new IPv4 source address in the outermost"
 			" IPv4 header",
@@ -9355,15 +8473,15 @@ static const struct token token_list[] = {
 		.next = NEXT(action_set_ipv4_src),
 		.call = parse_vc,
 	},
-	[ACTION_SET_IPV4_SRC_IPV4_SRC] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_IPV4_SRC_IPV4_SRC] = {
 		.name = "ipv4_addr",
 		.help = "new IPv4 source address to set",
-		.next = NEXT(action_set_ipv4_src, NEXT_ENTRY(COMMON_IPV4_ADDR)),
+		.next = NEXT(action_set_ipv4_src, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_IPV4_ADDR)),
 		.args = ARGS(ARGS_ENTRY_HTON
 			(struct rte_flow_action_set_ipv4, ipv4_addr)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_SET_IPV4_DST] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_IPV4_DST] = {
 		.name = "set_ipv4_dst",
 		.help = "Set a new IPv4 destination address in the outermost"
 			" IPv4 header",
@@ -9372,15 +8490,15 @@ static const struct token token_list[] = {
 		.next = NEXT(action_set_ipv4_dst),
 		.call = parse_vc,
 	},
-	[ACTION_SET_IPV4_DST_IPV4_DST] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_IPV4_DST_IPV4_DST] = {
 		.name = "ipv4_addr",
 		.help = "new IPv4 destination address to set",
-		.next = NEXT(action_set_ipv4_dst, NEXT_ENTRY(COMMON_IPV4_ADDR)),
+		.next = NEXT(action_set_ipv4_dst, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_IPV4_ADDR)),
 		.args = ARGS(ARGS_ENTRY_HTON
 			(struct rte_flow_action_set_ipv4, ipv4_addr)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_SET_IPV6_SRC] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_IPV6_SRC] = {
 		.name = "set_ipv6_src",
 		.help = "Set a new IPv6 source address in the outermost"
 			" IPv6 header",
@@ -9389,15 +8507,15 @@ static const struct token token_list[] = {
 		.next = NEXT(action_set_ipv6_src),
 		.call = parse_vc,
 	},
-	[ACTION_SET_IPV6_SRC_IPV6_SRC] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_IPV6_SRC_IPV6_SRC] = {
 		.name = "ipv6_addr",
 		.help = "new IPv6 source address to set",
-		.next = NEXT(action_set_ipv6_src, NEXT_ENTRY(COMMON_IPV6_ADDR)),
+		.next = NEXT(action_set_ipv6_src, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_IPV6_ADDR)),
 		.args = ARGS(ARGS_ENTRY_HTON
 			(struct rte_flow_action_set_ipv6, ipv6_addr)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_SET_IPV6_DST] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_IPV6_DST] = {
 		.name = "set_ipv6_dst",
 		.help = "Set a new IPv6 destination address in the outermost"
 			" IPv6 header",
@@ -9406,15 +8524,15 @@ static const struct token token_list[] = {
 		.next = NEXT(action_set_ipv6_dst),
 		.call = parse_vc,
 	},
-	[ACTION_SET_IPV6_DST_IPV6_DST] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_IPV6_DST_IPV6_DST] = {
 		.name = "ipv6_addr",
 		.help = "new IPv6 destination address to set",
-		.next = NEXT(action_set_ipv6_dst, NEXT_ENTRY(COMMON_IPV6_ADDR)),
+		.next = NEXT(action_set_ipv6_dst, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_IPV6_ADDR)),
 		.args = ARGS(ARGS_ENTRY_HTON
 			(struct rte_flow_action_set_ipv6, ipv6_addr)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_SET_TP_SRC] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_TP_SRC] = {
 		.name = "set_tp_src",
 		.help = "set a new source port number in the outermost"
 			" TCP/UDP header",
@@ -9423,15 +8541,15 @@ static const struct token token_list[] = {
 		.next = NEXT(action_set_tp_src),
 		.call = parse_vc,
 	},
-	[ACTION_SET_TP_SRC_TP_SRC] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_TP_SRC_TP_SRC] = {
 		.name = "port",
 		.help = "new source port number to set",
-		.next = NEXT(action_set_tp_src, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_set_tp_src, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY_HTON
 			     (struct rte_flow_action_set_tp, port)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_SET_TP_DST] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_TP_DST] = {
 		.name = "set_tp_dst",
 		.help = "set a new destination port number in the outermost"
 			" TCP/UDP header",
@@ -9440,30 +8558,30 @@ static const struct token token_list[] = {
 		.next = NEXT(action_set_tp_dst),
 		.call = parse_vc,
 	},
-	[ACTION_SET_TP_DST_TP_DST] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_TP_DST_TP_DST] = {
 		.name = "port",
 		.help = "new destination port number to set",
-		.next = NEXT(action_set_tp_dst, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_set_tp_dst, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY_HTON
 			     (struct rte_flow_action_set_tp, port)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_MAC_SWAP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MAC_SWAP] = {
 		.name = "mac_swap",
 		.help = "Swap the source and destination MAC addresses"
 			" in the outermost Ethernet header",
 		.priv = PRIV_ACTION(MAC_SWAP, 0),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc,
 	},
-	[ACTION_DEC_TTL] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_DEC_TTL] = {
 		.name = "dec_ttl",
 		.help = "decrease network TTL if available",
 		.priv = PRIV_ACTION(DEC_TTL, 0),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc,
 	},
-	[ACTION_SET_TTL] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_TTL] = {
 		.name = "set_ttl",
 		.help = "set ttl value",
 		.priv = PRIV_ACTION(SET_TTL,
@@ -9471,15 +8589,15 @@ static const struct token token_list[] = {
 		.next = NEXT(action_set_ttl),
 		.call = parse_vc,
 	},
-	[ACTION_SET_TTL_TTL] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_TTL_TTL] = {
 		.name = "ttl_value",
 		.help = "new ttl value to set",
-		.next = NEXT(action_set_ttl, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_set_ttl, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY_HTON
 			     (struct rte_flow_action_set_ttl, ttl_value)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_SET_MAC_SRC] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_MAC_SRC] = {
 		.name = "set_mac_src",
 		.help = "set source mac address",
 		.priv = PRIV_ACTION(SET_MAC_SRC,
@@ -9487,15 +8605,15 @@ static const struct token token_list[] = {
 		.next = NEXT(action_set_mac_src),
 		.call = parse_vc,
 	},
-	[ACTION_SET_MAC_SRC_MAC_SRC] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_MAC_SRC_MAC_SRC] = {
 		.name = "mac_addr",
 		.help = "new source mac address",
-		.next = NEXT(action_set_mac_src, NEXT_ENTRY(COMMON_MAC_ADDR)),
+		.next = NEXT(action_set_mac_src, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_MAC_ADDR)),
 		.args = ARGS(ARGS_ENTRY_HTON
 			     (struct rte_flow_action_set_mac, mac_addr)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_SET_MAC_DST] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_MAC_DST] = {
 		.name = "set_mac_dst",
 		.help = "set destination mac address",
 		.priv = PRIV_ACTION(SET_MAC_DST,
@@ -9503,71 +8621,71 @@ static const struct token token_list[] = {
 		.next = NEXT(action_set_mac_dst),
 		.call = parse_vc,
 	},
-	[ACTION_SET_MAC_DST_MAC_DST] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_MAC_DST_MAC_DST] = {
 		.name = "mac_addr",
 		.help = "new destination mac address to set",
-		.next = NEXT(action_set_mac_dst, NEXT_ENTRY(COMMON_MAC_ADDR)),
+		.next = NEXT(action_set_mac_dst, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_MAC_ADDR)),
 		.args = ARGS(ARGS_ENTRY_HTON
 			     (struct rte_flow_action_set_mac, mac_addr)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_INC_TCP_SEQ] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_INC_TCP_SEQ] = {
 		.name = "inc_tcp_seq",
 		.help = "increase TCP sequence number",
 		.priv = PRIV_ACTION(INC_TCP_SEQ, sizeof(rte_be32_t)),
 		.next = NEXT(action_inc_tcp_seq),
 		.call = parse_vc,
 	},
-	[ACTION_INC_TCP_SEQ_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_INC_TCP_SEQ_VALUE] = {
 		.name = "value",
 		.help = "the value to increase TCP sequence number by",
-		.next = NEXT(action_inc_tcp_seq, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_inc_tcp_seq, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARG_ENTRY_HTON(rte_be32_t)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_DEC_TCP_SEQ] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_DEC_TCP_SEQ] = {
 		.name = "dec_tcp_seq",
 		.help = "decrease TCP sequence number",
 		.priv = PRIV_ACTION(DEC_TCP_SEQ, sizeof(rte_be32_t)),
 		.next = NEXT(action_dec_tcp_seq),
 		.call = parse_vc,
 	},
-	[ACTION_DEC_TCP_SEQ_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_DEC_TCP_SEQ_VALUE] = {
 		.name = "value",
 		.help = "the value to decrease TCP sequence number by",
-		.next = NEXT(action_dec_tcp_seq, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_dec_tcp_seq, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARG_ENTRY_HTON(rte_be32_t)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_INC_TCP_ACK] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_INC_TCP_ACK] = {
 		.name = "inc_tcp_ack",
 		.help = "increase TCP acknowledgment number",
 		.priv = PRIV_ACTION(INC_TCP_ACK, sizeof(rte_be32_t)),
 		.next = NEXT(action_inc_tcp_ack),
 		.call = parse_vc,
 	},
-	[ACTION_INC_TCP_ACK_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_INC_TCP_ACK_VALUE] = {
 		.name = "value",
 		.help = "the value to increase TCP acknowledgment number by",
-		.next = NEXT(action_inc_tcp_ack, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_inc_tcp_ack, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARG_ENTRY_HTON(rte_be32_t)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_DEC_TCP_ACK] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_DEC_TCP_ACK] = {
 		.name = "dec_tcp_ack",
 		.help = "decrease TCP acknowledgment number",
 		.priv = PRIV_ACTION(DEC_TCP_ACK, sizeof(rte_be32_t)),
 		.next = NEXT(action_dec_tcp_ack),
 		.call = parse_vc,
 	},
-	[ACTION_DEC_TCP_ACK_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_DEC_TCP_ACK_VALUE] = {
 		.name = "value",
 		.help = "the value to decrease TCP acknowledgment number by",
-		.next = NEXT(action_dec_tcp_ack, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_dec_tcp_ack, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARG_ENTRY_HTON(rte_be32_t)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_RAW_ENCAP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RAW_ENCAP] = {
 		.name = "raw_encap",
 		.help = "encapsulation data, defined by set raw_encap",
 		.priv = PRIV_ACTION(RAW_ENCAP,
@@ -9575,28 +8693,28 @@ static const struct token token_list[] = {
 		.next = NEXT(action_raw_encap),
 		.call = parse_vc_action_raw_encap,
 	},
-	[ACTION_RAW_ENCAP_SIZE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RAW_ENCAP_SIZE] = {
 		.name = "size",
 		.help = "raw encap size",
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT),
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_raw_encap, size)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_RAW_ENCAP_INDEX] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RAW_ENCAP_INDEX] = {
 		.name = "index",
 		.help = "the index of raw_encap_confs",
-		.next = NEXT(NEXT_ENTRY(ACTION_RAW_ENCAP_INDEX_VALUE)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_RAW_ENCAP_INDEX_VALUE)),
 	},
-	[ACTION_RAW_ENCAP_INDEX_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RAW_ENCAP_INDEX_VALUE] = {
 		.name = "{index}",
 		.type = "UNSIGNED",
 		.help = "unsigned integer value",
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc_action_raw_encap_index,
 		.comp = comp_set_raw_index,
 	},
-	[ACTION_RAW_DECAP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RAW_DECAP] = {
 		.name = "raw_decap",
 		.help = "decapsulation data, defined by set raw_encap",
 		.priv = PRIV_ACTION(RAW_DECAP,
@@ -9604,179 +8722,179 @@ static const struct token token_list[] = {
 		.next = NEXT(action_raw_decap),
 		.call = parse_vc_action_raw_decap,
 	},
-	[ACTION_RAW_DECAP_INDEX] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RAW_DECAP_INDEX] = {
 		.name = "index",
 		.help = "the index of raw_encap_confs",
-		.next = NEXT(NEXT_ENTRY(ACTION_RAW_DECAP_INDEX_VALUE)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_RAW_DECAP_INDEX_VALUE)),
 	},
-	[ACTION_RAW_DECAP_INDEX_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_RAW_DECAP_INDEX_VALUE] = {
 		.name = "{index}",
 		.type = "UNSIGNED",
 		.help = "unsigned integer value",
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc_action_raw_decap_index,
 		.comp = comp_set_raw_index,
 	},
-	[ACTION_MODIFY_FIELD] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD] = {
 		.name = "modify_field",
 		.help = "modify destination field with data from source field",
 		.priv = PRIV_ACTION(MODIFY_FIELD, ACTION_MODIFY_SIZE),
-		.next = NEXT(NEXT_ENTRY(ACTION_MODIFY_FIELD_OP)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_OP)),
 		.call = parse_vc,
 	},
-	[ACTION_MODIFY_FIELD_OP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_OP] = {
 		.name = "op",
 		.help = "operation type",
-		.next = NEXT(NEXT_ENTRY(ACTION_MODIFY_FIELD_DST_TYPE),
-			NEXT_ENTRY(ACTION_MODIFY_FIELD_OP_VALUE)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_TYPE),
+			NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_OP_VALUE)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_MODIFY_FIELD_OP_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_OP_VALUE] = {
 		.name = "{operation}",
 		.help = "operation type value",
 		.call = parse_vc_modify_field_op,
 		.comp = comp_set_modify_field_op,
 	},
-	[ACTION_MODIFY_FIELD_DST_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_TYPE] = {
 		.name = "dst_type",
 		.help = "destination field type",
 		.next = NEXT(action_modify_field_dst,
-			NEXT_ENTRY(ACTION_MODIFY_FIELD_DST_TYPE_VALUE)),
+			NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_TYPE_VALUE)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_MODIFY_FIELD_DST_TYPE_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_TYPE_VALUE] = {
 		.name = "{dst_type}",
 		.help = "destination field type value",
 		.call = parse_vc_modify_field_id,
 		.comp = comp_set_modify_field_id,
 	},
-	[ACTION_MODIFY_FIELD_DST_LEVEL] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_LEVEL] = {
 		.name = "dst_level",
 		.help = "destination field level",
 		.next = NEXT(action_modify_field_dst,
-			     NEXT_ENTRY(ACTION_MODIFY_FIELD_DST_LEVEL_VALUE)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_LEVEL_VALUE)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_MODIFY_FIELD_DST_LEVEL_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_LEVEL_VALUE] = {
 		.name = "{dst_level}",
 		.help = "destination field level value",
 		.call = parse_vc_modify_field_level,
 		.comp = comp_none,
 	},
-	[ACTION_MODIFY_FIELD_DST_TAG_INDEX] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_TAG_INDEX] = {
 		.name = "dst_tag_index",
 		.help = "destination field tag array",
 		.next = NEXT(action_modify_field_dst,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_modify_field,
 					dst.tag_index)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_MODIFY_FIELD_DST_TYPE_ID] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_TYPE_ID] = {
 		.name = "dst_type_id",
 		.help = "destination field type ID",
 		.next = NEXT(action_modify_field_dst,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_modify_field,
 					dst.type)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_MODIFY_FIELD_DST_CLASS_ID] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_CLASS_ID] = {
 		.name = "dst_class",
 		.help = "destination field class ID",
 		.next = NEXT(action_modify_field_dst,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_action_modify_field,
 					     dst.class_id)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_MODIFY_FIELD_DST_OFFSET] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_OFFSET] = {
 		.name = "dst_offset",
 		.help = "destination field bit offset",
 		.next = NEXT(action_modify_field_dst,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_modify_field,
 					dst.offset)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_MODIFY_FIELD_SRC_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_TYPE] = {
 		.name = "src_type",
 		.help = "source field type",
 		.next = NEXT(action_modify_field_src,
-			NEXT_ENTRY(ACTION_MODIFY_FIELD_SRC_TYPE_VALUE)),
+			NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_TYPE_VALUE)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_MODIFY_FIELD_SRC_TYPE_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_TYPE_VALUE] = {
 		.name = "{src_type}",
 		.help = "source field type value",
 		.call = parse_vc_modify_field_id,
 		.comp = comp_set_modify_field_id,
 	},
-	[ACTION_MODIFY_FIELD_SRC_LEVEL] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_LEVEL] = {
 		.name = "src_level",
 		.help = "source field level",
 		.next = NEXT(action_modify_field_src,
-			     NEXT_ENTRY(ACTION_MODIFY_FIELD_SRC_LEVEL_VALUE)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_LEVEL_VALUE)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_MODIFY_FIELD_SRC_LEVEL_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_LEVEL_VALUE] = {
 		.name = "{src_level}",
 		.help = "source field level value",
 		.call = parse_vc_modify_field_level,
 		.comp = comp_none,
 	},
-	[ACTION_MODIFY_FIELD_SRC_TAG_INDEX] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_TAG_INDEX] = {
 		.name = "src_tag_index",
 		.help = "source field tag array",
 		.next = NEXT(action_modify_field_src,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_modify_field,
 					src.tag_index)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_MODIFY_FIELD_SRC_TYPE_ID] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_TYPE_ID] = {
 		.name = "src_type_id",
 		.help = "source field type ID",
 		.next = NEXT(action_modify_field_src,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_modify_field,
 					src.type)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_MODIFY_FIELD_SRC_CLASS_ID] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_CLASS_ID] = {
 		.name = "src_class",
 		.help = "source field class ID",
 		.next = NEXT(action_modify_field_src,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_action_modify_field,
 					     src.class_id)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_MODIFY_FIELD_SRC_OFFSET] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_OFFSET] = {
 		.name = "src_offset",
 		.help = "source field bit offset",
 		.next = NEXT(action_modify_field_src,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_modify_field,
 					src.offset)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_MODIFY_FIELD_SRC_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_VALUE] = {
 		.name = "src_value",
 		.help = "source immediate value",
-		.next = NEXT(NEXT_ENTRY(ACTION_MODIFY_FIELD_WIDTH),
-			     NEXT_ENTRY(COMMON_HEX)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_WIDTH),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_HEX)),
 		.args = ARGS(ARGS_ENTRY_ARB(0, 0),
 			     ARGS_ENTRY_ARB(0, 0),
 			     ARGS_ENTRY(struct rte_flow_action_modify_field,
 					src.value)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_MODIFY_FIELD_SRC_POINTER] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_POINTER] = {
 		.name = "src_ptr",
 		.help = "pointer to source immediate value",
-		.next = NEXT(NEXT_ENTRY(ACTION_MODIFY_FIELD_WIDTH),
-			     NEXT_ENTRY(COMMON_HEX)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_WIDTH),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_HEX)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_modify_field,
 					src.pvalue),
 			     ARGS_ENTRY_ARB(0, 0),
@@ -9785,23 +8903,23 @@ static const struct token token_list[] = {
 				 FLOW_FIELD_PATTERN_SIZE)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_MODIFY_FIELD_WIDTH] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_WIDTH] = {
 		.name = "width",
 		.help = "number of bits to copy",
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT),
-			NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT),
+			NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_modify_field,
 					width)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_SEND_TO_KERNEL] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SEND_TO_KERNEL] = {
 		.name = "send_to_kernel",
 		.help = "send packets to kernel",
 		.priv = PRIV_ACTION(SEND_TO_KERNEL, 0),
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc,
 	},
-	[ACTION_IPV6_EXT_REMOVE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_IPV6_EXT_REMOVE] = {
 		.name = "ipv6_ext_remove",
 		.help = "IPv6 extension type, defined by set ipv6_ext_remove",
 		.priv = PRIV_ACTION(IPV6_EXT_REMOVE,
@@ -9809,20 +8927,20 @@ static const struct token token_list[] = {
 		.next = NEXT(action_ipv6_ext_remove),
 		.call = parse_vc_action_ipv6_ext_remove,
 	},
-	[ACTION_IPV6_EXT_REMOVE_INDEX] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_IPV6_EXT_REMOVE_INDEX] = {
 		.name = "index",
 		.help = "the index of ipv6_ext_remove",
-		.next = NEXT(NEXT_ENTRY(ACTION_IPV6_EXT_REMOVE_INDEX_VALUE)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_IPV6_EXT_REMOVE_INDEX_VALUE)),
 	},
-	[ACTION_IPV6_EXT_REMOVE_INDEX_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_IPV6_EXT_REMOVE_INDEX_VALUE] = {
 		.name = "{index}",
 		.type = "UNSIGNED",
 		.help = "unsigned integer value",
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc_action_ipv6_ext_remove_index,
 		.comp = comp_set_ipv6_ext_index,
 	},
-	[ACTION_IPV6_EXT_PUSH] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_IPV6_EXT_PUSH] = {
 		.name = "ipv6_ext_push",
 		.help = "IPv6 extension data, defined by set ipv6_ext_push",
 		.priv = PRIV_ACTION(IPV6_EXT_PUSH,
@@ -9830,34 +8948,34 @@ static const struct token token_list[] = {
 		.next = NEXT(action_ipv6_ext_push),
 		.call = parse_vc_action_ipv6_ext_push,
 	},
-	[ACTION_IPV6_EXT_PUSH_INDEX] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_IPV6_EXT_PUSH_INDEX] = {
 		.name = "index",
 		.help = "the index of ipv6_ext_push",
-		.next = NEXT(NEXT_ENTRY(ACTION_IPV6_EXT_PUSH_INDEX_VALUE)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_IPV6_EXT_PUSH_INDEX_VALUE)),
 	},
-	[ACTION_IPV6_EXT_PUSH_INDEX_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_IPV6_EXT_PUSH_INDEX_VALUE] = {
 		.name = "{index}",
 		.type = "UNSIGNED",
 		.help = "unsigned integer value",
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc_action_ipv6_ext_push_index,
 		.comp = comp_set_ipv6_ext_index,
 	},
-	[ACTION_NAT64] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_NAT64] = {
 		.name = "nat64",
 		.help = "NAT64 IP headers translation",
 		.priv = PRIV_ACTION(NAT64, sizeof(struct rte_flow_action_nat64)),
 		.next = NEXT(action_nat64),
 		.call = parse_vc,
 	},
-	[ACTION_NAT64_MODE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_NAT64_MODE] = {
 		.name = "type",
 		.help = "NAT64 translation type",
-		.next = NEXT(action_nat64, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_nat64, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_nat64, type)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_JUMP_TO_TABLE_INDEX] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_JUMP_TO_TABLE_INDEX] = {
 		.name = "jump_to_table_index",
 		.help = "Jump to table index",
 		.priv = PRIV_ACTION(JUMP_TO_TABLE_INDEX,
@@ -9865,45 +8983,45 @@ static const struct token token_list[] = {
 		.next = NEXT(action_jump_to_table_index),
 		.call = parse_vc,
 	},
-	[ACTION_JUMP_TO_TABLE_INDEX_TABLE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_JUMP_TO_TABLE_INDEX_TABLE] = {
 		.name = "table",
 		.help = "table id to redirect traffic to",
 		.next = NEXT(action_jump_to_table_index,
-			NEXT_ENTRY(ACTION_JUMP_TO_TABLE_INDEX_TABLE_VALUE)),
+			NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_JUMP_TO_TABLE_INDEX_TABLE_VALUE)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_jump_to_table_index, table)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_JUMP_TO_TABLE_INDEX_TABLE_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_JUMP_TO_TABLE_INDEX_TABLE_VALUE] = {
 		.name = "{table_id}",
 		.type = "TABLE_ID",
 		.help = "table id for jump action",
 		.call = parse_jump_table_id,
 		.comp = comp_table_id,
 	},
-	[ACTION_JUMP_TO_TABLE_INDEX_INDEX] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_JUMP_TO_TABLE_INDEX_INDEX] = {
 		.name = "index",
 		.help = "rule index to redirect traffic to",
-		.next = NEXT(action_jump_to_table_index, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_jump_to_table_index, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_jump_to_table_index, index)),
 		.call = parse_vc_conf,
 	},
 
 	/* Top level command. */
-	[SET] = {
+	[RTE_FLOW_PARSER_CMD_SET] = {
 		.name = "set",
 		.help = "set raw encap/decap/sample data",
 		.type = "set raw_encap|raw_decap <index> <pattern>"
 				" or set sample_actions <index> <action>",
 		.next = NEXT(NEXT_ENTRY
-			     (SET_RAW_ENCAP,
-			      SET_RAW_DECAP,
-			      SET_SAMPLE_ACTIONS,
-			      SET_IPV6_EXT_REMOVE,
-			      SET_IPV6_EXT_PUSH)),
+			     (RTE_FLOW_PARSER_CMD_SET_RAW_ENCAP,
+			      RTE_FLOW_PARSER_CMD_SET_RAW_DECAP,
+			      RTE_FLOW_PARSER_CMD_SET_SAMPLE_ACTIONS,
+			      RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_REMOVE,
+			      RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_PUSH)),
 		.call = parse_set_init,
 	},
 	/* Sub-level commands. */
-	[SET_RAW_ENCAP] = {
+	[RTE_FLOW_PARSER_CMD_SET_RAW_ENCAP] = {
 		.name = "raw_encap",
 		.help = "set raw encap data",
 		.next = NEXT(next_set_raw),
@@ -9913,7 +9031,7 @@ static const struct token token_list[] = {
 				 0, RAW_ENCAP_CONFS_MAX_NUM - 1)),
 		.call = parse_set_raw_encap_decap,
 	},
-	[SET_RAW_DECAP] = {
+	[RTE_FLOW_PARSER_CMD_SET_RAW_DECAP] = {
 		.name = "raw_decap",
 		.help = "set raw decap data",
 		.next = NEXT(next_set_raw),
@@ -9923,58 +9041,58 @@ static const struct token token_list[] = {
 				 0, RAW_ENCAP_CONFS_MAX_NUM - 1)),
 		.call = parse_set_raw_encap_decap,
 	},
-	[SET_RAW_INDEX] = {
+	[RTE_FLOW_PARSER_CMD_SET_RAW_INDEX] = {
 		.name = "{index}",
-		.type = "COMMON_UNSIGNED",
+		.type = "RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED",
 		.help = "index of raw_encap/raw_decap data",
 		.next = NEXT(next_item),
 		.call = parse_port,
 	},
-	[SET_SAMPLE_INDEX] = {
+	[RTE_FLOW_PARSER_CMD_SET_SAMPLE_INDEX] = {
 		.name = "{index}",
 		.type = "UNSIGNED",
 		.help = "index of sample actions",
 		.next = NEXT(next_action_sample),
 		.call = parse_port,
 	},
-	[SET_SAMPLE_ACTIONS] = {
+	[RTE_FLOW_PARSER_CMD_SET_SAMPLE_ACTIONS] = {
 		.name = "sample_actions",
 		.help = "set sample actions list",
-		.next = NEXT(NEXT_ENTRY(SET_SAMPLE_INDEX)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_SET_SAMPLE_INDEX)),
 		.args = ARGS(ARGS_ENTRY_ARB_BOUNDED
 				(offsetof(struct buffer, port),
 				 sizeof(((struct buffer *)0)->port),
 				 0, RAW_SAMPLE_CONFS_MAX_NUM - 1)),
 		.call = parse_set_sample_action,
 	},
-	[SET_IPV6_EXT_PUSH] = {
+	[RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_PUSH] = {
 		.name = "ipv6_ext_push",
 		.help = "set IPv6 extension header",
-		.next = NEXT(NEXT_ENTRY(SET_IPV6_EXT_INDEX)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_INDEX)),
 		.args = ARGS(ARGS_ENTRY_ARB_BOUNDED
 				(offsetof(struct buffer, port),
 				 sizeof(((struct buffer *)0)->port),
 				 0, IPV6_EXT_PUSH_CONFS_MAX_NUM - 1)),
 		.call = parse_set_ipv6_ext_action,
 	},
-	[SET_IPV6_EXT_REMOVE] = {
+	[RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_REMOVE] = {
 		.name = "ipv6_ext_remove",
 		.help = "set IPv6 extension header",
-		.next = NEXT(NEXT_ENTRY(SET_IPV6_EXT_INDEX)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_INDEX)),
 		.args = ARGS(ARGS_ENTRY_ARB_BOUNDED
 				(offsetof(struct buffer, port),
 				 sizeof(((struct buffer *)0)->port),
 				 0, IPV6_EXT_PUSH_CONFS_MAX_NUM - 1)),
 		.call = parse_set_ipv6_ext_action,
 	},
-	[SET_IPV6_EXT_INDEX] = {
+	[RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_INDEX] = {
 		.name = "{index}",
 		.type = "UNSIGNED",
 		.help = "index of ipv6 extension push/remove actions",
 		.next = NEXT(item_ipv6_push_ext),
 		.call = parse_port,
 	},
-	[ITEM_IPV6_PUSH_REMOVE_EXT] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_PUSH_REMOVE_EXT] = {
 		.name = "ipv6_ext",
 		.help = "set IPv6 extension header",
 		.priv = PRIV_ITEM(IPV6_EXT,
@@ -9982,15 +9100,15 @@ static const struct token token_list[] = {
 		.next = NEXT(item_ipv6_push_ext_type),
 		.call = parse_vc,
 	},
-	[ITEM_IPV6_PUSH_REMOVE_EXT_TYPE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_IPV6_PUSH_REMOVE_EXT_TYPE] = {
 		.name = "type",
 		.help = "set IPv6 extension type",
 		.args = ARGS(ARGS_ENTRY_HTON(struct rte_flow_item_ipv6_ext,
 					     next_hdr)),
-		.next = NEXT(item_ipv6_push_ext_header, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_ipv6_push_ext_header, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 	},
-	[ACTION_SET_TAG] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_TAG] = {
 		.name = "set_tag",
 		.help = "set tag",
 		.priv = PRIV_ACTION(SET_TAG,
@@ -9998,30 +9116,30 @@ static const struct token token_list[] = {
 		.next = NEXT(action_set_tag),
 		.call = parse_vc,
 	},
-	[ACTION_SET_TAG_INDEX] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_TAG_INDEX] = {
 		.name = "index",
 		.help = "index of tag array",
-		.next = NEXT(action_set_tag, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_set_tag, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_set_tag, index)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_SET_TAG_DATA] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_TAG_DATA] = {
 		.name = "data",
 		.help = "tag value",
-		.next = NEXT(action_set_tag, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_set_tag, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY
 			     (struct rte_flow_action_set_tag, data)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_SET_TAG_MASK] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_TAG_MASK] = {
 		.name = "mask",
 		.help = "mask for tag value",
-		.next = NEXT(action_set_tag, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_set_tag, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY
 			     (struct rte_flow_action_set_tag, mask)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_SET_META] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_META] = {
 		.name = "set_meta",
 		.help = "set metadata",
 		.priv = PRIV_ACTION(SET_META,
@@ -10029,23 +9147,23 @@ static const struct token token_list[] = {
 		.next = NEXT(action_set_meta),
 		.call = parse_vc_action_set_meta,
 	},
-	[ACTION_SET_META_DATA] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_META_DATA] = {
 		.name = "data",
 		.help = "metadata value",
-		.next = NEXT(action_set_meta, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_set_meta, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY
 			     (struct rte_flow_action_set_meta, data)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_SET_META_MASK] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_META_MASK] = {
 		.name = "mask",
 		.help = "mask for metadata value",
-		.next = NEXT(action_set_meta, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_set_meta, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY
 			     (struct rte_flow_action_set_meta, mask)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_SET_IPV4_DSCP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_IPV4_DSCP] = {
 		.name = "set_ipv4_dscp",
 		.help = "set DSCP value",
 		.priv = PRIV_ACTION(SET_IPV4_DSCP,
@@ -10053,15 +9171,15 @@ static const struct token token_list[] = {
 		.next = NEXT(action_set_ipv4_dscp),
 		.call = parse_vc,
 	},
-	[ACTION_SET_IPV4_DSCP_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_IPV4_DSCP_VALUE] = {
 		.name = "dscp_value",
 		.help = "new IPv4 DSCP value to set",
-		.next = NEXT(action_set_ipv4_dscp, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_set_ipv4_dscp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY
 			     (struct rte_flow_action_set_dscp, dscp)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_SET_IPV6_DSCP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_IPV6_DSCP] = {
 		.name = "set_ipv6_dscp",
 		.help = "set DSCP value",
 		.priv = PRIV_ACTION(SET_IPV6_DSCP,
@@ -10069,15 +9187,15 @@ static const struct token token_list[] = {
 		.next = NEXT(action_set_ipv6_dscp),
 		.call = parse_vc,
 	},
-	[ACTION_SET_IPV6_DSCP_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SET_IPV6_DSCP_VALUE] = {
 		.name = "dscp_value",
 		.help = "new IPv6 DSCP value to set",
-		.next = NEXT(action_set_ipv6_dscp, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_set_ipv6_dscp, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY
 			     (struct rte_flow_action_set_dscp, dscp)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_AGE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_AGE] = {
 		.name = "age",
 		.help = "set a specific metadata header",
 		.next = NEXT(action_age),
@@ -10085,15 +9203,15 @@ static const struct token token_list[] = {
 			sizeof(struct rte_flow_action_age)),
 		.call = parse_vc,
 	},
-	[ACTION_AGE_TIMEOUT] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_AGE_TIMEOUT] = {
 		.name = "timeout",
 		.help = "flow age timeout value",
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_action_age,
 					   timeout, 24)),
-		.next = NEXT(action_age, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_age, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_AGE_UPDATE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_AGE_UPDATE] = {
 		.name = "age_update",
 		.help = "update aging parameter",
 		.next = NEXT(action_age_update),
@@ -10101,23 +9219,23 @@ static const struct token token_list[] = {
 				    sizeof(struct rte_flow_update_age)),
 		.call = parse_vc,
 	},
-	[ACTION_AGE_UPDATE_TIMEOUT] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_AGE_UPDATE_TIMEOUT] = {
 		.name = "timeout",
 		.help = "age timeout update value",
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_update_age,
 					   timeout, 24)),
-		.next = NEXT(action_age_update, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_age_update, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.call = parse_vc_conf_timeout,
 	},
-	[ACTION_AGE_UPDATE_TOUCH] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_AGE_UPDATE_TOUCH] = {
 		.name = "touch",
 		.help = "this flow is touched",
-		.next = NEXT(action_age_update, NEXT_ENTRY(COMMON_BOOLEAN)),
+		.next = NEXT(action_age_update, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_BOOLEAN)),
 		.args = ARGS(ARGS_ENTRY_BF(struct rte_flow_update_age,
 					   touch, 1)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_SAMPLE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SAMPLE] = {
 		.name = "sample",
 		.help = "set a sample action",
 		.next = NEXT(action_sample),
@@ -10125,38 +9243,38 @@ static const struct token token_list[] = {
 			sizeof(struct action_sample_data)),
 		.call = parse_vc_action_sample,
 	},
-	[ACTION_SAMPLE_RATIO] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SAMPLE_RATIO] = {
 		.name = "ratio",
 		.help = "flow sample ratio value",
-		.next = NEXT(action_sample, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_sample, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY_ARB
 			     (offsetof(struct action_sample_data, conf) +
 			      offsetof(struct rte_flow_action_sample, ratio),
 			      sizeof(((struct rte_flow_action_sample *)0)->
 				     ratio))),
 	},
-	[ACTION_SAMPLE_INDEX] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SAMPLE_INDEX] = {
 		.name = "index",
 		.help = "the index of sample actions list",
-		.next = NEXT(NEXT_ENTRY(ACTION_SAMPLE_INDEX_VALUE)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_SAMPLE_INDEX_VALUE)),
 	},
-	[ACTION_SAMPLE_INDEX_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SAMPLE_INDEX_VALUE] = {
 		.name = "{index}",
-		.type = "COMMON_UNSIGNED",
+		.type = "RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED",
 		.help = "unsigned integer value",
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_vc_action_sample_index,
 		.comp = comp_set_sample_index,
 	},
-	[ACTION_CONNTRACK] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_CONNTRACK] = {
 		.name = "conntrack",
 		.help = "create a conntrack object",
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.priv = PRIV_ACTION(CONNTRACK,
 				    sizeof(struct rte_flow_action_conntrack)),
 		.call = parse_vc,
 	},
-	[ACTION_CONNTRACK_UPDATE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_CONNTRACK_UPDATE] = {
 		.name = "conntrack_update",
 		.help = "update a conntrack object",
 		.next = NEXT(action_update_conntrack),
@@ -10164,19 +9282,19 @@ static const struct token token_list[] = {
 				    sizeof(struct rte_flow_modify_conntrack)),
 		.call = parse_vc,
 	},
-	[ACTION_CONNTRACK_UPDATE_DIR] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_CONNTRACK_UPDATE_DIR] = {
 		.name = "dir",
 		.help = "update a conntrack object direction",
 		.next = NEXT(action_update_conntrack),
 		.call = parse_vc_action_conntrack_update,
 	},
-	[ACTION_CONNTRACK_UPDATE_CTX] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_CONNTRACK_UPDATE_CTX] = {
 		.name = "ctx",
 		.help = "update a conntrack object context",
 		.next = NEXT(action_update_conntrack),
 		.call = parse_vc_action_conntrack_update,
 	},
-	[ACTION_PORT_REPRESENTOR] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_PORT_REPRESENTOR] = {
 		.name = "port_representor",
 		.help = "at embedded switch level, send matching traffic to the given ethdev",
 		.priv = PRIV_ACTION(PORT_REPRESENTOR,
@@ -10184,16 +9302,16 @@ static const struct token token_list[] = {
 		.next = NEXT(action_port_representor),
 		.call = parse_vc,
 	},
-	[ACTION_PORT_REPRESENTOR_PORT_ID] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_PORT_REPRESENTOR_PORT_ID] = {
 		.name = "port_id",
 		.help = "ethdev port ID",
 		.next = NEXT(action_port_representor,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_ethdev,
 					port_id)),
 		.call = parse_vc_conf,
 	},
-	[ACTION_REPRESENTED_PORT] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_REPRESENTED_PORT] = {
 		.name = "represented_port",
 		.help = "at embedded switch level, send matching traffic to the entity represented by the given ethdev",
 		.priv = PRIV_ACTION(REPRESENTED_PORT,
@@ -10201,34 +9319,34 @@ static const struct token token_list[] = {
 		.next = NEXT(action_represented_port),
 		.call = parse_vc,
 	},
-	[ACTION_REPRESENTED_PORT_ETHDEV_PORT_ID] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_REPRESENTED_PORT_ETHDEV_PORT_ID] = {
 		.name = "ethdev_port_id",
 		.help = "ethdev port ID",
 		.next = NEXT(action_represented_port,
-			     NEXT_ENTRY(COMMON_UNSIGNED)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_ethdev,
 					port_id)),
 		.call = parse_vc_conf,
 	},
 	/* Indirect action destroy arguments. */
-	[INDIRECT_ACTION_DESTROY_ID] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_DESTROY_ID] = {
 		.name = "action_id",
 		.help = "specify a indirect action id to destroy",
 		.next = NEXT(next_ia_destroy_attr,
-			     NEXT_ENTRY(COMMON_INDIRECT_ACTION_ID)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
 		.args = ARGS(ARGS_ENTRY_PTR(struct buffer,
 					    args.ia_destroy.action_id)),
 		.call = parse_ia_destroy,
 	},
 	/* Indirect action create arguments. */
-	[INDIRECT_ACTION_CREATE_ID] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_CREATE_ID] = {
 		.name = "action_id",
 		.help = "specify a indirect action id to create",
 		.next = NEXT(next_ia_create_attr,
-			     NEXT_ENTRY(COMMON_INDIRECT_ACTION_ID)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_INDIRECT_ACTION_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.vc.attr.group)),
 	},
-	[ACTION_INDIRECT] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_INDIRECT] = {
 		.name = "indirect",
 		.help = "apply indirect action by id",
 		.priv = PRIV_ACTION(INDIRECT, 0),
@@ -10236,7 +9354,7 @@ static const struct token token_list[] = {
 		.args = ARGS(ARGS_ENTRY_ARB(0, sizeof(uint32_t))),
 		.call = parse_vc,
 	},
-	[ACTION_INDIRECT_LIST] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_INDIRECT_LIST] = {
 		.name = "indirect_list",
 		.help = "apply indirect list action by id",
 		.priv = PRIV_ACTION(INDIRECT_LIST,
@@ -10245,107 +9363,107 @@ static const struct token token_list[] = {
 		.next = NEXT(next_ial),
 		.call = parse_vc,
 	},
-	[ACTION_INDIRECT_LIST_HANDLE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_INDIRECT_LIST_HANDLE] = {
 		.name = "handle",
 		.help = "indirect list handle",
-		.next = NEXT(next_ial, NEXT_ENTRY(INDIRECT_LIST_ACTION_ID2PTR_HANDLE)),
+		.next = NEXT(next_ial, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_INDIRECT_LIST_ACTION_ID2PTR_HANDLE)),
 		.args = ARGS(ARGS_ENTRY_ARB(0, sizeof(uint32_t))),
 	},
-	[ACTION_INDIRECT_LIST_CONF] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_INDIRECT_LIST_CONF] = {
 		.name = "conf",
 		.help = "indirect list configuration",
-		.next = NEXT(next_ial, NEXT_ENTRY(INDIRECT_LIST_ACTION_ID2PTR_CONF)),
+		.next = NEXT(next_ial, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_INDIRECT_LIST_ACTION_ID2PTR_CONF)),
 		.args = ARGS(ARGS_ENTRY_ARB(0, sizeof(uint32_t))),
 	},
-	[INDIRECT_LIST_ACTION_ID2PTR_HANDLE] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_LIST_ACTION_ID2PTR_HANDLE] = {
 		.type = "UNSIGNED",
 		.help = "unsigned integer value",
 		.call = parse_indlst_id2ptr,
 		.comp = comp_none,
 	},
-	[INDIRECT_LIST_ACTION_ID2PTR_CONF] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_LIST_ACTION_ID2PTR_CONF] = {
 		.type = "UNSIGNED",
 		.help = "unsigned integer value",
 		.call = parse_indlst_id2ptr,
 		.comp = comp_none,
 	},
-	[ACTION_SHARED_INDIRECT] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_SHARED_INDIRECT] = {
 		.name = "shared_indirect",
 		.help = "apply indirect action by id and port",
 		.priv = PRIV_ACTION(INDIRECT, 0),
-		.next = NEXT(NEXT_ENTRY(INDIRECT_ACTION_PORT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_PORT)),
 		.args = ARGS(ARGS_ENTRY_ARB(0, sizeof(uint32_t)),
 			     ARGS_ENTRY_ARB(0, sizeof(uint32_t))),
 		.call = parse_vc,
 	},
-	[INDIRECT_ACTION_PORT] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_PORT] = {
 		.name = "{indirect_action_port}",
-		.type = "INDIRECT_ACTION_PORT",
+		.type = "RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_PORT",
 		.help = "indirect action port",
-		.next = NEXT(NEXT_ENTRY(INDIRECT_ACTION_ID2PTR)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_ID2PTR)),
 		.call = parse_ia_port,
 		.comp = comp_none,
 	},
-	[INDIRECT_ACTION_ID2PTR] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_ID2PTR] = {
 		.name = "{action_id}",
 		.type = "INDIRECT_ACTION_ID",
 		.help = "indirect action id",
-		.next = NEXT(NEXT_ENTRY(ACTION_NEXT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_NEXT)),
 		.call = parse_ia_id2ptr,
 		.comp = comp_none,
 	},
-	[INDIRECT_ACTION_INGRESS] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_INGRESS] = {
 		.name = "ingress",
 		.help = "affect rule to ingress",
 		.next = NEXT(next_ia_create_attr),
 		.call = parse_ia,
 	},
-	[INDIRECT_ACTION_EGRESS] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_EGRESS] = {
 		.name = "egress",
 		.help = "affect rule to egress",
 		.next = NEXT(next_ia_create_attr),
 		.call = parse_ia,
 	},
-	[INDIRECT_ACTION_TRANSFER] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_TRANSFER] = {
 		.name = "transfer",
 		.help = "affect rule to transfer",
 		.next = NEXT(next_ia_create_attr),
 		.call = parse_ia,
 	},
-	[INDIRECT_ACTION_SPEC] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_SPEC] = {
 		.name = "action",
 		.help = "specify action to create indirect handle",
 		.next = NEXT(next_action),
 	},
-	[INDIRECT_ACTION_LIST] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_LIST] = {
 		.name = "list",
 		.help = "specify actions for indirect handle list",
-		.next = NEXT(NEXT_ENTRY(ACTIONS, END)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTIONS, RTE_FLOW_PARSER_CMD_END)),
 		.call = parse_ia,
 	},
-	[INDIRECT_ACTION_FLOW_CONF] = {
+	[RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_FLOW_CONF] = {
 		.name = "flow_conf",
 		.help = "specify actions configuration for indirect handle list",
-		.next = NEXT(NEXT_ENTRY(ACTIONS, END)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTIONS, RTE_FLOW_PARSER_CMD_END)),
 		.call = parse_ia,
 	},
-	[ACTION_POL_G] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_POL_G] = {
 		.name = "g_actions",
 		.help = "submit a list of associated actions for green",
 		.next = NEXT(next_action),
 		.call = parse_mp,
 	},
-	[ACTION_POL_Y] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_POL_Y] = {
 		.name = "y_actions",
 		.help = "submit a list of associated actions for yellow",
 		.next = NEXT(next_action),
 	},
-	[ACTION_POL_R] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_POL_R] = {
 		.name = "r_actions",
 		.help = "submit a list of associated actions for red",
 		.next = NEXT(next_action),
 	},
-	[ACTION_QUOTA_CREATE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_QUOTA_CREATE] = {
 		.name = "quota_create",
 		.help = "create quota action",
 		.priv = PRIV_ACTION(QUOTA,
@@ -10353,28 +9471,28 @@ static const struct token token_list[] = {
 		.next = NEXT(action_quota_create),
 		.call = parse_vc
 	},
-	[ACTION_QUOTA_CREATE_LIMIT] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_QUOTA_CREATE_LIMIT] = {
 		.name = "limit",
 		.help = "quota limit",
-		.next = NEXT(action_quota_create, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_quota_create, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_quota, quota)),
 		.call = parse_vc_conf
 	},
-	[ACTION_QUOTA_CREATE_MODE] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_QUOTA_CREATE_MODE] = {
 		.name = "mode",
 		.help = "quota mode",
 		.next = NEXT(action_quota_create,
-			     NEXT_ENTRY(ACTION_QUOTA_CREATE_MODE_NAME)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_QUOTA_CREATE_MODE_NAME)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_action_quota, mode)),
 		.call = parse_vc_conf
 	},
-	[ACTION_QUOTA_CREATE_MODE_NAME] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_QUOTA_CREATE_MODE_NAME] = {
 		.name = "mode_name",
 		.help = "quota mode name",
 		.call = parse_quota_mode_name,
 		.comp = comp_quota_mode_name
 	},
-	[ACTION_QUOTA_QU] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_QUOTA_QU] = {
 		.name = "quota_update",
 		.help = "update quota action",
 		.priv = PRIV_ACTION(QUOTA,
@@ -10382,22 +9500,22 @@ static const struct token token_list[] = {
 		.next = NEXT(action_quota_update),
 		.call = parse_vc
 	},
-	[ACTION_QUOTA_QU_LIMIT] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_QUOTA_QU_LIMIT] = {
 		.name = "limit",
 		.help = "quota limit",
-		.next = NEXT(action_quota_update, NEXT_ENTRY(COMMON_UNSIGNED)),
+		.next = NEXT(action_quota_update, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_update_quota, quota)),
 		.call = parse_vc_conf
 	},
-	[ACTION_QUOTA_QU_UPDATE_OP] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_QUOTA_QU_UPDATE_OP] = {
 		.name = "update_op",
-		.help = "query update op SET|ADD",
+		.help = "query update op RTE_FLOW_PARSER_CMD_SET|RTE_FLOW_PARSER_CMD_ADD",
 		.next = NEXT(action_quota_update,
-			     NEXT_ENTRY(ACTION_QUOTA_QU_UPDATE_OP_NAME)),
+			     NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_QUOTA_QU_UPDATE_OP_NAME)),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_update_quota, op)),
 		.call = parse_vc_conf
 	},
-	[ACTION_QUOTA_QU_UPDATE_OP_NAME] = {
+	[RTE_FLOW_PARSER_CMD_ACTION_QUOTA_QU_UPDATE_OP_NAME] = {
 		.name = "update_op_name",
 		.help = "quota update op name",
 		.call = parse_quota_update_name,
@@ -10405,37 +9523,37 @@ static const struct token token_list[] = {
 	},
 
 	/* Top-level command. */
-	[ADD] = {
+	[RTE_FLOW_PARSER_CMD_ADD] = {
 		.name = "add",
 		.type = "port meter policy {port_id} {arg}",
 		.help = "add port meter policy",
-		.next = NEXT(NEXT_ENTRY(ITEM_POL_PORT)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_POL_PORT)),
 		.call = parse_init,
 	},
 	/* Sub-level commands. */
-	[ITEM_POL_PORT] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_POL_PORT] = {
 		.name = "port",
 		.help = "add port meter policy",
-		.next = NEXT(NEXT_ENTRY(ITEM_POL_METER)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_POL_METER)),
 	},
-	[ITEM_POL_METER] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_POL_METER] = {
 		.name = "meter",
 		.help = "add port meter policy",
-		.next = NEXT(NEXT_ENTRY(ITEM_POL_POLICY)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ITEM_POL_POLICY)),
 	},
-	[ITEM_POL_POLICY] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_POL_POLICY] = {
 		.name = "policy",
 		.help = "add port meter policy",
-		.next = NEXT(NEXT_ENTRY(ACTION_POL_R),
-				NEXT_ENTRY(ACTION_POL_Y),
-				NEXT_ENTRY(ACTION_POL_G),
-				NEXT_ENTRY(COMMON_POLICY_ID),
-				NEXT_ENTRY(COMMON_PORT_ID)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_POL_R),
+				NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_POL_Y),
+				NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_POL_G),
+				NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_POLICY_ID),
+				NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PORT_ID)),
 		.args = ARGS(ARGS_ENTRY(struct buffer, args.policy.policy_id),
 				ARGS_ENTRY(struct buffer, port)),
 		.call = parse_mp,
 	},
-	[ITEM_AGGR_AFFINITY] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_AGGR_AFFINITY] = {
 		.name = "aggr_affinity",
 		.help = "match on the aggregated port receiving the packets",
 		.priv = PRIV_ITEM(AGGR_AFFINITY,
@@ -10443,15 +9561,15 @@ static const struct token token_list[] = {
 		.next = NEXT(item_aggr_affinity),
 		.call = parse_vc,
 	},
-	[ITEM_AGGR_AFFINITY_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_AGGR_AFFINITY_VALUE] = {
 		.name = "affinity",
 		.help = "aggregated affinity value",
-		.next = NEXT(item_aggr_affinity, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_aggr_affinity, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_aggr_affinity,
 					affinity)),
 	},
-	[ITEM_TX_QUEUE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_TX_QUEUE] = {
 		.name = "tx_queue",
 		.help = "match on the tx queue of send packet",
 		.priv = PRIV_ITEM(TX_QUEUE,
@@ -10459,10 +9577,10 @@ static const struct token token_list[] = {
 		.next = NEXT(item_tx_queue),
 		.call = parse_vc,
 	},
-	[ITEM_TX_QUEUE_VALUE] = {
+	[RTE_FLOW_PARSER_CMD_ITEM_TX_QUEUE_VALUE] = {
 		.name = "tx_queue_value",
 		.help = "tx queue value",
-		.next = NEXT(item_tx_queue, NEXT_ENTRY(COMMON_UNSIGNED),
+		.next = NEXT(item_tx_queue, NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_UNSIGNED),
 			     item_param),
 		.args = ARGS(ARGS_ENTRY(struct rte_flow_item_tx_queue,
 					tx_queue)),
@@ -10669,7 +9787,7 @@ parse_ia(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != INDIRECT_ACTION)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_INDIRECT_ACTION)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -10695,22 +9813,22 @@ parse_ia(struct context *ctx, const struct token *token,
 		ctx->object = out;
 		ctx->objmask = NULL;
 		return len;
-	case INDIRECT_ACTION_EGRESS:
+	case RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_EGRESS:
 		out->args.vc.attr.egress = 1;
 		return len;
-	case INDIRECT_ACTION_INGRESS:
+	case RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_INGRESS:
 		out->args.vc.attr.ingress = 1;
 		return len;
-	case INDIRECT_ACTION_TRANSFER:
+	case RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_TRANSFER:
 		out->args.vc.attr.transfer = 1;
 		return len;
-	case INDIRECT_ACTION_QU_MODE:
+	case RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_QU_MODE:
 		return len;
-	case INDIRECT_ACTION_LIST:
-		out->command = INDIRECT_ACTION_LIST_CREATE;
+	case RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_LIST:
+		out->command = RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_LIST_CREATE;
 		return len;
-	case INDIRECT_ACTION_FLOW_CONF:
-		out->command = INDIRECT_ACTION_FLOW_CONF_CREATE;
+	case RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_FLOW_CONF:
+		out->command = RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_FLOW_CONF_CREATE;
 		return len;
 	default:
 		return -1;
@@ -10733,8 +9851,8 @@ parse_ia_destroy(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || buffer_cmd(out) == INDIRECT_ACTION) {
-		if (ctx->curr != INDIRECT_ACTION_DESTROY)
+	if (!out->command || buffer_cmd(out) == RTE_FLOW_PARSER_CMD_INDIRECT_ACTION) {
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_DESTROY)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -10772,7 +9890,7 @@ parse_qia(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != QUEUE)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_QUEUE)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -10780,7 +9898,7 @@ parse_qia(struct context *ctx, const struct token *token,
 		return len;
 	}
 	switch (ctx->curr) {
-	case QUEUE_INDIRECT_ACTION:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION:
 		return len;
 	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_CREATE:
 	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_UPDATE:
@@ -10796,21 +9914,21 @@ parse_qia(struct context *ctx, const struct token *token,
 		ctx->object = out;
 		ctx->objmask = NULL;
 		return len;
-	case QUEUE_INDIRECT_ACTION_EGRESS:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_EGRESS:
 		out->args.vc.attr.egress = 1;
 		return len;
-	case QUEUE_INDIRECT_ACTION_INGRESS:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_INGRESS:
 		out->args.vc.attr.ingress = 1;
 		return len;
-	case QUEUE_INDIRECT_ACTION_TRANSFER:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_TRANSFER:
 		out->args.vc.attr.transfer = 1;
 		return len;
-	case QUEUE_INDIRECT_ACTION_CREATE_POSTPONE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_CREATE_POSTPONE:
 		return len;
-	case QUEUE_INDIRECT_ACTION_QU_MODE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_QU_MODE:
 		return len;
-	case QUEUE_INDIRECT_ACTION_LIST:
-		out->command = QUEUE_INDIRECT_ACTION_LIST_CREATE;
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_LIST:
+		out->command = RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_LIST_CREATE;
 		return len;
 	default:
 		return -1;
@@ -10832,8 +9950,8 @@ parse_qia_destroy(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || buffer_cmd(out) == QUEUE) {
-		if (ctx->curr != QUEUE_INDIRECT_ACTION_DESTROY)
+	if (!out->command || buffer_cmd(out) == RTE_FLOW_PARSER_CMD_QUEUE) {
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_DESTROY)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -10847,13 +9965,13 @@ parse_qia_destroy(struct context *ctx, const struct token *token,
 		return len;
 	}
 	switch (ctx->curr) {
-	case QUEUE_INDIRECT_ACTION:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION:
 		out->command = ctx->curr;
 		ctx->objdata = 0;
 		ctx->object = out;
 		ctx->objmask = NULL;
 		return len;
-	case QUEUE_INDIRECT_ACTION_DESTROY_ID:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_DESTROY_ID:
 		action_id = out->args.ia_destroy.action_id
 				+ out->args.ia_destroy.action_id_n++;
 		if ((uint8_t *)action_id > (uint8_t *)out + size)
@@ -10862,7 +9980,7 @@ parse_qia_destroy(struct context *ctx, const struct token *token,
 		ctx->object = action_id;
 		ctx->objmask = NULL;
 		return len;
-	case QUEUE_INDIRECT_ACTION_DESTROY_POSTPONE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_INDIRECT_ACTION_DESTROY_POSTPONE:
 		return len;
 	default:
 		return -1;
@@ -10884,7 +10002,7 @@ parse_mp(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != ITEM_POL_POLICY)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_ITEM_POL_POLICY)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -10896,7 +10014,7 @@ parse_mp(struct context *ctx, const struct token *token,
 		return len;
 	}
 	switch (ctx->curr) {
-	case RTE_FLOW_PARSER_CMD_METER_POLICY_ADD:
+	case RTE_FLOW_PARSER_CMD_ACTION_POL_G:
 		out->args.vc.actions =
 			(void *)RTE_ALIGN_CEIL((uintptr_t)(out + 1),
 					sizeof(double));
@@ -10927,12 +10045,12 @@ parse_vc(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != VALIDATE && ctx->curr != CREATE &&
-		    ctx->curr != PATTERN_TEMPLATE_CREATE &&
-		    ctx->curr != ACTIONS_TEMPLATE_CREATE &&
-		    ctx->curr != UPDATE)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_VALIDATE && ctx->curr != RTE_FLOW_PARSER_CMD_CREATE &&
+		    ctx->curr != RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_CREATE &&
+		    ctx->curr != RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_CREATE &&
+		    ctx->curr != RTE_FLOW_PARSER_CMD_UPDATE)
 			return -1;
-		if (ctx->curr == UPDATE)
+		if (ctx->curr == RTE_FLOW_PARSER_CMD_UPDATE)
 			out->args.vc.pattern =
 				(void *)RTE_ALIGN_CEIL((uintptr_t)(out + 1),
 						       sizeof(double));
@@ -10950,53 +10068,53 @@ parse_vc(struct context *ctx, const struct token *token,
 	default:
 		ctx->object = &out->args.vc.attr;
 		break;
-	case VC_TUNNEL_SET:
-	case VC_TUNNEL_MATCH:
+	case RTE_FLOW_PARSER_CMD_VC_TUNNEL_SET:
+	case RTE_FLOW_PARSER_CMD_VC_TUNNEL_MATCH:
 		ctx->object = &out->args.vc.tunnel_ops;
 		break;
-	case VC_USER_ID:
+	case RTE_FLOW_PARSER_CMD_VC_USER_ID:
 		ctx->object = out;
 		break;
 	}
 	ctx->objmask = NULL;
 	switch (ctx->curr) {
-	case VC_GROUP:
-	case VC_PRIORITY:
-	case VC_USER_ID:
+	case RTE_FLOW_PARSER_CMD_VC_GROUP:
+	case RTE_FLOW_PARSER_CMD_VC_PRIORITY:
+	case RTE_FLOW_PARSER_CMD_VC_USER_ID:
 		return len;
-	case VC_TUNNEL_SET:
+	case RTE_FLOW_PARSER_CMD_VC_TUNNEL_SET:
 		out->args.vc.tunnel_ops.enabled = 1;
 		out->args.vc.tunnel_ops.actions = 1;
 		return len;
-	case VC_TUNNEL_MATCH:
+	case RTE_FLOW_PARSER_CMD_VC_TUNNEL_MATCH:
 		out->args.vc.tunnel_ops.enabled = 1;
 		out->args.vc.tunnel_ops.items = 1;
 		return len;
-	case VC_INGRESS:
+	case RTE_FLOW_PARSER_CMD_VC_INGRESS:
 		out->args.vc.attr.ingress = 1;
 		return len;
-	case VC_EGRESS:
+	case RTE_FLOW_PARSER_CMD_VC_EGRESS:
 		out->args.vc.attr.egress = 1;
 		return len;
-	case VC_TRANSFER:
+	case RTE_FLOW_PARSER_CMD_VC_TRANSFER:
 		out->args.vc.attr.transfer = 1;
 		return len;
-	case ITEM_PATTERN:
+	case RTE_FLOW_PARSER_CMD_ITEM_PATTERN:
 		out->args.vc.pattern =
 			(void *)RTE_ALIGN_CEIL((uintptr_t)(out + 1),
 					       sizeof(double));
 		ctx->object = out->args.vc.pattern;
 		ctx->objmask = NULL;
 		return len;
-	case ITEM_END:
-		if ((buffer_cmd(out) == VALIDATE || buffer_cmd(out) == CREATE) &&
+	case RTE_FLOW_PARSER_CMD_ITEM_END:
+		if ((buffer_cmd(out) == RTE_FLOW_PARSER_CMD_VALIDATE || buffer_cmd(out) == RTE_FLOW_PARSER_CMD_CREATE) &&
 		    ctx->last)
 			return -1;
-		if (buffer_cmd(out) == PATTERN_TEMPLATE_CREATE &&
+		if (buffer_cmd(out) == RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_CREATE &&
 		    !ctx->last)
 			return -1;
 		break;
-	case ACTIONS:
+	case RTE_FLOW_PARSER_CMD_ACTIONS:
 		out->args.vc.actions = out->args.vc.pattern ?
 			(void *)RTE_ALIGN_CEIL((uintptr_t)
 					       (out->args.vc.pattern +
@@ -11007,7 +10125,7 @@ parse_vc(struct context *ctx, const struct token *token,
 		ctx->object = out->args.vc.actions;
 		ctx->objmask = NULL;
 		return len;
-	case VC_IS_USER_ID:
+	case RTE_FLOW_PARSER_CMD_VC_IS_USER_ID:
 		out->args.vc.user_id = true;
 		return len;
 	default:
@@ -11075,23 +10193,23 @@ parse_vc_spec(struct context *ctx, const struct token *token,
 		return -1;
 	/* Parse parameter types. */
 	switch (ctx->curr) {
-	case ITEM_PARAM_IS:
+	case RTE_FLOW_PARSER_CMD_ITEM_PARAM_IS:
 		index = 0;
 		objmask = 1;
 		break;
-	case ITEM_PARAM_SPEC:
+	case RTE_FLOW_PARSER_CMD_ITEM_PARAM_SPEC:
 		index = 0;
 		break;
-	case ITEM_PARAM_LAST:
+	case RTE_FLOW_PARSER_CMD_ITEM_PARAM_LAST:
 		index = 1;
 		break;
-	case ITEM_PARAM_PREFIX:
+	case RTE_FLOW_PARSER_CMD_ITEM_PARAM_PREFIX:
 		/* Modify next token to expect a prefix. */
 		if (ctx->next_num < 2)
 			return -1;
-		ctx->next[ctx->next_num - 2] = NEXT_ENTRY(COMMON_PREFIX);
+		ctx->next[ctx->next_num - 2] = NEXT_ENTRY(RTE_FLOW_PARSER_CMD_COMMON_PREFIX);
 		/* Fall through. */
-	case ITEM_PARAM_MASK:
+	case RTE_FLOW_PARSER_CMD_ITEM_PARAM_MASK:
 		index = 2;
 		break;
 	default:
@@ -11148,7 +10266,7 @@ parse_vc_conf_timeout(struct context *ctx, const struct token *token,
 	struct rte_flow_update_age *update;
 
 	(void)size;
-	if (ctx->curr != ACTION_AGE_UPDATE_TIMEOUT)
+	if (ctx->curr != RTE_FLOW_PARSER_CMD_ACTION_AGE_UPDATE_TIMEOUT)
 		return -1;
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -11184,13 +10302,13 @@ parse_vc_item_ecpri_type(struct context *ctx, const struct token *token,
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	switch (ctx->curr) {
-	case ITEM_ECPRI_COMMON_TYPE_IQ_DATA:
+	case RTE_FLOW_PARSER_CMD_ITEM_ECPRI_COMMON_TYPE_IQ_DATA:
 		msg_type = RTE_ECPRI_MSG_TYPE_IQ_DATA;
 		break;
-	case ITEM_ECPRI_COMMON_TYPE_RTC_CTRL:
+	case RTE_FLOW_PARSER_CMD_ITEM_ECPRI_COMMON_TYPE_RTC_CTRL:
 		msg_type = RTE_ECPRI_MSG_TYPE_RTC_CTRL;
 		break;
-	case ITEM_ECPRI_COMMON_TYPE_DLY_MSR:
+	case RTE_FLOW_PARSER_CMD_ITEM_ECPRI_COMMON_TYPE_DLY_MSR:
 		msg_type = RTE_ECPRI_MSG_TYPE_DLY_MSR;
 		break;
 	default:
@@ -11237,22 +10355,22 @@ parse_vc_item_l2tpv2_type(struct context *ctx, const struct token *token,
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	switch (ctx->curr) {
-	case ITEM_L2TPV2_TYPE_DATA:
+	case RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE_DATA:
 		msg_type |= RTE_L2TPV2_MSG_TYPE_DATA;
 		break;
-	case ITEM_L2TPV2_TYPE_DATA_L:
+	case RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE_DATA_L:
 		msg_type |= RTE_L2TPV2_MSG_TYPE_DATA_L;
 		break;
-	case ITEM_L2TPV2_TYPE_DATA_S:
+	case RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE_DATA_S:
 		msg_type |= RTE_L2TPV2_MSG_TYPE_DATA_S;
 		break;
-	case ITEM_L2TPV2_TYPE_DATA_O:
+	case RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE_DATA_O:
 		msg_type |= RTE_L2TPV2_MSG_TYPE_DATA_O;
 		break;
-	case ITEM_L2TPV2_TYPE_DATA_L_S:
+	case RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE_DATA_L_S:
 		msg_type |= RTE_L2TPV2_MSG_TYPE_DATA_L_S;
 		break;
-	case ITEM_L2TPV2_TYPE_CTRL:
+	case RTE_FLOW_PARSER_CMD_ITEM_L2TPV2_TYPE_CTRL:
 		msg_type |= RTE_L2TPV2_MSG_TYPE_CONTROL;
 		break;
 	default:
@@ -11293,7 +10411,7 @@ parse_vc_compare_op(struct context *ctx, const struct token *token,
 	(void)token;
 	(void)buf;
 	(void)size;
-	if (ctx->curr != ITEM_COMPARE_OP_VALUE)
+	if (ctx->curr != RTE_FLOW_PARSER_CMD_ITEM_COMPARE_OP_VALUE)
 		return -1;
 	for (i = 0; compare_ops[i]; ++i)
 		if (!strcmp_partial(compare_ops[i], str, len))
@@ -11319,8 +10437,8 @@ parse_vc_compare_field_id(struct context *ctx, const struct token *token,
 	(void)token;
 	(void)buf;
 	(void)size;
-	if (ctx->curr != ITEM_COMPARE_FIELD_A_TYPE_VALUE &&
-		ctx->curr != ITEM_COMPARE_FIELD_B_TYPE_VALUE)
+	if (ctx->curr != RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_TYPE_VALUE &&
+		ctx->curr != RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_TYPE_VALUE)
 		return -1;
 	for (i = 0; flow_field_ids[i]; ++i)
 		if (!strcmp_partial(flow_field_ids[i], str, len))
@@ -11330,7 +10448,7 @@ parse_vc_compare_field_id(struct context *ctx, const struct token *token,
 	if (!ctx->object)
 		return len;
 	compare_item = ctx->object;
-	if (ctx->curr == ITEM_COMPARE_FIELD_A_TYPE_VALUE)
+	if (ctx->curr == RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_TYPE_VALUE)
 		compare_item->a.field = (enum rte_flow_field_id)i;
 	else
 		compare_item->b.field = (enum rte_flow_field_id)i;
@@ -11351,8 +10469,8 @@ parse_vc_compare_field_level(struct context *ctx, const struct token *token,
 
 	(void)token;
 	(void)size;
-	if (ctx->curr != ITEM_COMPARE_FIELD_A_LEVEL_VALUE &&
-		ctx->curr != ITEM_COMPARE_FIELD_B_LEVEL_VALUE)
+	if (ctx->curr != RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_LEVEL_VALUE &&
+		ctx->curr != RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_LEVEL_VALUE)
 		return -1;
 	if (!ctx->object)
 		return len;
@@ -11363,15 +10481,15 @@ parse_vc_compare_field_level(struct context *ctx, const struct token *token,
 		return -1;
 	/* No need to validate action template mask value */
 	if (out->args.vc.masks) {
-		if (ctx->curr == ITEM_COMPARE_FIELD_A_LEVEL_VALUE)
+		if (ctx->curr == RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_LEVEL_VALUE)
 			compare_item->a.level = val;
 		else
 			compare_item->b.level = val;
 		return len;
 	}
-	if ((ctx->curr == ITEM_COMPARE_FIELD_A_LEVEL_VALUE &&
+	if ((ctx->curr == RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_LEVEL_VALUE &&
 	     compare_item->a.field == RTE_FLOW_FIELD_FLEX_ITEM) ||
-	    (ctx->curr == ITEM_COMPARE_FIELD_B_LEVEL_VALUE &&
+	    (ctx->curr == RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_LEVEL_VALUE &&
 	     compare_item->b.field == RTE_FLOW_FIELD_FLEX_ITEM)) {
 		flex_handle = parser_flex_handle_get(ctx->port, val);
 		if (!flex_handle) {
@@ -11379,12 +10497,12 @@ parse_vc_compare_field_level(struct context *ctx, const struct token *token,
 			return -1;
 		}
 	}
-	if (ctx->curr == ITEM_COMPARE_FIELD_A_LEVEL_VALUE) {
+	if (ctx->curr == RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_A_LEVEL_VALUE) {
 		if (compare_item->a.field != RTE_FLOW_FIELD_FLEX_ITEM)
 			compare_item->a.level = val;
 		else
 			compare_item->a.flex_handle = flex_handle;
-	} else if (ctx->curr == ITEM_COMPARE_FIELD_B_LEVEL_VALUE) {
+	} else if (ctx->curr == RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_LEVEL_VALUE) {
 		if (compare_item->b.field != RTE_FLOW_FIELD_FLEX_ITEM)
 			compare_item->b.level = val;
 		else
@@ -11409,13 +10527,13 @@ parse_vc_action_meter_color_type(struct context *ctx, const struct token *token,
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	switch (ctx->curr) {
-	case ACTION_METER_COLOR_GREEN:
+	case RTE_FLOW_PARSER_CMD_ACTION_METER_COLOR_GREEN:
 		color = RTE_COLOR_GREEN;
 	break;
-	case ACTION_METER_COLOR_YELLOW:
+	case RTE_FLOW_PARSER_CMD_ACTION_METER_COLOR_YELLOW:
 		color = RTE_COLOR_YELLOW;
 	break;
-	case ACTION_METER_COLOR_RED:
+	case RTE_FLOW_PARSER_CMD_ACTION_METER_COLOR_RED:
 		color = RTE_COLOR_RED;
 	break;
 	default:
@@ -11499,16 +10617,16 @@ parse_vc_action_rss_func(struct context *ctx, const struct token *token,
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
 		return -1;
 	switch (ctx->curr) {
-	case ACTION_RSS_FUNC_DEFAULT:
+	case RTE_FLOW_PARSER_CMD_ACTION_RSS_FUNC_DEFAULT:
 		func = RTE_ETH_HASH_FUNCTION_DEFAULT;
 		break;
-	case ACTION_RSS_FUNC_TOEPLITZ:
+	case RTE_FLOW_PARSER_CMD_ACTION_RSS_FUNC_TOEPLITZ:
 		func = RTE_ETH_HASH_FUNCTION_TOEPLITZ;
 		break;
-	case ACTION_RSS_FUNC_SIMPLE_XOR:
+	case RTE_FLOW_PARSER_CMD_ACTION_RSS_FUNC_SIMPLE_XOR:
 		func = RTE_ETH_HASH_FUNCTION_SIMPLE_XOR;
 		break;
-	case ACTION_RSS_FUNC_SYMMETRIC_TOEPLITZ:
+	case RTE_FLOW_PARSER_CMD_ACTION_RSS_FUNC_SYMMETRIC_TOEPLITZ:
 		func = RTE_ETH_HASH_FUNCTION_SYMMETRIC_TOEPLITZ;
 		break;
 	default:
@@ -11538,7 +10656,7 @@ parse_vc_action_rss_type(struct context *ctx, const struct token *token,
 	(void)token;
 	(void)buf;
 	(void)size;
-	if (ctx->curr != ACTION_RSS_TYPE)
+	if (ctx->curr != RTE_FLOW_PARSER_CMD_ACTION_RSS_TYPE)
 		return -1;
 	if (!(ctx->objdata >> 16) && ctx->object) {
 		action_rss_data = ctx->object;
@@ -11558,7 +10676,7 @@ parse_vc_action_rss_type(struct context *ctx, const struct token *token,
 	/* Repeat token. */
 	if (ctx->next_num == RTE_DIM(ctx->next))
 		return -1;
-	ctx->next[ctx->next_num++] = NEXT_ENTRY(ACTION_RSS_TYPE);
+	ctx->next[ctx->next_num++] = NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_RSS_TYPE);
 	if (!ctx->object)
 		return len;
 	action_rss_data = ctx->object;
@@ -11584,7 +10702,7 @@ parse_vc_action_rss_queue(struct context *ctx, const struct token *token,
 	(void)token;
 	(void)buf;
 	(void)size;
-	if (ctx->curr != ACTION_RSS_QUEUE)
+	if (ctx->curr != RTE_FLOW_PARSER_CMD_ACTION_RSS_QUEUE)
 		return -1;
 	i = ctx->objdata >> 16;
 	if (!strcmp_partial("end", str, len)) {
@@ -11608,7 +10726,7 @@ parse_vc_action_rss_queue(struct context *ctx, const struct token *token,
 	/* Repeat token. */
 	if (ctx->next_num == RTE_DIM(ctx->next))
 		return -1;
-	ctx->next[ctx->next_num++] = NEXT_ENTRY(ACTION_RSS_QUEUE);
+	ctx->next[ctx->next_num++] = NEXT_ENTRY(RTE_FLOW_PARSER_CMD_ACTION_RSS_QUEUE);
 end:
 	if (!ctx->object)
 		return len;
@@ -12443,7 +11561,7 @@ parse_vc_action_raw_encap_index(struct context *ctx, const struct token *token,
 	RTE_SET_USED(token);
 	RTE_SET_USED(buf);
 	RTE_SET_USED(size);
-	if (ctx->curr != ACTION_RAW_ENCAP_INDEX_VALUE)
+	if (ctx->curr != RTE_FLOW_PARSER_CMD_ACTION_RAW_ENCAP_INDEX_VALUE)
 		return -1;
 	arg = ARGS_ENTRY_ARB_BOUNDED
 		(offsetof(struct action_raw_encap_data, idx),
@@ -12755,7 +11873,7 @@ parse_vc_action_sample_index(struct context *ctx, const struct token *token,
 	RTE_SET_USED(token);
 	RTE_SET_USED(buf);
 	RTE_SET_USED(size);
-	if (ctx->curr != ACTION_SAMPLE_INDEX_VALUE)
+	if (ctx->curr != RTE_FLOW_PARSER_CMD_ACTION_SAMPLE_INDEX_VALUE)
 		return -1;
 	arg = ARGS_ENTRY_ARB_BOUNDED
 		(offsetof(struct action_sample_data, idx),
@@ -12796,7 +11914,7 @@ parse_vc_modify_field_op(struct context *ctx, const struct token *token,
 	(void)token;
 	(void)buf;
 	(void)size;
-	if (ctx->curr != ACTION_MODIFY_FIELD_OP_VALUE)
+	if (ctx->curr != RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_OP_VALUE)
 		return -1;
 	for (i = 0; modify_field_ops[i]; ++i)
 		if (!strcmp_partial(modify_field_ops[i], str, len))
@@ -12822,8 +11940,8 @@ parse_vc_modify_field_id(struct context *ctx, const struct token *token,
 	(void)token;
 	(void)buf;
 	(void)size;
-	if (ctx->curr != ACTION_MODIFY_FIELD_DST_TYPE_VALUE &&
-		ctx->curr != ACTION_MODIFY_FIELD_SRC_TYPE_VALUE)
+	if (ctx->curr != RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_TYPE_VALUE &&
+		ctx->curr != RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_TYPE_VALUE)
 		return -1;
 	for (i = 0; flow_field_ids[i]; ++i)
 		if (!strcmp_partial(flow_field_ids[i], str, len))
@@ -12833,7 +11951,7 @@ parse_vc_modify_field_id(struct context *ctx, const struct token *token,
 	if (!ctx->object)
 		return len;
 	action_modify_field = ctx->object;
-	if (ctx->curr == ACTION_MODIFY_FIELD_DST_TYPE_VALUE)
+	if (ctx->curr == RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_TYPE_VALUE)
 		action_modify_field->dst.field = (enum rte_flow_field_id)i;
 	else
 		action_modify_field->src.field = (enum rte_flow_field_id)i;
@@ -12854,8 +11972,8 @@ parse_vc_modify_field_level(struct context *ctx, const struct token *token,
 
 	(void)token;
 	(void)size;
-	if (ctx->curr != ACTION_MODIFY_FIELD_DST_LEVEL_VALUE &&
-		ctx->curr != ACTION_MODIFY_FIELD_SRC_LEVEL_VALUE)
+	if (ctx->curr != RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_LEVEL_VALUE &&
+		ctx->curr != RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_LEVEL_VALUE)
 		return -1;
 	if (!ctx->object)
 		return len;
@@ -12866,15 +11984,15 @@ parse_vc_modify_field_level(struct context *ctx, const struct token *token,
 		return -1;
 	/* No need to validate action template mask value */
 	if (out->args.vc.masks) {
-		if (ctx->curr == ACTION_MODIFY_FIELD_DST_LEVEL_VALUE)
+		if (ctx->curr == RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_LEVEL_VALUE)
 			action->dst.level = val;
 		else
 			action->src.level = val;
 		return len;
 	}
-	if ((ctx->curr == ACTION_MODIFY_FIELD_DST_LEVEL_VALUE &&
+	if ((ctx->curr == RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_LEVEL_VALUE &&
 	     action->dst.field == RTE_FLOW_FIELD_FLEX_ITEM) ||
-	    (ctx->curr == ACTION_MODIFY_FIELD_SRC_LEVEL_VALUE &&
+	    (ctx->curr == RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_LEVEL_VALUE &&
 	     action->src.field == RTE_FLOW_FIELD_FLEX_ITEM)) {
 		flex_handle = parser_flex_handle_get(ctx->port, val);
 		if (!flex_handle) {
@@ -12882,12 +12000,12 @@ parse_vc_modify_field_level(struct context *ctx, const struct token *token,
 			return -1;
 		}
 	}
-	if (ctx->curr == ACTION_MODIFY_FIELD_DST_LEVEL_VALUE) {
+	if (ctx->curr == RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_DST_LEVEL_VALUE) {
 		if (action->dst.field != RTE_FLOW_FIELD_FLEX_ITEM)
 			action->dst.level = val;
 		else
 			action->dst.flex_handle = flex_handle;
-	} else if (ctx->curr == ACTION_MODIFY_FIELD_SRC_LEVEL_VALUE) {
+	} else if (ctx->curr == RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_LEVEL_VALUE) {
 		if (action->src.field != RTE_FLOW_FIELD_FLEX_ITEM)
 			action->src.level = val;
 		else
@@ -12906,8 +12024,8 @@ parse_vc_action_conntrack_update(struct context *ctx, const struct token *token,
 	struct rte_flow_modify_conntrack *ct_modify = NULL;
 
 	(void)size;
-	if (ctx->curr != ACTION_CONNTRACK_UPDATE_CTX &&
-	    ctx->curr != ACTION_CONNTRACK_UPDATE_DIR)
+	if (ctx->curr != RTE_FLOW_PARSER_CMD_ACTION_CONNTRACK_UPDATE_CTX &&
+	    ctx->curr != RTE_FLOW_PARSER_CMD_ACTION_CONNTRACK_UPDATE_DIR)
 		return -1;
 	/* Token name must match. */
 	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
@@ -12916,7 +12034,7 @@ parse_vc_action_conntrack_update(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	ct_modify = (struct rte_flow_modify_conntrack *)out->args.vc.data;
-	if (ctx->curr == ACTION_CONNTRACK_UPDATE_DIR) {
+	if (ctx->curr == RTE_FLOW_PARSER_CMD_ACTION_CONNTRACK_UPDATE_DIR) {
 		ct_modify->new_ct.is_original_dir =
 				conntrack_context.is_original_dir;
 		ct_modify->direction = 1;
@@ -12947,7 +12065,7 @@ parse_destroy(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != DESTROY)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_DESTROY)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -12960,7 +12078,7 @@ parse_destroy(struct context *ctx, const struct token *token,
 					       sizeof(double));
 		return len;
 	}
-	if (ctx->curr == DESTROY_IS_USER_ID) {
+	if (ctx->curr == RTE_FLOW_PARSER_CMD_DESTROY_IS_USER_ID) {
 		out->args.destroy.is_user_id = true;
 		return len;
 	}
@@ -12988,7 +12106,7 @@ parse_flush(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != FLUSH)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_FLUSH)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13015,7 +12133,7 @@ parse_dump(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != DUMP)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_DUMP)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13026,15 +12144,15 @@ parse_dump(struct context *ctx, const struct token *token,
 		return len;
 	}
 	switch (ctx->curr) {
-	case DUMP_ALL:
-	case DUMP_ONE:
-		out->args.dump.mode = (ctx->curr == DUMP_ALL) ? true : false;
+	case RTE_FLOW_PARSER_CMD_DUMP_ALL:
+	case RTE_FLOW_PARSER_CMD_DUMP_ONE:
+		out->args.dump.mode = (ctx->curr == RTE_FLOW_PARSER_CMD_DUMP_ALL) ? true : false;
 		out->command = ctx->curr;
 		ctx->objdata = 0;
 		ctx->object = out;
 		ctx->objmask = NULL;
 		return len;
-	case DUMP_IS_USER_ID:
+	case RTE_FLOW_PARSER_CMD_DUMP_IS_USER_ID:
 		out->args.dump.is_user_id = true;
 		return len;
 	default:
@@ -13057,7 +12175,7 @@ parse_query(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != QUERY)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_QUERY)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13066,7 +12184,7 @@ parse_query(struct context *ctx, const struct token *token,
 		ctx->object = out;
 		ctx->objmask = NULL;
 	}
-	if (ctx->curr == QUERY_IS_USER_ID) {
+	if (ctx->curr == RTE_FLOW_PARSER_CMD_QUERY_IS_USER_ID) {
 		out->args.query.is_user_id = true;
 		return len;
 	}
@@ -13123,7 +12241,7 @@ parse_list(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != LIST)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_LIST)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13159,8 +12277,8 @@ parse_aged(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || buffer_cmd(out) == QUEUE) {
-		if (ctx->curr != AGED && ctx->curr != QUEUE_AGED)
+	if (!out->command || buffer_cmd(out) == RTE_FLOW_PARSER_CMD_QUEUE) {
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_AGED && ctx->curr != RTE_FLOW_PARSER_CMD_QUEUE_AGED)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13169,7 +12287,7 @@ parse_aged(struct context *ctx, const struct token *token,
 		ctx->object = out;
 		ctx->objmask = NULL;
 	}
-	if (ctx->curr == AGED_DESTROY)
+	if (ctx->curr == RTE_FLOW_PARSER_CMD_AGED_DESTROY)
 		out->args.aged.destroy = 1;
 	return len;
 }
@@ -13189,7 +12307,7 @@ parse_isolate(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != ISOLATE)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_ISOLATE)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13216,7 +12334,7 @@ parse_configure(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != INFO && ctx->curr != CONFIGURE)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_INFO && ctx->curr != RTE_FLOW_PARSER_CMD_CONFIGURE)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13243,8 +12361,8 @@ parse_template(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != PATTERN_TEMPLATE &&
-		    ctx->curr != ACTIONS_TEMPLATE)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE &&
+		    ctx->curr != RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13266,13 +12384,13 @@ parse_template(struct context *ctx, const struct token *token,
 		ctx->object = out;
 		ctx->objmask = NULL;
 		return len;
-	case PATTERN_TEMPLATE_EGRESS:
+	case RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_EGRESS:
 		out->args.vc.attr.egress = 1;
 		return len;
-	case PATTERN_TEMPLATE_INGRESS:
+	case RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_INGRESS:
 		out->args.vc.attr.ingress = 1;
 		return len;
-	case PATTERN_TEMPLATE_TRANSFER:
+	case RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_TRANSFER:
 		out->args.vc.attr.transfer = 1;
 		return len;
 	case RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_CREATE:
@@ -13282,14 +12400,14 @@ parse_template(struct context *ctx, const struct token *token,
 		ctx->object = out;
 		ctx->objmask = NULL;
 		return len;
-	case ACTIONS_TEMPLATE_SPEC:
+	case RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_SPEC:
 		out->args.vc.actions =
 			(void *)RTE_ALIGN_CEIL((uintptr_t)(out + 1),
 					       sizeof(double));
 		ctx->object = out->args.vc.actions;
 		ctx->objmask = NULL;
 		return len;
-	case ACTIONS_TEMPLATE_MASK:
+	case RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_MASK:
 		out->args.vc.masks =
 			(void *)RTE_ALIGN_CEIL((uintptr_t)
 					       (out->args.vc.actions +
@@ -13298,13 +12416,13 @@ parse_template(struct context *ctx, const struct token *token,
 		ctx->object = out->args.vc.masks;
 		ctx->objmask = NULL;
 		return len;
-	case ACTIONS_TEMPLATE_EGRESS:
+	case RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_EGRESS:
 		out->args.vc.attr.egress = 1;
 		return len;
-	case ACTIONS_TEMPLATE_INGRESS:
+	case RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_INGRESS:
 		out->args.vc.attr.ingress = 1;
 		return len;
-	case ACTIONS_TEMPLATE_TRANSFER:
+	case RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_TRANSFER:
 		out->args.vc.attr.transfer = 1;
 		return len;
 	default:
@@ -13328,10 +12446,10 @@ parse_template_destroy(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command ||
-		buffer_cmd(out) == PATTERN_TEMPLATE ||
-		buffer_cmd(out) == ACTIONS_TEMPLATE) {
-		if (ctx->curr != PATTERN_TEMPLATE_DESTROY &&
-			ctx->curr != ACTIONS_TEMPLATE_DESTROY)
+		buffer_cmd(out) == RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE ||
+		buffer_cmd(out) == RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE) {
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_PATTERN_TEMPLATE_DESTROY &&
+			ctx->curr != RTE_FLOW_PARSER_CMD_ACTIONS_TEMPLATE_DESTROY)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13370,7 +12488,7 @@ parse_table(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != TABLE)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_TABLE)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13389,7 +12507,7 @@ parse_table(struct context *ctx, const struct token *token,
 		ctx->objmask = NULL;
 		out->args.table.id = UINT32_MAX;
 		return len;
-	case TABLE_PATTERN_TEMPLATE:
+	case RTE_FLOW_PARSER_CMD_TABLE_PATTERN_TEMPLATE:
 		out->args.table.pat_templ_id =
 			(void *)RTE_ALIGN_CEIL((uintptr_t)(out + 1),
 					       sizeof(double));
@@ -13401,7 +12519,7 @@ parse_table(struct context *ctx, const struct token *token,
 		ctx->object = template_id;
 		ctx->objmask = NULL;
 		return len;
-	case TABLE_ACTIONS_TEMPLATE:
+	case RTE_FLOW_PARSER_CMD_TABLE_ACTIONS_TEMPLATE:
 		out->args.table.act_templ_id =
 			(void *)RTE_ALIGN_CEIL((uintptr_t)
 					       (out->args.table.pat_templ_id +
@@ -13415,36 +12533,36 @@ parse_table(struct context *ctx, const struct token *token,
 		ctx->object = template_id;
 		ctx->objmask = NULL;
 		return len;
-	case TABLE_INGRESS:
+	case RTE_FLOW_PARSER_CMD_TABLE_INGRESS:
 		out->args.table.attr.flow_attr.ingress = 1;
 		return len;
-	case TABLE_EGRESS:
+	case RTE_FLOW_PARSER_CMD_TABLE_EGRESS:
 		out->args.table.attr.flow_attr.egress = 1;
 		return len;
-	case TABLE_TRANSFER:
+	case RTE_FLOW_PARSER_CMD_TABLE_TRANSFER:
 		out->args.table.attr.flow_attr.transfer = 1;
 		return len;
-	case TABLE_TRANSFER_WIRE_ORIG:
+	case RTE_FLOW_PARSER_CMD_TABLE_TRANSFER_WIRE_ORIG:
 		if (!out->args.table.attr.flow_attr.transfer)
 			return -1;
 		out->args.table.attr.specialize |= RTE_FLOW_TABLE_SPECIALIZE_TRANSFER_WIRE_ORIG;
 		return len;
-	case TABLE_TRANSFER_VPORT_ORIG:
+	case RTE_FLOW_PARSER_CMD_TABLE_TRANSFER_VPORT_ORIG:
 		if (!out->args.table.attr.flow_attr.transfer)
 			return -1;
 		out->args.table.attr.specialize |= RTE_FLOW_TABLE_SPECIALIZE_TRANSFER_VPORT_ORIG;
 		return len;
-	case TABLE_RESIZABLE:
+	case RTE_FLOW_PARSER_CMD_TABLE_RESIZABLE:
 		out->args.table.attr.specialize |=
 			RTE_FLOW_TABLE_SPECIALIZE_RESIZABLE;
 		return len;
-	case TABLE_RULES_NUMBER:
+	case RTE_FLOW_PARSER_CMD_TABLE_RULES_NUMBER:
 		ctx->objdata = 0;
 		ctx->object = out;
 		ctx->objmask = NULL;
 		return len;
-	case TABLE_RESIZE_ID:
-	case TABLE_RESIZE_RULES_NUMBER:
+	case RTE_FLOW_PARSER_CMD_TABLE_RESIZE_ID:
+	case RTE_FLOW_PARSER_CMD_TABLE_RESIZE_RULES_NUMBER:
 		return len;
 	default:
 		return -1;
@@ -13466,9 +12584,9 @@ parse_table_destroy(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || buffer_cmd(out) == TABLE) {
-		if (ctx->curr != TABLE_DESTROY &&
-		    ctx->curr != TABLE_RESIZE_COMPLETE)
+	if (!out->command || buffer_cmd(out) == RTE_FLOW_PARSER_CMD_TABLE) {
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_TABLE_DESTROY &&
+		    ctx->curr != RTE_FLOW_PARSER_CMD_TABLE_RESIZE_COMPLETE)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13544,7 +12662,7 @@ parse_qo(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != QUEUE)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_QUEUE)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13564,21 +12682,21 @@ parse_qo(struct context *ctx, const struct token *token,
 		ctx->objmask = NULL;
 		out->args.vc.rule_id = UINT32_MAX;
 		return len;
-	case QUEUE_TEMPLATE_TABLE:
-	case QUEUE_PATTERN_TEMPLATE:
-	case QUEUE_ACTIONS_TEMPLATE:
-	case QUEUE_CREATE_POSTPONE:
-	case QUEUE_RULE_ID:
-	case QUEUE_UPDATE_ID:
+	case RTE_FLOW_PARSER_CMD_QUEUE_TEMPLATE_TABLE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_PATTERN_TEMPLATE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_ACTIONS_TEMPLATE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_CREATE_POSTPONE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_RULE_ID:
+	case RTE_FLOW_PARSER_CMD_QUEUE_UPDATE_ID:
 		return len;
-	case ITEM_PATTERN:
+	case RTE_FLOW_PARSER_CMD_ITEM_PATTERN:
 		out->args.vc.pattern =
 			(void *)RTE_ALIGN_CEIL((uintptr_t)(out + 1),
 					       sizeof(double));
 		ctx->object = out->args.vc.pattern;
 		ctx->objmask = NULL;
 		return len;
-	case ACTIONS:
+	case RTE_FLOW_PARSER_CMD_ACTIONS:
 		out->args.vc.actions =
 			(void *)RTE_ALIGN_CEIL((uintptr_t)
 					       (out->args.vc.pattern +
@@ -13607,9 +12725,9 @@ parse_qo_destroy(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (!out->command || buffer_cmd(out) == QUEUE) {
-		if (ctx->curr != QUEUE_DESTROY &&
-		    ctx->curr != QUEUE_FLOW_UPDATE_RESIZED)
+	if (!out->command || buffer_cmd(out) == RTE_FLOW_PARSER_CMD_QUEUE) {
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_QUEUE_DESTROY &&
+		    ctx->curr != RTE_FLOW_PARSER_CMD_QUEUE_FLOW_UPDATE_RESIZED)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13623,7 +12741,7 @@ parse_qo_destroy(struct context *ctx, const struct token *token,
 		return len;
 	}
 	switch (ctx->curr) {
-	case QUEUE_DESTROY_ID:
+	case RTE_FLOW_PARSER_CMD_QUEUE_DESTROY_ID:
 		flow_id = out->args.destroy.rule
 				+ out->args.destroy.rule_n++;
 		if ((uint8_t *)flow_id > (uint8_t *)out + size)
@@ -13632,7 +12750,7 @@ parse_qo_destroy(struct context *ctx, const struct token *token,
 		ctx->object = flow_id;
 		ctx->objmask = NULL;
 		return len;
-	case QUEUE_DESTROY_POSTPONE:
+	case RTE_FLOW_PARSER_CMD_QUEUE_DESTROY_POSTPONE:
 		return len;
 	default:
 		return -1;
@@ -13654,7 +12772,7 @@ parse_push(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != PUSH)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_PUSH)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13682,7 +12800,7 @@ parse_pull(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != PULL)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_PULL)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13710,7 +12828,7 @@ parse_hash(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != HASH)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_HASH)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13722,23 +12840,23 @@ parse_hash(struct context *ctx, const struct token *token,
 		return len;
 	}
 	switch (ctx->curr) {
-	case HASH_CALC_TABLE:
-	case HASH_CALC_PATTERN_INDEX:
+	case RTE_FLOW_PARSER_CMD_HASH_CALC_TABLE:
+	case RTE_FLOW_PARSER_CMD_HASH_CALC_PATTERN_INDEX:
 		return len;
-	case ITEM_PATTERN:
+	case RTE_FLOW_PARSER_CMD_ITEM_PATTERN:
 		out->args.vc.pattern =
 			(void *)RTE_ALIGN_CEIL((uintptr_t)(out + 1),
 					       sizeof(double));
 		ctx->object = out->args.vc.pattern;
 		ctx->objmask = NULL;
 		return len;
-	case HASH_CALC_ENCAP:
+	case RTE_FLOW_PARSER_CMD_HASH_CALC_ENCAP:
 		out->args.vc.encap_hash = 1;
 		return len;
-	case ENCAP_HASH_FIELD_SRC_PORT:
+	case RTE_FLOW_PARSER_CMD_ENCAP_HASH_FIELD_SRC_PORT:
 		out->args.vc.field = RTE_FLOW_ENCAP_HASH_FIELD_SRC_PORT;
 		return len;
-	case ENCAP_HASH_FIELD_GRE_FLOW_ID:
+	case RTE_FLOW_PARSER_CMD_ENCAP_HASH_FIELD_GRE_FLOW_ID:
 		out->args.vc.field = RTE_FLOW_ENCAP_HASH_FIELD_NVGRE_FLOW_ID;
 		return len;
 	default:
@@ -13760,7 +12878,7 @@ parse_group(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != FLOW_GROUP)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_FLOW_GROUP)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13772,13 +12890,13 @@ parse_group(struct context *ctx, const struct token *token,
 		return len;
 	}
 	switch (ctx->curr) {
-	case GROUP_INGRESS:
+	case RTE_FLOW_PARSER_CMD_GROUP_INGRESS:
 		out->args.vc.attr.ingress = 1;
 		return len;
-	case GROUP_EGRESS:
+	case RTE_FLOW_PARSER_CMD_GROUP_EGRESS:
 		out->args.vc.attr.egress = 1;
 		return len;
-	case GROUP_TRANSFER:
+	case RTE_FLOW_PARSER_CMD_GROUP_TRANSFER:
 		out->args.vc.attr.transfer = 1;
 		return len;
 	case RTE_FLOW_PARSER_CMD_GROUP_SET_MISS_ACTIONS:
@@ -13807,8 +12925,8 @@ parse_flex(struct context *ctx, const struct token *token,
 	/* Nothing else to do if there is no buffer. */
 	if (!out)
 		return len;
-	if (buffer_cmd(out) == ZERO) {
-		if (ctx->curr != FLEX)
+	if (buffer_cmd(out) == RTE_FLOW_PARSER_CMD_ZERO) {
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_FLEX)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13844,7 +12962,7 @@ parse_tunnel(struct context *ctx, const struct token *token,
 	if (!out)
 		return len;
 	if (!out->command) {
-		if (ctx->curr != TUNNEL)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_TUNNEL)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -13861,8 +12979,8 @@ parse_tunnel(struct context *ctx, const struct token *token,
 		case RTE_FLOW_PARSER_CMD_TUNNEL_LIST:
 			out->command = ctx->curr;
 			break;
-		case TUNNEL_CREATE_TYPE:
-		case TUNNEL_DESTROY_ID:
+		case RTE_FLOW_PARSER_CMD_TUNNEL_CREATE_TYPE:
+		case RTE_FLOW_PARSER_CMD_TUNNEL_DESTROY_ID:
 			ctx->object = &out->args.vc.tunnel_ops;
 			break;
 		}
@@ -14423,9 +13541,9 @@ parse_ia_id2ptr(struct context *ctx, const struct token *token,
 		return ret;
 	/* set indirect action */
 	if (action) {
-		portid_t port_id = ctx->port;
-		if (ctx->prev == INDIRECT_ACTION_PORT)
-			port_id = (portid_t)(uintptr_t)action->conf;
+		rte_port_id_t port_id = ctx->port;
+		if (ctx->prev == RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_PORT)
+			port_id = (rte_port_id_t)(uintptr_t)action->conf;
 		action->conf = parser_action_handle_get(port_id, id);
 		ret = (action->conf) ? ret : -1;
 	}
@@ -14456,7 +13574,7 @@ parse_indlst_id2ptr(struct context *ctx, const struct token *token,
 		action_conf = (void *)(uintptr_t)action->conf;
 		action_conf->conf = NULL;
 		switch (ctx->curr) {
-		case INDIRECT_LIST_ACTION_ID2PTR_HANDLE:
+		case RTE_FLOW_PARSER_CMD_INDIRECT_LIST_ACTION_ID2PTR_HANDLE:
 		action_conf->handle = (typeof(action_conf->handle))
 				parser_action_handle_get(ctx->port, id);
 			if (!action_conf->handle) {
@@ -14464,7 +13582,7 @@ parse_indlst_id2ptr(struct context *ctx, const struct token *token,
 				return -1;
 			}
 			break;
-		case INDIRECT_LIST_ACTION_ID2PTR_CONF:
+		case RTE_FLOW_PARSER_CMD_INDIRECT_LIST_ACTION_ID2PTR_CONF:
 			indlst_conf = indirect_action_list_conf_get(id);
 			if (!indlst_conf)
 				return -1;
@@ -14653,7 +13771,7 @@ parse_set_init(struct context *ctx, const struct token *token,
 	ctx->object = out;
 	ctx->objmask = NULL;
 	if (!out->command) {
-		if (ctx->curr != SET)
+		if (ctx->curr != RTE_FLOW_PARSER_CMD_SET)
 			return -1;
 		if (sizeof(*out) > size)
 			return -1;
@@ -14746,7 +13864,7 @@ parse_meter_color(struct context *ctx, const struct token *token,
 		return -1;
 	if (!ctx->object)
 		return len;
-	if (ctx->prev == ACTION_METER_MARK_CONF_COLOR) {
+	if (ctx->prev == RTE_FLOW_PARSER_CMD_ACTION_METER_MARK_CONF_COLOR) {
 		struct rte_flow_action *action =
 			out->args.vc.actions + out->args.vc.actions_n - 1;
 		const struct arg *arg = pop_args(ctx);
@@ -14968,7 +14086,7 @@ comp_port(struct context *ctx, const struct token *token,
 	  unsigned int ent, char *buf, unsigned int size)
 {
 	unsigned int i = 0;
-	portid_t p;
+	rte_port_id_t p;
 
 	(void)ctx;
 	(void)token;
@@ -14992,7 +14110,7 @@ comp_rule_id(struct context *ctx, const struct token *token,
 
 	(void)token;
 	if (parser_port_id_is_invalid(ctx->port, DISABLED_WARN) ||
-	    ctx->port == (portid_t)RTE_PORT_ALL)
+	    ctx->port == (rte_port_id_t)RTE_PORT_ALL)
 		return -1;
 	count = parser_flow_rule_count(ctx->port);
 	if (!buf)
@@ -15031,7 +14149,7 @@ comp_set_compare_field_id(struct context *ctx, const struct token *token,
 	if (ent >= RTE_DIM(flow_field_ids) - 1)
 		return -1;
 	name = flow_field_ids[ent];
-	if (ctx->curr == ITEM_COMPARE_FIELD_B_TYPE ||
+	if (ctx->curr == RTE_FLOW_PARSER_CMD_ITEM_COMPARE_FIELD_B_TYPE ||
 	    (strcmp(name, "pointer") && strcmp(name, "value")))
 		return strlcpy(buf, name, size);
 	return -1;
@@ -15068,7 +14186,7 @@ comp_vc_action_rss_queue(struct context *ctx, const struct token *token,
 
 	(void)token;
 	if (parser_port_id_is_invalid(ctx->port, DISABLED_WARN) ||
-	    ctx->port == (portid_t)RTE_PORT_ALL)
+	    ctx->port == (rte_port_id_t)RTE_PORT_ALL)
 		return -1;
 	count = parser_rss_queue_count(ctx->port);
 	if (!buf)
@@ -15161,7 +14279,7 @@ comp_set_modify_field_id(struct context *ctx, const struct token *token,
 	if (ent >= RTE_DIM(flow_field_ids) - 1)
 		return -1;
 	name = flow_field_ids[ent];
-	if (ctx->curr == ACTION_MODIFY_FIELD_SRC_TYPE ||
+	if (ctx->curr == RTE_FLOW_PARSER_CMD_ACTION_MODIFY_FIELD_SRC_TYPE ||
 	    (strcmp(name, "pointer") && strcmp(name, "value")))
 		return strlcpy(buf, name, size);
 	return -1;
@@ -15177,7 +14295,7 @@ comp_pattern_template_id(struct context *ctx, const struct token *token,
 
 	(void)token;
 	if (parser_port_id_is_invalid(ctx->port, DISABLED_WARN) ||
-	    ctx->port == (portid_t)RTE_PORT_ALL)
+	    ctx->port == (rte_port_id_t)RTE_PORT_ALL)
 		return -1;
 	count = parser_pattern_template_count(ctx->port);
 	if (!buf)
@@ -15199,7 +14317,7 @@ comp_actions_template_id(struct context *ctx, const struct token *token,
 
 	(void)token;
 	if (parser_port_id_is_invalid(ctx->port, DISABLED_WARN) ||
-	    ctx->port == (portid_t)RTE_PORT_ALL)
+	    ctx->port == (rte_port_id_t)RTE_PORT_ALL)
 		return -1;
 	count = parser_actions_template_count(ctx->port);
 	if (!buf)
@@ -15221,7 +14339,7 @@ comp_table_id(struct context *ctx, const struct token *token,
 
 	(void)token;
 	if (parser_port_id_is_invalid(ctx->port, DISABLED_WARN) ||
-	    ctx->port == (portid_t)RTE_PORT_ALL)
+	    ctx->port == (rte_port_id_t)RTE_PORT_ALL)
 		return -1;
 	count = parser_table_count(ctx->port);
 	if (!buf)
@@ -15242,7 +14360,7 @@ comp_queue_id(struct context *ctx, const struct token *token,
 
 	(void)token;
 	if (parser_port_id_is_invalid(ctx->port, DISABLED_WARN) ||
-	    ctx->port == (portid_t)RTE_PORT_ALL)
+	    ctx->port == (rte_port_id_t)RTE_PORT_ALL)
 		return -1;
 	count = parser_queue_count(ctx->port);
 	if (!buf)
@@ -15351,8 +14469,8 @@ static void
 cmd_flow_context_init(struct context *ctx)
 {
 	/* A full memset() is not necessary. */
-	ctx->curr = ZERO;
-	ctx->prev = ZERO;
+	ctx->curr = RTE_FLOW_PARSER_CMD_ZERO;
+	ctx->prev = RTE_FLOW_PARSER_CMD_ZERO;
 	ctx->next_num = 0;
 	ctx->args_num = 0;
 	ctx->eol = 0;
@@ -15370,7 +14488,7 @@ cmd_flow_parse(cmdline_parse_token_hdr_t *hdr, const char *src, void *result,
 {
 	struct context *ctx = parser_cmd_context();
 	const struct token *token;
-	const enum index *list;
+	const enum rte_flow_parser_command_index *list;
 	int len;
 	int i;
 
@@ -15743,7 +14861,7 @@ cmd_flow_parsed(struct buffer *in)
 	case RTE_FLOW_PARSER_CMD_TUNNEL_LIST:
 		parser_command_flow_tunnel_list(in->port);
 		break;
-	case RTE_FLOW_PARSER_CMD_METER_POLICY_ADD:
+	case RTE_FLOW_PARSER_CMD_ACTION_POL_G:
 		parser_command_meter_policy_add(in->port,
 				in->args.policy.policy_id,
 				in->args.vc.actions);
@@ -15804,7 +14922,7 @@ cmd_flow_complete_get_nb(cmdline_parse_token_hdr_t *hdr)
 {
 	struct context *ctx = parser_cmd_context();
 	const struct token *token = &token_list[ctx->curr];
-	const enum index *list;
+	const enum rte_flow_parser_command_index *list;
 	int i;
 
 	RTE_SET_USED(hdr);
@@ -15839,7 +14957,7 @@ cmd_flow_complete_get_elt(cmdline_parse_token_hdr_t *hdr, int index,
 {
 	struct context *ctx = parser_cmd_context();
 	const struct token *token = &token_list[ctx->curr];
-	const enum index *list;
+	const enum rte_flow_parser_command_index *list;
 	int i;
 
 	RTE_SET_USED(hdr);
@@ -15927,11 +15045,11 @@ cmd_flow_tok(cmdline_parse_token_hdr_t **hdr,
 	}
 	/* Determine if command should end here. */
 	if (ctx->eol && ctx->last && ctx->next_num) {
-		const enum index *list = ctx->next[ctx->next_num - 1];
+		const enum rte_flow_parser_command_index *list = ctx->next[ctx->next_num - 1];
 		int i;
 
 		for (i = 0; list[i]; ++i) {
-			if (list[i] != END)
+			if (list[i] != RTE_FLOW_PARSER_CMD_END)
 				continue;
 			*hdr = NULL;
 			return;
@@ -15988,20 +15106,20 @@ cmd_set_raw_tok(cmdline_parse_token_hdr_t **hdr,
 	/* Always reinitialize context before requesting the first token. */
 	if (!(hdr_inst - tokens)) {
 		cmd_flow_context_init(ctx);
-		ctx->curr = START_SET;
+		ctx->curr = RTE_FLOW_PARSER_CMD_START_SET;
 	}
 	/* Return NULL when no more tokens are expected. */
-	if (!ctx->next_num && (ctx->curr != START_SET)) {
+	if (!ctx->next_num && (ctx->curr != RTE_FLOW_PARSER_CMD_START_SET)) {
 		*hdr = NULL;
 		return;
 	}
 	/* Determine if command should end here. */
 	if (ctx->eol && ctx->last && ctx->next_num) {
-		const enum index *list = ctx->next[ctx->next_num - 1];
+		const enum rte_flow_parser_command_index *list = ctx->next[ctx->next_num - 1];
 		int i;
 
 		for (i = 0; list[i]; ++i) {
-			if (list[i] != END_SET)
+			if (list[i] != RTE_FLOW_PARSER_CMD_END_SET)
 				continue;
 			*hdr = NULL;
 			return;
@@ -16037,7 +15155,6 @@ rte_flow_parser_cmd_flow_dispatch(struct rte_flow_parser_output *out)
 {
 	if (!out)
 		return;
-	out->command = parser_public_command(buffer_cmd((const struct buffer *)out));
 	cmd_flow_parsed((struct buffer *)out);
 }
 
@@ -16046,7 +15163,6 @@ rte_flow_parser_cmd_set_raw_dispatch(struct rte_flow_parser_output *out)
 {
 	if (!out)
 		return;
-	out->command = parser_public_command(buffer_cmd((const struct buffer *)out));
 	cmd_set_raw_parsed((struct buffer *)out);
 }
 
@@ -16073,7 +15189,6 @@ rte_flow_parser_create(const struct rte_flow_parser_ops *ops, void *userdata)
 	parser->userdata = userdata;
 	return parser;
 }
-
 void
 rte_flow_parser_destroy(struct rte_flow_parser *parser)
 {
@@ -16122,7 +15237,6 @@ rte_flow_parser_parse(struct rte_flow_parser *parser, const char *src,
 		return ret;
 	if (*pos)
 		return -EINVAL;
-	result->command = parser_public_command(buffer_cmd((const struct buffer *)result));
 	return 0;
 }
 

@@ -95,8 +95,8 @@ struct cmdline_file_info {
 #define MAX_MEMPOOL 8
 
 typedef uint32_t lcoreid_t;
-typedef uint16_t portid_t;
-typedef uint16_t queueid_t;
+typedef rte_port_id_t portid_t;
+typedef rte_queue_id_t queueid_t;
 typedef uint16_t streamid_t;
 
 enum {
