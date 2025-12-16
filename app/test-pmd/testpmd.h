@@ -156,18 +156,6 @@ struct pkt_burst_stats {
 
 
 #define TESTPMD_RSS_TYPES_CHAR_NUM_PER_LINE 64
-/** Information for a given RSS type. */
-struct rss_type_info {
-	const char *str; /**< Type name. */
-	uint64_t rss_type; /**< Type value. */
-};
-
-/**
- * RSS type information table.
- *
- * An entry with a NULL type name terminates the list.
- */
-extern const struct rss_type_info rss_type_table[];
 
 /**
  * Dynf name array.
@@ -1187,9 +1175,6 @@ int setup_hairpin_queues(portid_t pi, portid_t p_pi, uint16_t cnt_pi);
 int hairpin_bind(uint16_t cfg_pi, portid_t *pl, portid_t *peer_pl);
 void hairpin_map_usage(void);
 int parse_hairpin_map(const char *hpmap);
-
-uint64_t str_to_rsstypes(const char *str);
-const char *rsstypes_to_str(uint64_t rss_type);
 
 uint16_t str_to_flowtype(const char *string);
 const char *flowtype_to_str(uint16_t flow_type);

@@ -2355,7 +2355,7 @@ cmd_config_rss_parsed(void *parsed_result,
 	} else if (!strcmp(res->value, "none")) {
 		rss_conf.rss_hf = 0;
 	} else {
-		rss_conf.rss_hf = str_to_rsstypes(res->value);
+		rss_conf.rss_hf = rte_eth_rss_type_from_str(res->value);
 		if (rss_conf.rss_hf == 0) {
 			fprintf(stderr, "Unknown parameter\n");
 			return;

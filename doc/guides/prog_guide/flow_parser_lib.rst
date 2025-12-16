@@ -84,11 +84,12 @@ Callback Model
 Two callback tables are provided at creation time:
 
 * ``struct rte_flow_parser_query_ops`` supplies read-only helpers used during
-  parsing and completion: port validation, queue/template counts, RSS type
-  tables, default encapsulation templates, raw encap/decap caches,
+  parsing and completion: port validation, queue/template counts, default
+  encapsulation templates, raw encap/decap caches,
   IPv6 extension caches, sample action caches, flex item handles, etc. Missing
   callbacks fall back to safe defaults (for example, built-in VXLAN/NVGRE/L2/
-  MPLS encap templates and RSS type strings).
+  MPLS encap templates). RSS type strings come from the ethdev global table
+  (``rte_eth_rss_type_info_get()``).
 * ``struct rte_flow_parser_command_ops`` is invoked when a command is accepted
   by the cmdline integration helpers. ``rte_flow_parser_parse()`` only parses
   and never dispatches callbacks. Typical command implementations map directly
@@ -126,12 +127,14 @@ If the application does not supply specific query callbacks, the parser uses
 built-in defaults:
 
 * VXLAN/NVGRE/L2/MPLS* encap/decap templates for actions.
-* RSS type string table and default hash fields (``RTE_ETH_RSS_IP``).
+* RSS type string table from ethdev (``rte_eth_rss_type_info_get()``) and
+  default hash fields (``RTE_ETH_RSS_IP``).
 * Raw encap/decap, IPv6 extension, and sample action caches return empty/null
   unless provided by callbacks.
 
-Applications can override any of these by implementing the corresponding
-``*_conf_get`` or table callbacks in ``rte_flow_parser_query_ops``.
+Applications can override encapsulation templates, caches, and hash fields by
+implementing the corresponding ``*_conf_get`` callbacks in
+``rte_flow_parser_query_ops``.
 
 Example Usage
 -------------

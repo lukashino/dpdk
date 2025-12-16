@@ -38,12 +38,6 @@ __rte_experimental void rte_flow_parser_ctx_destroy(
 __rte_experimental void rte_flow_parser_ctx_reset_defaults(
 	struct rte_flow_parser_ctx *ctx);
 
-// TODO: suspect to remove with ops, plug "default" rss table into code directly.
-struct rte_flow_parser_rss_type_info {
-	const char *str;
-	uint64_t rss_type;
-};
-
 struct rte_flow_parser_vxlan_encap_conf {
 	uint32_t select_ipv4:1;
 	uint32_t select_vlan:1;
@@ -1085,9 +1079,6 @@ struct rte_flow_parser_query_ops {
 			(uint16_t index, void *userdata);
 	const struct rte_flow_action *(*sample_actions_get)
 			(uint16_t index, void *userdata);
-	const struct rte_flow_parser_rss_type_info *(*rss_type_table_get)
-			(void *userdata);
-	uint64_t (*rss_hf_get)(void *userdata);
 	const struct rte_flow_parser_vxlan_encap_conf *(*vxlan_encap_conf_get)
 			(void *userdata);
 	const struct rte_flow_parser_nvgre_encap_conf *(*nvgre_encap_conf_get)
