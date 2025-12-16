@@ -2111,8 +2111,8 @@ parser_command_set_ipv6_ext_remove(uint16_t index,
 	fprintf(stderr, "Error - set_ipv6_ext_remove callback not provided\n");
 }
 
-static const struct rte_flow_action_raw_encap *
-parser_raw_encap_conf_get(uint16_t index)
+const struct rte_flow_action_raw_encap *
+rte_flow_parser_raw_encap_conf_get(uint16_t index)
 {
 	const struct rte_flow_parser_query_ops *ops = parser_query_ops();
 
@@ -2121,26 +2121,14 @@ parser_raw_encap_conf_get(uint16_t index)
 	return NULL;
 }
 
-static const struct rte_flow_action_raw_decap *
-parser_raw_decap_conf_get(uint16_t index)
+const struct rte_flow_action_raw_decap *
+rte_flow_parser_raw_decap_conf_get(uint16_t index)
 {
 	const struct rte_flow_parser_query_ops *ops = parser_query_ops();
 
 	if (ops && ops->raw_decap_conf_get)
 		return ops->raw_decap_conf_get(index, parser_userdata());
 	return NULL;
-}
-
-const struct rte_flow_action_raw_encap *
-rte_flow_parser_raw_encap_conf_get(uint16_t index)
-{
-	return parser_raw_encap_conf_get(index);
-}
-
-const struct rte_flow_action_raw_decap *
-rte_flow_parser_raw_decap_conf_get(uint16_t index)
-{
-	return parser_raw_decap_conf_get(index);
 }
 
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_create, 26.0);

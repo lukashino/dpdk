@@ -72,7 +72,7 @@ cmd_show_set_raw_parsed(void *parsed_result, struct cmdline *cl, void *data)
 			}
 			raw_data = conf->data;
 			raw_size = conf->size;
-		} else {
+		} else if (!strcmp(res->cmd_what, "raw_decap")) {
 			const struct rte_flow_action_raw_decap *conf =
 				rte_flow_parser_raw_decap_conf_get(index);
 
@@ -147,9 +147,3 @@ cmdline_parse_inst_t cmd_show_set_raw_all = {
 		NULL,
 	},
 };
-
-static void __attribute__((constructor))
-flow_parser_cli_register(void)
-{
-	rte_flow_parser_cmdline_register(&cmd_flow, &cmd_set_raw);
-}

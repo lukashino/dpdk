@@ -151,6 +151,14 @@ __rte_experimental const struct rte_flow_action_raw_decap *
 rte_flow_parser_ctx_raw_decap_conf_get(struct rte_flow_parser_ctx *ctx,
 	uint16_t index);
 
+__rte_experimental
+const struct rte_flow_action_raw_encap *
+rte_flow_parser_raw_encap_conf_get(uint16_t index);
+
+__rte_experimental
+const struct rte_flow_action_raw_decap *
+rte_flow_parser_raw_decap_conf_get(uint16_t index);
+
 __rte_experimental int rte_flow_parser_ctx_set_ipv6_ext_push(
 	struct rte_flow_parser_ctx *ctx, uint16_t index,
 	const struct rte_flow_item pattern[], uint32_t pattern_n);
@@ -1310,14 +1318,6 @@ void rte_flow_parser_cmd_flow_dispatch(struct rte_flow_parser_output *out);
 
 __rte_experimental
 void rte_flow_parser_cmd_set_raw_dispatch(struct rte_flow_parser_output *out);
-
-__rte_experimental
-const struct rte_flow_action_raw_encap *
-rte_flow_parser_raw_encap_conf_get(uint16_t index);
-
-__rte_experimental
-const struct rte_flow_action_raw_decap *
-rte_flow_parser_raw_decap_conf_get(uint16_t index);
 
 /**
  * Parse a flow CLI string.
