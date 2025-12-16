@@ -18,6 +18,27 @@ extern "C" {
 
 struct rte_flow_parser;
 struct rte_flow_parser_ctx;
+
+/* Shared limits used across parser helpers. */
+#define ACTION_RAW_ENCAP_MAX_DATA 512
+#define RAW_ENCAP_CONFS_MAX_NUM 8
+#define ACTION_IPV6_EXT_PUSH_MAX_DATA 512
+#define IPV6_EXT_PUSH_CONFS_MAX_NUM 8
+#define ACTION_SAMPLE_ACTIONS_NUM 10
+#define RAW_SAMPLE_CONFS_MAX_NUM 8
+#define ACTION_RSS_QUEUE_NUM 128
+#define ACTION_VXLAN_ENCAP_ITEMS_NUM 6
+#define ACTION_NVGRE_ENCAP_ITEMS_NUM 5
+
+/* Parser context lifecycle and shared state helpers. */
+__rte_experimental struct rte_flow_parser_ctx *
+rte_flow_parser_ctx_create(void);
+__rte_experimental void rte_flow_parser_ctx_destroy(
+	struct rte_flow_parser_ctx *ctx);
+__rte_experimental void rte_flow_parser_ctx_reset_defaults(
+	struct rte_flow_parser_ctx *ctx);
+
+// TODO: suspect to remove with ops, plug "default" rss table into code directly.
 struct rte_flow_parser_rss_type_info {
 	const char *str;
 	uint64_t rss_type;
@@ -104,43 +125,6 @@ struct rte_flow_parser_mplsoudp_decap_conf {
 	uint32_t select_vlan:1;
 };
 
-/* Shared limits used across parser helpers. */
-#define ACTION_RAW_ENCAP_MAX_DATA 512
-#define RAW_ENCAP_CONFS_MAX_NUM 8
-#define ACTION_IPV6_EXT_PUSH_MAX_DATA 512
-#define IPV6_EXT_PUSH_CONFS_MAX_NUM 8
-#define ACTION_SAMPLE_ACTIONS_NUM 10
-#define RAW_SAMPLE_CONFS_MAX_NUM 8
-#define ACTION_RSS_QUEUE_NUM 128
-#define ACTION_VXLAN_ENCAP_ITEMS_NUM 6
-#define ACTION_NVGRE_ENCAP_ITEMS_NUM 5
-
-/* Default encapsulation/decapsulation configurations. */
-extern const struct rte_flow_parser_vxlan_encap_conf
-	rte_flow_parser_default_vxlan_encap_conf;
-extern const struct rte_flow_parser_nvgre_encap_conf
-	rte_flow_parser_default_nvgre_encap_conf;
-extern const struct rte_flow_parser_l2_encap_conf
-	rte_flow_parser_default_l2_encap_conf;
-extern const struct rte_flow_parser_l2_decap_conf
-	rte_flow_parser_default_l2_decap_conf;
-extern const struct rte_flow_parser_mplsogre_encap_conf
-	rte_flow_parser_default_mplsogre_encap_conf;
-extern const struct rte_flow_parser_mplsogre_decap_conf
-	rte_flow_parser_default_mplsogre_decap_conf;
-extern const struct rte_flow_parser_mplsoudp_encap_conf
-	rte_flow_parser_default_mplsoudp_encap_conf;
-extern const struct rte_flow_parser_mplsoudp_decap_conf
-	rte_flow_parser_default_mplsoudp_decap_conf;
-
-/* Parser context lifecycle and shared state helpers. */
-__rte_experimental struct rte_flow_parser_ctx *
-rte_flow_parser_ctx_create(void);
-__rte_experimental void rte_flow_parser_ctx_destroy(
-	struct rte_flow_parser_ctx *ctx);
-__rte_experimental void rte_flow_parser_ctx_reset_defaults(
-	struct rte_flow_parser_ctx *ctx);
-
 /* Accessors for mutable encap/decap configurations. */
 __rte_experimental struct rte_flow_parser_vxlan_encap_conf *
 rte_flow_parser_ctx_vxlan_encap_conf(struct rte_flow_parser_ctx *ctx);
@@ -192,11 +176,6 @@ __rte_experimental int rte_flow_parser_ctx_set_sample_actions(
 __rte_experimental const struct rte_flow_action *
 rte_flow_parser_ctx_sample_actions_get(struct rte_flow_parser_ctx *ctx,
 	uint16_t index);
-
-/* Maximum number of patterns supported by the parser. */
-#define RTE_FLOW_PARSER_MAX_PATTERNS   64
-/* Maximum number of flex items supported by the parser. */
-#define RTE_FLOW_PARSER_MAX_FLEX_ITEMS 8
 
 /**
  * Tunnel steering/match flags used by the parser.

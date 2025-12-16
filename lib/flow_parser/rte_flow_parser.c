@@ -76,6 +76,24 @@ struct action_ipv6_ext_remove_data {
 	uint16_t idx;
 };
 
+const struct rte_flow_parser_l2_encap_conf
+rte_flow_parser_default_l2_encap_conf = { 0 };
+
+const struct rte_flow_parser_l2_decap_conf
+rte_flow_parser_default_l2_decap_conf = { 0 };
+
+const struct rte_flow_parser_mplsogre_encap_conf
+rte_flow_parser_default_mplsogre_encap_conf = { 0 };
+
+const struct rte_flow_parser_mplsogre_decap_conf
+rte_flow_parser_default_mplsogre_decap_conf = { 0 };
+
+const struct rte_flow_parser_mplsoudp_encap_conf
+rte_flow_parser_default_mplsoudp_encap_conf = { 0 };
+
+const struct rte_flow_parser_mplsoudp_decap_conf
+rte_flow_parser_default_mplsoudp_decap_conf = { 0 };
+
 const struct rte_flow_parser_vxlan_encap_conf
 rte_flow_parser_default_vxlan_encap_conf = {
 	.select_ipv4 = 1,
@@ -1145,24 +1163,6 @@ rte_flow_parser_ctx_sample_actions_get(struct rte_flow_parser_ctx *ctx,
 		return NULL;
 	return ctx->raw_sample_confs[index].data;
 }
-
-const struct rte_flow_parser_l2_encap_conf
-rte_flow_parser_default_l2_encap_conf = { 0 };
-
-const struct rte_flow_parser_l2_decap_conf
-rte_flow_parser_default_l2_decap_conf = { 0 };
-
-const struct rte_flow_parser_mplsogre_encap_conf
-rte_flow_parser_default_mplsogre_encap_conf = { 0 };
-
-const struct rte_flow_parser_mplsogre_decap_conf
-rte_flow_parser_default_mplsogre_decap_conf = { 0 };
-
-const struct rte_flow_parser_mplsoudp_encap_conf
-rte_flow_parser_default_mplsoudp_encap_conf = { 0 };
-
-const struct rte_flow_parser_mplsoudp_decap_conf
-rte_flow_parser_default_mplsoudp_decap_conf = { 0 };
 
 struct rte_flow_action_conntrack conntrack_context;
 
