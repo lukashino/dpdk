@@ -1046,8 +1046,8 @@ struct rte_flow_parser_output {
  * Query hooks: the parser consults these to validate IDs and fetch cached
  * objects for completions or rule composition.
  */
-struct rte_flow_parser_query_ops {
-	int (*port_validate)(uint16_t port_id, bool warn, void *userdata);
+struct rte_flow_parser_ops_query {
+	int (*port_validate)(uint16_t port_id, void *userdata);
 	uint16_t (*flow_rule_count)(uint16_t port_id, void *userdata);
 	int (*flow_rule_id_get)(uint16_t port_id, unsigned int index,
 			      uint64_t *rule_id, void *userdata);
@@ -1077,32 +1077,6 @@ struct rte_flow_parser_query_ops {
 	struct rte_flow_item_flex_handle *(*flex_handle_get)(uint16_t port_id,
 						     uint16_t flex_id,
 						     void *userdata);
-	const struct rte_flow_action_raw_encap *(*raw_encap_conf_get)
-			(uint16_t index, void *userdata);
-	const struct rte_flow_action_raw_decap *(*raw_decap_conf_get)
-			(uint16_t index, void *userdata);
-	const struct rte_flow_action_ipv6_ext_push *(*ipv6_ext_push_conf_get)
-			(uint16_t index, void *userdata);
-	const struct rte_flow_action_ipv6_ext_remove *(*ipv6_ext_remove_conf_get)
-			(uint16_t index, void *userdata);
-	const struct rte_flow_action *(*sample_actions_get)
-			(uint16_t index, void *userdata);
-	const struct rte_flow_parser_vxlan_encap_conf *(*vxlan_encap_conf_get)
-			(void *userdata);
-	const struct rte_flow_parser_nvgre_encap_conf *(*nvgre_encap_conf_get)
-			(void *userdata);
-	const struct rte_flow_parser_l2_encap_conf *(*l2_encap_conf_get)
-			(void *userdata);
-	const struct rte_flow_parser_l2_decap_conf *(*l2_decap_conf_get)
-			(void *userdata);
-	const struct rte_flow_parser_mplsogre_encap_conf *(*mplsogre_encap_conf_get)
-			(void *userdata);
-	const struct rte_flow_parser_mplsogre_decap_conf *(*mplsogre_decap_conf_get)
-			(void *userdata);
-	const struct rte_flow_parser_mplsoudp_encap_conf *(*mplsoudp_encap_conf_get)
-			(void *userdata);
-	const struct rte_flow_parser_mplsoudp_decap_conf *(*mplsoudp_decap_conf_get)
-			(void *userdata);
 	uint16_t (*verbose_level_get)(void *userdata);
 	int (*flex_pattern_get)(uint16_t pattern_id,
 			       const struct rte_flow_item_flex **spec,
@@ -1114,7 +1088,7 @@ struct rte_flow_parser_query_ops {
  * Command hooks: executed when the parser accepts a command. Applications
  * should implement the callbacks they need; unused callbacks may be NULL.
  */
-struct rte_flow_parser_command_ops {
+struct rte_flow_parser_ops_command {
 	void (*flow_get_info)(uint16_t port_id, void *userdata);
 	void (*flow_configure)(uint16_t port_id,
 			const struct rte_flow_port_attr *port_attr,
@@ -1242,26 +1216,11 @@ struct rte_flow_parser_command_ops {
 		 const char *filename, void *userdata);
 	void (*flex_item_destroy)(uint16_t port_id, uint16_t flex_id,
 		 void *userdata);
-	void (*set_raw_encap)(uint16_t index,
-		 const struct rte_flow_item pattern[], uint32_t pattern_n,
-		 void *userdata);
-	void (*set_raw_decap)(uint16_t index,
-		 const struct rte_flow_item pattern[], uint32_t pattern_n,
-		 void *userdata);
-	void (*set_sample_actions)(uint16_t index,
-		 const struct rte_flow_action actions[], uint32_t actions_n,
-		 void *userdata);
-	void (*set_ipv6_ext_push)(uint16_t index,
-		 const struct rte_flow_item pattern[], uint32_t pattern_n,
-		 void *userdata);
-	void (*set_ipv6_ext_remove)(uint16_t index,
-		 const struct rte_flow_item pattern[], uint32_t pattern_n,
-		 void *userdata);
 };
 
 struct rte_flow_parser_ops {
-	const struct rte_flow_parser_query_ops *query;
-	const struct rte_flow_parser_command_ops *command;
+	const struct rte_flow_parser_ops_query *query;
+	const struct rte_flow_parser_ops_command *command;
 };
 
 /**

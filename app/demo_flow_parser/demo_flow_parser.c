@@ -6,9 +6,9 @@
 #include <rte_common.h>
 #include <rte_flow_parser.h>
 
-static int stub_port_validate(uint16_t port_id, bool warn, void *userdata)
+static int stub_port_validate(uint16_t port_id, void *userdata)
 {
-	(void)warn; (void)userdata;
+	(void)userdata;
 	return port_id != 0; /* only port 0 allowed */
 }
 
@@ -23,11 +23,11 @@ static void stub_flow_create(uint16_t port_id, const struct rte_flow_attr *attr,
 	       port_id, (unsigned long)user_id);
 }
 
-static const struct rte_flow_parser_query_ops stub_query_ops = {
+static const struct rte_flow_parser_ops_query stub_query_ops = {
 	.port_validate = stub_port_validate,
 };
 
-static const struct rte_flow_parser_command_ops stub_cmd_ops = {
+static const struct rte_flow_parser_ops_command stub_cmd_ops = {
 	.flow_create = stub_flow_create,
 };
 

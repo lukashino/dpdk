@@ -26,109 +26,6 @@ flow_parser_reset_defaults(void)
 	rte_flow_parser_ctx_reset_defaults(parser_ctx);
 }
 
-
-static void
-parser_set_ipv6_ext_remove(uint16_t idx,
-			   const struct rte_flow_item pattern[],
-			   uint32_t pattern_n, void *userdata)
-{
-	struct rte_flow_parser_ctx *ctx = userdata;
-
-	if (ctx)
-		rte_flow_parser_ctx_set_ipv6_ext_remove(ctx, idx, pattern,
-					      pattern_n);
-}
-
-static void
-parser_set_ipv6_ext_push(uint16_t idx,
-			 const struct rte_flow_item pattern[],
-			 uint32_t pattern_n, void *userdata)
-{
-	struct rte_flow_parser_ctx *ctx = userdata;
-
-	if (ctx)
-		rte_flow_parser_ctx_set_ipv6_ext_push(ctx, idx, pattern,
-					   pattern_n);
-}
-
-static void
-parser_set_sample_actions(uint16_t idx,
-			  const struct rte_flow_action actions[],
-			  uint32_t actions_n, void *userdata)
-{
-	struct rte_flow_parser_ctx *ctx = userdata;
-
-	if (ctx)
-		rte_flow_parser_ctx_set_sample_actions(ctx, idx, actions,
-					       actions_n);
-}
-
-static void
-parser_set_raw_encap(uint16_t index, const struct rte_flow_item pattern[],
-		     uint32_t pattern_n, void *userdata)
-{
-	struct rte_flow_parser_ctx *ctx = userdata;
-
-	if (ctx)
-		rte_flow_parser_ctx_set_raw_encap(ctx, index, pattern, pattern_n);
-}
-
-static void
-parser_set_raw_decap(uint16_t index, const struct rte_flow_item pattern[],
-		     uint32_t pattern_n, void *userdata)
-{
-	struct rte_flow_parser_ctx *ctx = userdata;
-
-	if (ctx)
-		rte_flow_parser_ctx_set_raw_decap(ctx, index, pattern, pattern_n);
-}
-
-static const struct rte_flow_action_raw_encap *
-parser_raw_encap_conf_get_cb(uint16_t index, void *userdata)
-{
-	struct rte_flow_parser_ctx *ctx = userdata;
-
-	return rte_flow_parser_ctx_raw_encap_conf_get(ctx, index);
-}
-
-static const struct rte_flow_action_raw_decap *
-parser_raw_decap_conf_get_cb(uint16_t index, void *userdata)
-{
-	struct rte_flow_parser_ctx *ctx = userdata;
-
-	return rte_flow_parser_ctx_raw_decap_conf_get(ctx, index);
-}
-
-static const struct rte_flow_action_ipv6_ext_push *
-parser_ipv6_ext_push_conf_get_cb(uint16_t index, void *userdata)
-{
-	struct rte_flow_parser_ctx *ctx = userdata;
-
-	return rte_flow_parser_ctx_ipv6_ext_push_conf_get(ctx, index);
-}
-
-static const struct rte_flow_action_ipv6_ext_remove *
-parser_ipv6_ext_remove_conf_get_cb(uint16_t index, void *userdata)
-{
-	struct rte_flow_parser_ctx *ctx = userdata;
-
-	return rte_flow_parser_ctx_ipv6_ext_remove_conf_get(ctx, index);
-}
-
-static const struct rte_flow_action *
-parser_sample_actions_get_cb(uint16_t index, void *userdata)
-{
-	struct rte_flow_parser_ctx *ctx = userdata;
-
-	return rte_flow_parser_ctx_sample_actions_get(ctx, index);
-}
-
-static enum print_warning
-parser_warning_mode(bool warn)
-{
-	return warn ? ENABLED_WARN : DISABLED_WARN;
-}
-
 static struct rte_port *
 parser_port_get(uint16_t port_id)
 {
@@ -183,59 +80,11 @@ parser_tunnel_convert(const struct rte_flow_parser_tunnel_ops *src,
 	return dst;
 }
 
-static const struct rte_flow_parser_vxlan_encap_conf *
-parser_vxlan_encap_conf_get_cb(void *userdata)
-{
-	return rte_flow_parser_ctx_vxlan_encap_conf(userdata);
-}
-
-static const struct rte_flow_parser_nvgre_encap_conf *
-parser_nvgre_encap_conf_get_cb(void *userdata)
-{
-	return rte_flow_parser_ctx_nvgre_encap_conf(userdata);
-}
-
-static const struct rte_flow_parser_l2_encap_conf *
-parser_l2_encap_conf_get_cb(void *userdata)
-{
-	return rte_flow_parser_ctx_l2_encap_conf(userdata);
-}
-
-static const struct rte_flow_parser_l2_decap_conf *
-parser_l2_decap_conf_get_cb(void *userdata)
-{
-	return rte_flow_parser_ctx_l2_decap_conf(userdata);
-}
-
-static const struct rte_flow_parser_mplsogre_encap_conf *
-parser_mplsogre_encap_conf_get_cb(void *userdata)
-{
-	return rte_flow_parser_ctx_mplsogre_encap_conf(userdata);
-}
-
-static const struct rte_flow_parser_mplsogre_decap_conf *
-parser_mplsogre_decap_conf_get_cb(void *userdata)
-{
-	return rte_flow_parser_ctx_mplsogre_decap_conf(userdata);
-}
-
-static const struct rte_flow_parser_mplsoudp_encap_conf *
-parser_mplsoudp_encap_conf_get_cb(void *userdata)
-{
-	return rte_flow_parser_ctx_mplsoudp_encap_conf(userdata);
-}
-
-static const struct rte_flow_parser_mplsoudp_decap_conf *
-parser_mplsoudp_decap_conf_get_cb(void *userdata)
-{
-	return rte_flow_parser_ctx_mplsoudp_decap_conf(userdata);
-}
-
 static int
-parser_port_validate(uint16_t port_id, bool warn, void *userdata)
+parser_port_validate(uint16_t port_id, void *userdata)
 {
 	RTE_SET_USED(userdata);
-	return port_id_is_invalid(port_id, parser_warning_mode(warn));
+	return port_id_is_invalid(port_id, DISABLED_WARN);
 }
 
 static uint16_t
@@ -913,7 +762,7 @@ parser_flex_item_destroy(uint16_t port_id, uint16_t token, void *userdata)
 	flex_item_destroy(port_id, token);
 }
 
-static const struct rte_flow_parser_query_ops parser_query_ops = {
+static const struct rte_flow_parser_ops_query parser_query_ops = {
 	.port_validate = parser_port_validate,
 	.flow_rule_count = parser_flow_rule_count,
 	.flow_rule_id_get = parser_flow_rule_id_get,
@@ -929,25 +778,12 @@ static const struct rte_flow_parser_query_ops parser_query_ops = {
 	.action_handle_get = parser_action_handle_get,
 	.meter_profile_get = parser_meter_profile_get,
 	.meter_policy_get = parser_meter_policy_get,
-	.vxlan_encap_conf_get = parser_vxlan_encap_conf_get_cb,
-	.nvgre_encap_conf_get = parser_nvgre_encap_conf_get_cb,
-	.l2_encap_conf_get = parser_l2_encap_conf_get_cb,
-	.l2_decap_conf_get = parser_l2_decap_conf_get_cb,
-	.mplsogre_encap_conf_get = parser_mplsogre_encap_conf_get_cb,
-	.mplsogre_decap_conf_get = parser_mplsogre_decap_conf_get_cb,
-	.mplsoudp_encap_conf_get = parser_mplsoudp_encap_conf_get_cb,
-	.mplsoudp_decap_conf_get = parser_mplsoudp_decap_conf_get_cb,
-	.raw_encap_conf_get = parser_raw_encap_conf_get_cb,
-	.raw_decap_conf_get = parser_raw_decap_conf_get_cb,
-	.ipv6_ext_push_conf_get = parser_ipv6_ext_push_conf_get_cb,
-	.ipv6_ext_remove_conf_get = parser_ipv6_ext_remove_conf_get_cb,
-	.sample_actions_get = parser_sample_actions_get_cb,
 	.verbose_level_get = parser_verbose_level_get,
 	.flex_handle_get = parser_flex_handle_get,
 	.flex_pattern_get = parser_flex_pattern_get,
 };
 
-static const struct rte_flow_parser_command_ops parser_command_ops = {
+static const struct rte_flow_parser_ops_command parser_command_ops = {
 	.flow_get_info = parser_flow_get_info,
 	.flow_configure = parser_flow_configure,
 	.flow_pattern_template_create = parser_flow_pattern_template_create,
@@ -996,11 +832,6 @@ static const struct rte_flow_parser_command_ops parser_command_ops = {
 	.meter_policy_add = parser_meter_policy_add,
 	.flex_item_create = parser_flex_item_create,
 	.flex_item_destroy = parser_flex_item_destroy,
-	.set_raw_encap = parser_set_raw_encap,
-	.set_raw_decap = parser_set_raw_decap,
-	.set_sample_actions = parser_set_sample_actions,
-	.set_ipv6_ext_push = parser_set_ipv6_ext_push,
-	.set_ipv6_ext_remove = parser_set_ipv6_ext_remove,
 };
 
 static const struct rte_flow_parser_ops parser_ops = {
@@ -1083,4 +914,3 @@ testpmd_mplsoudp_decap_conf(void)
 		return NULL;
 	return rte_flow_parser_ctx_mplsoudp_decap_conf(parser_ctx);
 }
-
