@@ -2233,11 +2233,11 @@ rte_flow_parser_raw_decap_conf_get(uint16_t index)
 	return parser_raw_decap_conf_get(index);
 }
 
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_raw_encap_conf_get, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_raw_decap_conf_get, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_create, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_destroy, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_reset_defaults, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_raw_encap_conf_get, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_raw_decap_conf_get, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_vxlan_encap_conf, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_nvgre_encap_conf, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_l2_encap_conf, 26.0);
