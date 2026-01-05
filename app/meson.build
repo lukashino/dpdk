@@ -15,7 +15,6 @@ endif
 apps = [
         'dumpcap',
         'graph',
-        'demo_flow_parser',
         'pdump',
         'proc-info',
         'test-acl',

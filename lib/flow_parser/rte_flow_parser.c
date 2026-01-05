@@ -1,6 +1,5 @@
 /* SPDX-License-Identifier: BSD-3-Clause
- * Copyright 2016 6WIND S.A.
- * Copyright 2016 Mellanox Technologies, Ltd
+ * Copyright 2026 Dyna-NIC
  */
 
 #include <stddef.h>
