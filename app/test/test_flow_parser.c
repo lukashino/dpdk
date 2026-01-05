@@ -18,7 +18,7 @@ test_flow_parser_command_mapping(void)
 	struct rte_flow_parser_output *out = (void *)outbuf;
 	int ret;
 
-	ret = rte_flow_parser_init(NULL, NULL);
+	ret = rte_flow_parser_init(NULL);
 	if (ret != 0)
 		return TEST_FAILED;
 

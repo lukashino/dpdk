@@ -323,7 +323,7 @@ main(void)
 	printf("===========================\n");
 
 	/* Initialize the flow parser */
-	ret = rte_flow_parser_init(NULL, NULL);
+	ret = rte_flow_parser_init(NULL);
 	if (ret != 0) {
 		fprintf(stderr, "Failed to initialize flow parser: %d\n", ret);
 		return 1;

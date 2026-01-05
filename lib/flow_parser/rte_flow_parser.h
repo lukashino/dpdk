@@ -1007,41 +1007,35 @@ struct rte_flow_parser_output {
  * objects for completions or rule composition.
  */
 struct rte_flow_parser_ops_query {
-	int (*port_validate)(uint16_t port_id, void *userdata);
-	uint16_t (*flow_rule_count)(uint16_t port_id, void *userdata);
+	int (*port_validate)(uint16_t port_id);
+	uint16_t (*flow_rule_count)(uint16_t port_id);
 	int (*flow_rule_id_get)(uint16_t port_id, unsigned int index,
-			      uint64_t *rule_id, void *userdata);
-	uint16_t (*pattern_template_count)(uint16_t port_id, void *userdata);
+			      uint64_t *rule_id);
+	uint16_t (*pattern_template_count)(uint16_t port_id);
 	int (*pattern_template_id_get)(uint16_t port_id, unsigned int index,
-				     uint32_t *template_id, void *userdata);
-	uint16_t (*actions_template_count)(uint16_t port_id, void *userdata);
+				     uint32_t *template_id);
+	uint16_t (*actions_template_count)(uint16_t port_id);
 	int (*actions_template_id_get)(uint16_t port_id, unsigned int index,
-				        uint32_t *template_id, void *userdata);
-	uint16_t (*table_count)(uint16_t port_id, void *userdata);
+				        uint32_t *template_id);
+	uint16_t (*table_count)(uint16_t port_id);
 	int (*table_id_get)(uint16_t port_id, unsigned int index,
-			    uint32_t *table_id, void *userdata);
-	uint16_t (*queue_count)(uint16_t port_id, void *userdata);
-	uint16_t (*rss_queue_count)(uint16_t port_id, void *userdata);
+			    uint32_t *table_id);
+	uint16_t (*queue_count)(uint16_t port_id);
+	uint16_t (*rss_queue_count)(uint16_t port_id);
 	struct rte_flow_template_table *(*table_get)(uint16_t port_id,
-						    uint32_t table_id,
-						    void *userdata);
+						    uint32_t table_id);
 	struct rte_flow_action_handle *(*action_handle_get)(uint16_t port_id,
-						       uint32_t action_id,
-						       void *userdata);
+						       uint32_t action_id);
 	struct rte_flow_meter_profile *(*meter_profile_get)(uint16_t port_id,
-						      uint32_t profile_id,
-						      void *userdata);
+						      uint32_t profile_id);
 	struct rte_flow_meter_policy *(*meter_policy_get)(uint16_t port_id,
-						     uint32_t policy_id,
-						     void *userdata);
+						     uint32_t policy_id);
 	struct rte_flow_item_flex_handle *(*flex_handle_get)(uint16_t port_id,
-						     uint16_t flex_id,
-						     void *userdata);
-	uint16_t (*verbose_level_get)(void *userdata);
+						     uint16_t flex_id);
+	uint16_t (*verbose_level_get)(void);
 	int (*flex_pattern_get)(uint16_t pattern_id,
 			       const struct rte_flow_item_flex **spec,
-			       const struct rte_flow_item_flex **mask,
-			       void *userdata);
+			       const struct rte_flow_item_flex **mask);
 };
 
 /**
@@ -1049,133 +1043,116 @@ struct rte_flow_parser_ops_query {
  * should implement the callbacks they need; unused callbacks may be NULL.
  */
 struct rte_flow_parser_ops_command {
-	void (*flow_get_info)(uint16_t port_id, void *userdata);
+	void (*flow_get_info)(uint16_t port_id);
 	void (*flow_configure)(uint16_t port_id,
 			const struct rte_flow_port_attr *port_attr,
 			uint32_t nb_queue,
-			const struct rte_flow_queue_attr *queue_attr,
-			void *userdata);
+			const struct rte_flow_queue_attr *queue_attr);
 	void (*flow_pattern_template_create)(uint16_t port_id, uint32_t id,
 				 const struct rte_flow_pattern_template_attr *attr,
-				 const struct rte_flow_item pattern[],
-				 void *userdata);
+				 const struct rte_flow_item pattern[]);
 	void (*flow_pattern_template_destroy)(uint16_t port_id,
-				 uint32_t nb_id, const uint32_t id[],
-				 void *userdata);
+				 uint32_t nb_id, const uint32_t id[]);
 	void (*flow_actions_template_create)(uint16_t port_id, uint32_t id,
 				 const struct rte_flow_actions_template_attr *attr,
 				 const struct rte_flow_action actions[],
-				 const struct rte_flow_action masks[],
-				 void *userdata);
+				 const struct rte_flow_action masks[]);
 	void (*flow_actions_template_destroy)(uint16_t port_id,
-				 uint32_t nb_id, const uint32_t id[],
-				 void *userdata);
+				 uint32_t nb_id, const uint32_t id[]);
 	void (*flow_template_table_create)(uint16_t port_id, uint32_t table_id,
 			 const struct rte_flow_template_table_attr *attr,
 			 uint32_t nb_pattern, const uint32_t pattern_id[],
-			 uint32_t nb_action, const uint32_t action_id[],
-			 void *userdata);
+			 uint32_t nb_action, const uint32_t action_id[]);
 	void (*flow_template_table_destroy)(uint16_t port_id, uint32_t nb_id,
-			 const uint32_t id[], void *userdata);
+			 const uint32_t id[]);
 	void (*flow_template_table_resize_complete)(uint16_t port_id,
-			uint32_t table_id, void *userdata);
+			uint32_t table_id);
 	void (*queue_group_set_miss_actions)(uint16_t port_id,
 			const struct rte_flow_attr *attr,
-			const struct rte_flow_action actions[],
-			void *userdata);
+			const struct rte_flow_action actions[]);
 	void (*flow_template_table_resize)(uint16_t port_id, uint32_t table_id,
-			 uint32_t nb_rules, void *userdata);
+			 uint32_t nb_rules);
 	void (*queue_flow_create)(uint16_t port_id, uint16_t queue,
 			  bool postpone, uint32_t table_id,
 			  uint32_t rule_id, uint32_t pattern_template_id,
 			  uint32_t action_template_id,
 			  const struct rte_flow_item pattern[],
-			  const struct rte_flow_action actions[],
-			  void *userdata);
+			  const struct rte_flow_action actions[]);
 	void (*queue_flow_destroy)(uint16_t port_id, uint16_t queue,
 			   bool postpone, uint32_t nb_rule,
-			   const uint64_t rule[], bool is_user_id,
-			   void *userdata);
+			   const uint64_t rule[], bool is_user_id);
 	void (*queue_flow_update_resized)(uint16_t port_id, uint16_t queue,
-			 bool postpone, uint64_t rule_id, void *userdata);
+			 bool postpone, uint64_t rule_id);
 	void (*queue_flow_update)(uint16_t port_id, uint16_t queue,
 			 bool postpone, uint32_t rule_id,
 			 uint32_t action_template_id,
-			 const struct rte_flow_action actions[],
-			 void *userdata);
-	void (*queue_flow_push)(uint16_t port_id, uint16_t queue, void *userdata);
-	void (*queue_flow_pull)(uint16_t port_id, uint16_t queue, void *userdata);
+			 const struct rte_flow_action actions[]);
+	void (*queue_flow_push)(uint16_t port_id, uint16_t queue);
+	void (*queue_flow_pull)(uint16_t port_id, uint16_t queue);
 	void (*flow_hash_calc)(uint16_t port_id, uint32_t table_id,
 		    uint32_t pattern_template_id,
-		    const struct rte_flow_item pattern[], void *userdata);
+		    const struct rte_flow_item pattern[]);
 	void (*flow_hash_calc_encap)(uint16_t port_id,
 		       enum rte_flow_encap_hash_field field,
-		       const struct rte_flow_item pattern[], void *userdata);
+		       const struct rte_flow_item pattern[]);
 	void (*queue_flow_aged)(uint16_t port_id, uint16_t queue,
-		    bool destroy, void *userdata);
+		    bool destroy);
 	void (*queue_action_handle_create)(uint16_t port_id, uint16_t queue,
 		     bool postpone, uint32_t group,
 		     bool is_list, const struct rte_flow_indir_action_conf *conf,
-		     const struct rte_flow_action actions[], void *userdata);
+		     const struct rte_flow_action actions[]);
 	void (*queue_action_handle_destroy)(uint16_t port_id, uint16_t queue,
-		     bool postpone, uint32_t nb_id, const uint32_t id[],
-		     void *userdata);
+		     bool postpone, uint32_t nb_id, const uint32_t id[]);
 	void (*queue_action_handle_update)(uint16_t port_id, uint16_t queue,
 		     bool postpone, uint32_t group,
-		     const struct rte_flow_action actions[], void *userdata);
+		     const struct rte_flow_action actions[]);
 	void (*queue_action_handle_query)(uint16_t port_id, uint16_t queue,
-		     bool postpone, uint32_t action_id, void *userdata);
+		     bool postpone, uint32_t action_id);
 	void (*queue_action_handle_query_update)(uint16_t port_id,
 		     uint16_t queue, bool postpone, uint32_t action_id,
 		     enum rte_flow_query_update_mode qu_mode,
-		     struct rte_flow_action actions[], void *userdata);
+		     struct rte_flow_action actions[]);
 	void (*action_handle_create)(uint16_t port_id, uint32_t group,
 		    bool is_list, const struct rte_flow_indir_action_conf *conf,
-		    const struct rte_flow_action actions[], void *userdata);
+		    const struct rte_flow_action actions[]);
 	void (*action_handle_destroy)(uint16_t port_id, uint32_t nb_id,
-		    const uint32_t id[], void *userdata);
+		    const uint32_t id[]);
 	void (*action_handle_update)(uint16_t port_id, uint32_t group,
-		    const struct rte_flow_action actions[], void *userdata);
-	void (*action_handle_query)(uint16_t port_id, uint32_t action_id,
-		    void *userdata);
+		    const struct rte_flow_action actions[]);
+	void (*action_handle_query)(uint16_t port_id, uint32_t action_id);
 	void (*action_handle_query_update)(uint16_t port_id, uint32_t action_id,
 		    enum rte_flow_query_update_mode qu_mode,
-		    struct rte_flow_action actions[], void *userdata);
+		    struct rte_flow_action actions[]);
 	void (*flow_validate)(uint16_t port_id, const struct rte_flow_attr *attr,
 		  const struct rte_flow_item pattern[],
 		  const struct rte_flow_action actions[],
-		  const struct rte_flow_parser_tunnel_ops *ops, void *userdata);
+		  const struct rte_flow_parser_tunnel_ops *ops);
 	void (*flow_create)(uint16_t port_id, const struct rte_flow_attr *attr,
 		 const struct rte_flow_item pattern[],
 		 const struct rte_flow_action actions[],
-		 const struct rte_flow_parser_tunnel_ops *ops, uintptr_t user_id,
-		 void *userdata);
+		 const struct rte_flow_parser_tunnel_ops *ops, uintptr_t user_id);
 	void (*flow_destroy)(uint16_t port_id, uint32_t nb_rule,
-		 const uint64_t rule[], bool is_user_id, void *userdata);
+		 const uint64_t rule[], bool is_user_id);
 	void (*flow_update)(uint16_t port_id, uint32_t rule_id,
-		 const struct rte_flow_action actions[], uintptr_t user_id,
-		 void *userdata);
-	void (*flow_flush)(uint16_t port_id, void *userdata);
+		 const struct rte_flow_action actions[], uintptr_t user_id);
+	void (*flow_flush)(uint16_t port_id);
 	void (*flow_dump)(uint16_t port_id, bool all, uint64_t rule,
-		 const char *file, bool is_user_id, void *userdata);
+		 const char *file, bool is_user_id);
 	void (*flow_query)(uint16_t port_id, uint64_t rule,
-		 struct rte_flow_action *action, bool is_user_id,
-		 void *userdata);
+		 struct rte_flow_action *action, bool is_user_id);
 	void (*flow_list)(uint16_t port_id, uint32_t group_n,
-		 const uint32_t group[], void *userdata);
-	void (*flow_isolate)(uint16_t port_id, int set, void *userdata);
-	void (*flow_aged)(uint16_t port_id, int destroy, void *userdata);
+		 const uint32_t group[]);
+	void (*flow_isolate)(uint16_t port_id, int set);
+	void (*flow_aged)(uint16_t port_id, int destroy);
 	void (*flow_tunnel_create)(uint16_t port_id,
-		 const struct rte_flow_parser_tunnel_ops *ops, void *userdata);
-	void (*flow_tunnel_destroy)(uint16_t port_id, uint32_t id,
-		 void *userdata);
-	void (*flow_tunnel_list)(uint16_t port_id, void *userdata);
+		 const struct rte_flow_parser_tunnel_ops *ops);
+	void (*flow_tunnel_destroy)(uint16_t port_id, uint32_t id);
+	void (*flow_tunnel_list)(uint16_t port_id);
 	void (*meter_policy_add)(uint16_t port_id, uint32_t policy_id,
-		 const struct rte_flow_action actions[], void *userdata);
+		 const struct rte_flow_action actions[]);
 	void (*flex_item_create)(uint16_t port_id, uint16_t flex_id,
-		 const char *filename, void *userdata);
-	void (*flex_item_destroy)(uint16_t port_id, uint16_t flex_id,
-		 void *userdata);
+		 const char *filename);
+	void (*flex_item_destroy)(uint16_t port_id, uint16_t flex_id);
 };
 
 struct rte_flow_parser_ops {
@@ -1188,14 +1165,11 @@ struct rte_flow_parser_ops {
  *
  * @param ops
  *   Callback table providing query/command hooks. May be NULL.
- * @param userdata
- *   Opaque pointer returned to all callbacks.
  * @return
  *   0 on success, negative errno on error.
  */
 __rte_experimental
-int rte_flow_parser_init(const struct rte_flow_parser_ops *ops,
-			 void *userdata);
+int rte_flow_parser_init(const struct rte_flow_parser_ops *ops);
 
 /**
  * Register cmdline instances so the parser can drive dynamic tokens and
