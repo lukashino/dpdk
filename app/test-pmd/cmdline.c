@@ -10253,7 +10253,7 @@ static void cmd_set_vxlan_parsed(void *parsed_result,
 {
 	struct cmd_set_vxlan_result *res = parsed_result;
 	struct rte_flow_parser_vxlan_encap_conf *vxlan_conf =
-		testpmd_vxlan_encap_conf();
+		rte_flow_parser_vxlan_encap_conf();
 	union {
 		uint32_t vxlan_id;
 		uint8_t vni[4];
@@ -10458,7 +10458,7 @@ static void cmd_set_nvgre_parsed(void *parsed_result,
 {
 	struct cmd_set_nvgre_result *res = parsed_result;
 	struct rte_flow_parser_nvgre_encap_conf *nvgre_conf =
-		testpmd_nvgre_encap_conf();
+		rte_flow_parser_nvgre_encap_conf();
 	union {
 		uint32_t nvgre_tni;
 		uint8_t tni[4];
@@ -10594,7 +10594,7 @@ static void cmd_set_l2_encap_parsed(void *parsed_result,
 {
 	struct cmd_set_l2_encap_result *res = parsed_result;
 	struct rte_flow_parser_l2_encap_conf *l2_conf =
-		testpmd_l2_encap_conf();
+		rte_flow_parser_l2_encap_conf();
 
 	if (l2_conf == NULL)
 		return;
@@ -10678,7 +10678,7 @@ static void cmd_set_l2_decap_parsed(void *parsed_result,
 {
 	struct cmd_set_l2_decap_result *res = parsed_result;
 	struct rte_flow_parser_l2_decap_conf *l2_conf =
-		testpmd_l2_decap_conf();
+		rte_flow_parser_l2_decap_conf();
 
 	if (l2_conf == NULL)
 		return;
@@ -10782,7 +10782,7 @@ static void cmd_set_mplsogre_encap_parsed(void *parsed_result,
 {
 	struct cmd_set_mplsogre_encap_result *res = parsed_result;
 	struct rte_flow_parser_mplsogre_encap_conf *mplsogre_conf =
-		testpmd_mplsogre_encap_conf();
+		rte_flow_parser_mplsogre_encap_conf();
 	union {
 		uint32_t mplsogre_label;
 		uint8_t label[4];
@@ -10902,7 +10902,7 @@ static void cmd_set_mplsogre_decap_parsed(void *parsed_result,
 {
 	struct cmd_set_mplsogre_decap_result *res = parsed_result;
 	struct rte_flow_parser_mplsogre_decap_conf *mplsogre_conf =
-		testpmd_mplsogre_decap_conf();
+		rte_flow_parser_mplsogre_decap_conf();
 
 	if (mplsogre_conf == NULL)
 		return;
@@ -11028,7 +11028,7 @@ static void cmd_set_mplsoudp_encap_parsed(void *parsed_result,
 {
 	struct cmd_set_mplsoudp_encap_result *res = parsed_result;
 	struct rte_flow_parser_mplsoudp_encap_conf *mplsoudp_conf =
-		testpmd_mplsoudp_encap_conf();
+		rte_flow_parser_mplsoudp_encap_conf();
 	union {
 		uint32_t mplsoudp_label;
 		uint8_t label[4];
@@ -11159,7 +11159,7 @@ static void cmd_set_mplsoudp_decap_parsed(void *parsed_result,
 {
 	struct cmd_set_mplsoudp_decap_result *res = parsed_result;
 	struct rte_flow_parser_mplsoudp_decap_conf *mplsoudp_conf =
-		testpmd_mplsoudp_decap_conf();
+		rte_flow_parser_mplsoudp_decap_conf();
 
 	if (mplsoudp_conf == NULL)
 		return;

@@ -16,27 +16,24 @@ test_flow_parser_command_mapping(void)
 	static const char *list_cmd = "flow list 0";
 	uint8_t outbuf[4096];
 	struct rte_flow_parser_output *out = (void *)outbuf;
-	struct rte_flow_parser *parser;
 	int ret;
 
-	parser = rte_flow_parser_create(NULL, NULL);
-	if (parser == NULL)
+	ret = rte_flow_parser_init(NULL, NULL);
+	if (ret != 0)
 		return TEST_FAILED;
 
 	memset(outbuf, 0, sizeof(outbuf));
-	ret = rte_flow_parser_parse(parser, create_cmd, out, sizeof(outbuf));
+	ret = rte_flow_parser_parse(create_cmd, out, sizeof(outbuf));
 	if (ret != 0 ||
 	    out->command != RTE_FLOW_PARSER_CMD_CREATE ||
 	    out->port != 0 ||
 	    out->args.vc.pattern_n == 0 ||
 	    out->args.vc.actions_n == 0) {
-		rte_flow_parser_destroy(parser);
 		return TEST_FAILED;
 	}
 
 	memset(outbuf, 0, sizeof(outbuf));
-	ret = rte_flow_parser_parse(parser, list_cmd, out, sizeof(outbuf));
-	rte_flow_parser_destroy(parser);
+	ret = rte_flow_parser_parse(list_cmd, out, sizeof(outbuf));
 	if (ret != 0 ||
 	    out->command != RTE_FLOW_PARSER_CMD_LIST ||
 	    out->port != 0)

@@ -37,14 +37,14 @@ static const struct rte_flow_parser_ops stub_ops = {
 };
 
 static void
-run_case(struct rte_flow_parser *p, const char *cmd)
+run_case(const char *cmd)
 {
 	uint8_t outbuf[4096];
 	struct rte_flow_parser_output *out = (void *)outbuf;
 	int ret;
 
 	memset(outbuf, 0, sizeof(outbuf));
-	ret = rte_flow_parser_parse(p, cmd, out, sizeof(outbuf));
+	ret = rte_flow_parser_parse(cmd, out, sizeof(outbuf));
 	if (ret == 0) {
 		printf("[OK]  %s\n", cmd);
 		printf("      port=%u patterns=%u actions=%u\n",
@@ -57,7 +57,6 @@ run_case(struct rte_flow_parser *p, const char *cmd)
 
 int main(void)
 {
-	struct rte_flow_parser *p = rte_flow_parser_create(&stub_ops, NULL);
 	static const char *cases[] = {
 		"flow create 0 ingress pattern eth / end actions drop / end",
 		"flow create 0 ingress pattern eth dst is 90:61:ae:fd:41:43 / end actions queue index 1 / end",
@@ -67,13 +66,14 @@ int main(void)
 		"flow create 0 ingress pattern eth / ipv4 src is 192.168.0.1 / udp / end actions age timeout 128 / end",
 	};
 	unsigned int i;
+	int ret;
 
-	if (!p) {
-		fprintf(stderr, "failed to create parser\n");
+	ret = rte_flow_parser_init(&stub_ops, NULL);
+	if (ret != 0) {
+		fprintf(stderr, "failed to init parser: %d\n", ret);
 		return 1;
 	}
 	for (i = 0; i < RTE_DIM(cases); i++)
-		run_case(p, cases[i]);
-	rte_flow_parser_destroy(p);
+		run_case(cases[i]);
 	return 0;
 }

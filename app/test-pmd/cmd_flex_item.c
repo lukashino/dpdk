@@ -136,7 +136,7 @@ flex_link_item_parse(const char *src, struct rte_flow_item *item)
 	sprintf(flow_rule,
 		"flow create 0 pattern %s / end actions drop / end", src);
 	memset(outbuf, 0, sizeof(outbuf));
-	ret = rte_flow_parser_parse(NULL, flow_rule, out, sizeof(outbuf));
+	ret = rte_flow_parser_parse(flow_rule, out, sizeof(outbuf));
 	if (ret)
 		return ret;
 	if (out->command != RTE_FLOW_PARSER_CMD_CREATE)

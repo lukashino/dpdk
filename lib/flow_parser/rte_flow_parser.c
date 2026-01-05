@@ -1090,168 +1090,94 @@ struct rte_flow_parser {
 	struct rte_flow_parser_ctx ctx;
 };
 
-static struct rte_flow_parser default_parser;
-static struct rte_flow_parser *parser_inst = &default_parser;
-
-static inline struct rte_flow_parser *
-parser_push_current(struct rte_flow_parser *parser)
-{
-	struct rte_flow_parser *prev = parser_inst;
-
-	parser_inst = parser ? parser : &default_parser;
-	return prev;
-}
-
-static inline void
-parser_pop_current(struct rte_flow_parser *parser)
-{
-	parser_inst = parser ? parser : &default_parser;
-}
+static struct rte_flow_parser parser;
 
 static inline void *
 parser_cb_userdata(void)
 {
-	return parser_inst ? parser_inst->userdata : NULL;
+	return parser.userdata;
 }
 
 static inline struct rte_flow_parser_ctx *
-parser_ctx_get(struct rte_flow_parser *parser)
+parser_ctx(void)
 {
-	struct rte_flow_parser *p = parser ? parser : &default_parser;
-	return &p->ctx;
-}
-
-static inline struct rte_flow_parser_ctx *
-parser_ctx_current(void)
-{
-	return parser_ctx_get(parser_inst);
+	return &parser.ctx;
 }
 
 int
-rte_flow_parser_set_default_ops(const struct rte_flow_parser_ops *ops,
-				void *userdata)
+rte_flow_parser_init(const struct rte_flow_parser_ops *ops,
+		     void *userdata)
 {
-	default_parser.ops = ops;
-	default_parser.userdata = userdata;
+	parser.ops = ops;
+	parser.userdata = userdata;
+	parser_ctx_reset_defaults(&parser.ctx);
 	return 0;
 }
 
 __rte_experimental void
-rte_flow_parser_reset_defaults(struct rte_flow_parser *parser)
+rte_flow_parser_reset_defaults(void)
 {
-	struct rte_flow_parser *p = parser ? parser : &default_parser;
-
-	parser_ctx_reset_defaults(&p->ctx);
+	parser_ctx_reset_defaults(&parser.ctx);
 }
 
 __rte_experimental struct rte_flow_parser_vxlan_encap_conf *
-rte_flow_parser_vxlan_encap_conf(struct rte_flow_parser *parser)
+rte_flow_parser_vxlan_encap_conf(void)
 {
-	return &parser_ctx_get(parser)->vxlan_encap_conf;
+	return &parser.ctx.vxlan_encap_conf;
 }
 
 __rte_experimental struct rte_flow_parser_nvgre_encap_conf *
-rte_flow_parser_nvgre_encap_conf(struct rte_flow_parser *parser)
+rte_flow_parser_nvgre_encap_conf(void)
 {
-	return &parser_ctx_get(parser)->nvgre_encap_conf;
+	return &parser.ctx.nvgre_encap_conf;
 }
 
 __rte_experimental struct rte_flow_parser_l2_encap_conf *
-rte_flow_parser_l2_encap_conf(struct rte_flow_parser *parser)
+rte_flow_parser_l2_encap_conf(void)
 {
-	return &parser_ctx_get(parser)->l2_encap_conf;
+	return &parser.ctx.l2_encap_conf;
 }
 
 __rte_experimental struct rte_flow_parser_l2_decap_conf *
-rte_flow_parser_l2_decap_conf(struct rte_flow_parser *parser)
+rte_flow_parser_l2_decap_conf(void)
 {
-	return &parser_ctx_get(parser)->l2_decap_conf;
+	return &parser.ctx.l2_decap_conf;
 }
 
 __rte_experimental struct rte_flow_parser_mplsogre_encap_conf *
-rte_flow_parser_mplsogre_encap_conf(struct rte_flow_parser *parser)
+rte_flow_parser_mplsogre_encap_conf(void)
 {
-	return &parser_ctx_get(parser)->mplsogre_encap_conf;
+	return &parser.ctx.mplsogre_encap_conf;
 }
 
 __rte_experimental struct rte_flow_parser_mplsogre_decap_conf *
-rte_flow_parser_mplsogre_decap_conf(struct rte_flow_parser *parser)
+rte_flow_parser_mplsogre_decap_conf(void)
 {
-	return &parser_ctx_get(parser)->mplsogre_decap_conf;
+	return &parser.ctx.mplsogre_decap_conf;
 }
 
 __rte_experimental struct rte_flow_parser_mplsoudp_encap_conf *
-rte_flow_parser_mplsoudp_encap_conf(struct rte_flow_parser *parser)
+rte_flow_parser_mplsoudp_encap_conf(void)
 {
-	return &parser_ctx_get(parser)->mplsoudp_encap_conf;
+	return &parser.ctx.mplsoudp_encap_conf;
 }
 
 __rte_experimental struct rte_flow_parser_mplsoudp_decap_conf *
-rte_flow_parser_mplsoudp_decap_conf(struct rte_flow_parser *parser)
+rte_flow_parser_mplsoudp_decap_conf(void)
 {
-	return &parser_ctx_get(parser)->mplsoudp_decap_conf;
+	return &parser.ctx.mplsoudp_decap_conf;
 }
 
 static inline const struct rte_flow_parser_ops_query *
 parser_query_ops(void)
 {
-	return (parser_inst && parser_inst->ops) ?
-		parser_inst->ops->query : NULL;
-}
-
-static inline const struct rte_flow_parser_vxlan_encap_conf *
-parser_vxlan_conf(void)
-{
-	return &parser_ctx_current()->vxlan_encap_conf;
-}
-
-static inline const struct rte_flow_parser_nvgre_encap_conf *
-parser_nvgre_conf(void)
-{
-	return &parser_ctx_current()->nvgre_encap_conf;
-}
-
-static inline const struct rte_flow_parser_l2_encap_conf *
-parser_l2_encap_conf_get(void)
-{
-	return &parser_ctx_current()->l2_encap_conf;
-}
-
-static inline const struct rte_flow_parser_l2_decap_conf *
-parser_l2_decap_conf_get(void)
-{
-	return &parser_ctx_current()->l2_decap_conf;
-}
-
-static inline const struct rte_flow_parser_mplsogre_encap_conf *
-parser_mplsogre_encap_conf_get(void)
-{
-	return &parser_ctx_current()->mplsogre_encap_conf;
-}
-
-static inline const struct rte_flow_parser_mplsogre_decap_conf *
-parser_mplsogre_decap_conf_get(void)
-{
-	return &parser_ctx_current()->mplsogre_decap_conf;
-}
-
-static inline const struct rte_flow_parser_mplsoudp_encap_conf *
-parser_mplsoudp_encap_conf_get(void)
-{
-	return &parser_ctx_current()->mplsoudp_encap_conf;
-}
-
-static inline const struct rte_flow_parser_mplsoudp_decap_conf *
-parser_mplsoudp_decap_conf_get(void)
-{
-	return &parser_ctx_current()->mplsoudp_decap_conf;
+	return parser.ops ? parser.ops->query : NULL;
 }
 
 static inline const struct rte_flow_parser_ops_command *
 parser_command_ops(void)
 {
-	return (parser_inst && parser_inst->ops) ?
-		parser_inst->ops->command : NULL;
+	return parser.ops ? parser.ops->command : NULL;
 }
 
 static inline uint16_t
@@ -1986,7 +1912,7 @@ parser_command_set_raw_encap(uint16_t index,
 			     const struct rte_flow_item pattern[],
 			     uint32_t pattern_n)
 {
-	struct rte_flow_parser_ctx *ctx = parser_ctx_current();
+	struct rte_flow_parser_ctx *ctx = parser_ctx();
 
 	if (parser_ctx_set_raw_encap(ctx, index, pattern, pattern_n) == 0)
 		return;
@@ -1998,7 +1924,7 @@ parser_command_set_raw_decap(uint16_t index,
 			     const struct rte_flow_item pattern[],
 			     uint32_t pattern_n)
 {
-	struct rte_flow_parser_ctx *ctx = parser_ctx_current();
+	struct rte_flow_parser_ctx *ctx = parser_ctx();
 
 	if (parser_ctx_set_raw_decap(ctx, index, pattern, pattern_n) == 0)
 		return;
@@ -2010,7 +1936,7 @@ parser_command_set_sample_actions(uint16_t index,
 				  const struct rte_flow_action actions[],
 				  uint32_t actions_n)
 {
-	struct rte_flow_parser_ctx *ctx = parser_ctx_current();
+	struct rte_flow_parser_ctx *ctx = parser_ctx();
 
 	if (parser_ctx_set_sample_actions(ctx, index, actions, actions_n) == 0)
 		return;
@@ -2022,7 +1948,7 @@ parser_command_set_ipv6_ext_push(uint16_t index,
 				 const struct rte_flow_item pattern[],
 				 uint32_t pattern_n)
 {
-	struct rte_flow_parser_ctx *ctx = parser_ctx_current();
+	struct rte_flow_parser_ctx *ctx = parser_ctx();
 
 	if (parser_ctx_set_ipv6_ext_push(ctx, index, pattern, pattern_n) == 0)
 		return;
@@ -2034,65 +1960,41 @@ parser_command_set_ipv6_ext_remove(uint16_t index,
 				   const struct rte_flow_item pattern[],
 				   uint32_t pattern_n)
 {
-	struct rte_flow_parser_ctx *ctx = parser_ctx_current();
+	struct rte_flow_parser_ctx *ctx = parser_ctx();
 
 	if (parser_ctx_set_ipv6_ext_remove(ctx, index, pattern, pattern_n) == 0)
 		return;
 	fprintf(stderr, "Error - set_ipv6_ext_remove failed for index %u\n", index);
 }
 
-static inline const struct rte_flow_action_raw_encap *
-parser_raw_encap_conf_get(uint16_t index)
-{
-	return parser_ctx_raw_encap_conf_get(parser_ctx_current(), index);
-}
-
-static inline const struct rte_flow_action_raw_decap *
-parser_raw_decap_conf_get(uint16_t index)
-{
-	return parser_ctx_raw_decap_conf_get(parser_ctx_current(), index);
-}
-
 const struct rte_flow_action_raw_encap *
 rte_flow_parser_raw_encap_conf_get(uint16_t index)
 {
-	return parser_raw_encap_conf_get(index);
+	return parser_ctx_raw_encap_conf_get(parser_ctx(), index);
 }
 
 const struct rte_flow_action_raw_decap *
 rte_flow_parser_raw_decap_conf_get(uint16_t index)
 {
-	return parser_raw_decap_conf_get(index);
+	return parser_ctx_raw_decap_conf_get(parser_ctx(), index);
 }
-
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_reset_defaults, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_vxlan_encap_conf, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_nvgre_encap_conf, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_l2_encap_conf, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_l2_decap_conf, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_mplsogre_encap_conf, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_mplsogre_decap_conf, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_mplsoudp_encap_conf, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_mplsoudp_decap_conf, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_raw_encap_conf_get, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_raw_decap_conf_get, 26.0);
 
 static const struct rte_flow_action *
 parser_sample_actions_get(uint16_t index)
 {
-	return parser_ctx_sample_actions_get(parser_ctx_current(), index);
+	return parser_ctx_sample_actions_get(parser_ctx(), index);
 }
 
 static const struct rte_flow_action_ipv6_ext_push *
 parser_ipv6_ext_push_conf_get(uint16_t index)
 {
-	return parser_ctx_ipv6_ext_push_conf_get(parser_ctx_current(), index);
+	return parser_ctx_ipv6_ext_push_conf_get(parser_ctx(), index);
 }
 
 static const struct rte_flow_action_ipv6_ext_remove *
 parser_ipv6_ext_remove_conf_get(uint16_t index)
 {
-	return parser_ctx_ipv6_ext_remove_conf_get(parser_ctx_current(), index);
+	return parser_ctx_ipv6_ext_remove_conf_get(parser_ctx(), index);
 }
 
 /** Maximum size for pattern in struct rte_flow_item_raw. */
@@ -2244,14 +2146,9 @@ static struct context default_parser_context;
 static inline struct context *
 parser_cmd_context(void)
 {
-	if (!parser_inst->flow_ctx) {
-		if (parser_inst == &default_parser)
-			parser_inst->flow_ctx = &default_parser_context;
-		else
-			parser_inst->flow_ctx = calloc(1,
-					sizeof(*parser_inst->flow_ctx));
-	}
-	return parser_inst->flow_ctx;
+	if (!parser.flow_ctx)
+		parser.flow_ctx = &default_parser_context;
+	return parser.flow_ctx;
 }
 
 /** Static initializer for the next field. */
@@ -10443,7 +10340,8 @@ end:
 static int
 parse_setup_vxlan_encap_data(struct action_vxlan_encap_data *action_vxlan_encap_data)
 {
-	const struct rte_flow_parser_vxlan_encap_conf *conf = parser_vxlan_conf();
+	const struct rte_flow_parser_vxlan_encap_conf *conf =
+		rte_flow_parser_vxlan_encap_conf();
 
 	/* Set up default configuration. */
 	*action_vxlan_encap_data = (struct action_vxlan_encap_data){
@@ -10585,7 +10483,8 @@ parse_vc_action_vxlan_encap(struct context *ctx, const struct token *token,
 static int
 parse_setup_nvgre_encap_data(struct action_nvgre_encap_data *action_nvgre_encap_data)
 {
-	const struct rte_flow_parser_nvgre_encap_conf *conf = parser_nvgre_conf();
+	const struct rte_flow_parser_nvgre_encap_conf *conf =
+		rte_flow_parser_nvgre_encap_conf();
 
 	/* Set up default configuration. */
 	*action_nvgre_encap_data = (struct action_nvgre_encap_data){
@@ -10693,7 +10592,8 @@ parse_vc_action_l2_encap(struct context *ctx, const struct token *token,
 	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_action *action;
 	struct action_raw_encap_data *action_encap_data;
-	const struct rte_flow_parser_l2_encap_conf *conf = parser_l2_encap_conf_get();
+	const struct rte_flow_parser_l2_encap_conf *conf =
+		rte_flow_parser_l2_encap_conf();
 	struct rte_flow_item_eth eth = { .hdr.ether_type = 0, };
 	struct rte_flow_item_vlan vlan = {
 		.hdr.vlan_tci = conf->vlan_tci,
@@ -10758,9 +10658,10 @@ parse_vc_action_l2_decap(struct context *ctx, const struct token *token,
 	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_action *action;
 	struct action_raw_decap_data *action_decap_data;
-	const struct rte_flow_parser_l2_decap_conf *conf = parser_l2_decap_conf_get();
+	const struct rte_flow_parser_l2_decap_conf *conf =
+		rte_flow_parser_l2_decap_conf();
 	const struct rte_flow_parser_mplsoudp_encap_conf *mpls_conf =
-		parser_mplsoudp_encap_conf_get();
+		rte_flow_parser_mplsoudp_encap_conf();
 	struct rte_flow_item_eth eth = { .hdr.ether_type = 0, };
 	struct rte_flow_item_vlan vlan = {
 		.hdr.vlan_tci = mpls_conf->vlan_tci,
@@ -10816,7 +10717,7 @@ parse_vc_action_mplsogre_encap(struct context *ctx, const struct token *token,
 	struct rte_flow_action *action;
 	struct action_raw_encap_data *action_encap_data;
 	const struct rte_flow_parser_mplsogre_encap_conf *conf =
-		parser_mplsogre_encap_conf_get();
+		rte_flow_parser_mplsogre_encap_conf();
 	struct rte_flow_item_eth eth = { .hdr.ether_type = 0, };
 	struct rte_flow_item_vlan vlan = {
 		.hdr.vlan_tci = conf->vlan_tci,
@@ -10923,9 +10824,9 @@ parse_vc_action_mplsogre_decap(struct context *ctx, const struct token *token,
 	struct rte_flow_action *action;
 	struct action_raw_decap_data *action_decap_data;
 	const struct rte_flow_parser_mplsogre_decap_conf *conf =
-		parser_mplsogre_decap_conf_get();
+		rte_flow_parser_mplsogre_decap_conf();
 	const struct rte_flow_parser_mplsogre_encap_conf *enc_conf =
-		parser_mplsogre_encap_conf_get();
+		rte_flow_parser_mplsogre_encap_conf();
 	struct rte_flow_item_eth eth = { .hdr.ether_type = 0, };
 	struct rte_flow_item_vlan vlan = {.hdr.vlan_tci = 0};
 	struct rte_flow_item_ipv4 ipv4 = {
@@ -11014,7 +10915,7 @@ parse_vc_action_mplsoudp_encap(struct context *ctx, const struct token *token,
 	struct rte_flow_action *action;
 	struct action_raw_encap_data *action_encap_data;
 	const struct rte_flow_parser_mplsoudp_encap_conf *conf =
-		parser_mplsoudp_encap_conf_get();
+		rte_flow_parser_mplsoudp_encap_conf();
 	struct rte_flow_item_eth eth = { .hdr.ether_type = 0, };
 	struct rte_flow_item_vlan vlan = {
 		.hdr.vlan_tci = conf->vlan_tci,
@@ -11122,9 +11023,9 @@ parse_vc_action_mplsoudp_decap(struct context *ctx, const struct token *token,
 	struct rte_flow_action *action;
 	struct action_raw_decap_data *action_decap_data;
 	const struct rte_flow_parser_mplsoudp_decap_conf *conf =
-		parser_mplsoudp_decap_conf_get();
+		rte_flow_parser_mplsoudp_decap_conf();
 	const struct rte_flow_parser_mplsoudp_encap_conf *enc_conf =
-		parser_mplsoudp_encap_conf_get();
+		rte_flow_parser_mplsoudp_encap_conf();
 	struct rte_flow_item_eth eth = { .hdr.ether_type = 0, };
 	struct rte_flow_item_vlan vlan = {.hdr.vlan_tci = 0};
 	struct rte_flow_item_ipv4 ipv4 = {
@@ -11237,7 +11138,7 @@ parse_vc_action_raw_decap_index(struct context *ctx, const struct token *token,
 	action_raw_decap_data = ctx->object;
 	idx = action_raw_decap_data->idx;
 	const struct rte_flow_action_raw_decap *conf =
-		parser_raw_decap_conf_get(idx);
+		rte_flow_parser_raw_decap_conf_get(idx);
 
 	if (!conf) {
 		fprintf(stderr, "Error - raw decap index %u is empty\n", idx);
@@ -11283,7 +11184,7 @@ parse_vc_action_raw_encap_index(struct context *ctx, const struct token *token,
 	action_raw_encap_data = ctx->object;
 	idx = action_raw_encap_data->idx;
 	const struct rte_flow_action_raw_encap *conf =
-		parser_raw_encap_conf_get(idx);
+		rte_flow_parser_raw_encap_conf_get(idx);
 
 	if (!conf) {
 		fprintf(stderr, "Error - raw encap index %u is empty\n", idx);
@@ -11341,7 +11242,7 @@ parse_vc_action_raw_decap(struct context *ctx, const struct token *token,
 	/* Copy the headers to the buffer. */
 	action_raw_decap_data = ctx->object;
 	const struct rte_flow_action_raw_decap *conf =
-		parser_raw_decap_conf_get(0);
+		rte_flow_parser_raw_decap_conf_get(0);
 
 	if (!conf || !conf->data || !conf->size) {
 		fprintf(stderr, "Error - raw decap index 0 is empty\n");
@@ -14869,51 +14770,11 @@ rte_flow_parser_cmd_set_raw_dispatch(struct rte_flow_parser_output *out)
 	cmd_set_raw_parsed((struct rte_flow_parser_output *)out);
 }
 
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmdline_register, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_flow_tok, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_set_raw_tok, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_flow_dispatch, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_set_raw_dispatch, 26.0);
-
-struct rte_flow_parser *
-rte_flow_parser_create(const struct rte_flow_parser_ops *ops, void *userdata)
-{
-	struct rte_flow_parser *parser;
-
-	parser = calloc(1, sizeof(*parser));
-	if (!parser)
-		return NULL;
-	parser->flow_ctx = calloc(1, sizeof(*parser->flow_ctx));
-	if (!parser->flow_ctx) {
-		free(parser);
-		return NULL;
-	}
-	parser->ops = ops;
-	parser->userdata = userdata;
-	parser_ctx_reset_defaults(&parser->ctx);
-	return parser;
-}
-void
-rte_flow_parser_destroy(struct rte_flow_parser *parser)
-{
-	if (!parser)
-		return;
-	if (parser == &default_parser)
-		return;
-	if (parser_inst == parser)
-		parser_inst = &default_parser;
-	free(parser->flow_ctx);
-	free(parser);
-}
-
 int
-rte_flow_parser_parse(struct rte_flow_parser *parser, const char *src,
+rte_flow_parser_parse(const char *src,
 		      struct rte_flow_parser_output *result,
 		      size_t result_size)
 {
-	struct rte_flow_parser *prev;
-	struct context *ctx;
-	struct context saved_flow_ctx;
 	const char *pos;
 	int ret;
 
@@ -14921,10 +14782,7 @@ rte_flow_parser_parse(struct rte_flow_parser *parser, const char *src,
 		return -EINVAL;
 	if (result_size < sizeof(struct rte_flow_parser_output))
 		return -ENOBUFS;
-	prev = parser_push_current(parser);
-	ctx = parser_cmd_context();
-	saved_flow_ctx = *ctx;
-	cmd_flow_context_init(ctx);
+	cmd_flow_context_init(parser_cmd_context());
 	pos = src;
 	do {
 		ret = cmd_flow_parse(NULL, pos, result,
@@ -14935,8 +14793,6 @@ rte_flow_parser_parse(struct rte_flow_parser *parser, const char *src,
 				pos++;
 		}
 	} while (ret > 0 && *pos);
-	*ctx = saved_flow_ctx;
-	parser_pop_current(prev);
 	if (ret < 0)
 		return ret;
 	if (*pos)
@@ -14945,19 +14801,17 @@ rte_flow_parser_parse(struct rte_flow_parser *parser, const char *src,
 }
 
 int
-rte_flow_parser_run(struct rte_flow_parser *parser, const char *src)
+rte_flow_parser_run(const char *src)
 {
 	uint8_t buf[4096];
 	struct rte_flow_parser_output *out = (struct rte_flow_parser_output *)buf;
-	struct rte_flow_parser *prev;
 	int ret;
 
-	ret = rte_flow_parser_parse(parser, src,
+	ret = rte_flow_parser_parse(src,
 				    (struct rte_flow_parser_output *)buf,
 				    sizeof(buf));
 	if (ret < 0)
 		return ret;
-	prev = parser_push_current(parser);
 	switch (out->command) {
 	case RTE_FLOW_PARSER_CMD_SET_SAMPLE_ACTIONS:
 	case RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_PUSH:
@@ -14970,46 +14824,23 @@ rte_flow_parser_run(struct rte_flow_parser *parser, const char *src)
 		cmd_flow_parsed(out);
 		break;
 	}
-	parser_pop_current(prev);
 	return 0;
 }
-
-/* Thread-local scratch buffer used by the lightweight parsing helpers. */
-struct simple_parse_buf {
-	uint8_t *data;
-	size_t size;
-};
-
-static __thread struct simple_parse_buf simple_buf;
 
 static int
 parser_simple_parse(const char *cmd, struct rte_flow_parser_output **out)
 {
-	size_t need = simple_buf.size ? simple_buf.size : 4096;
+	static __thread uint8_t buf[4096];
 	int ret;
 
 	if (!cmd || !out)
 		return -EINVAL;
-retry:
-	if (!simple_buf.data || simple_buf.size < need) {
-		uint8_t *tmp = realloc(simple_buf.data, need);
-
-		if (!tmp)
-			return -ENOMEM;
-		simple_buf.data = tmp;
-		simple_buf.size = need;
-	}
-	memset(simple_buf.data, 0, simple_buf.size);
-	ret = rte_flow_parser_parse(NULL, cmd,
-				    (struct rte_flow_parser_output *)simple_buf.data,
-				    simple_buf.size);
-	if (ret == -ENOBUFS) {
-		need <<= 1;
-		goto retry;
-	}
+	memset(buf, 0, sizeof(buf));
+	ret = rte_flow_parser_parse(cmd, (struct rte_flow_parser_output *)buf,
+				    sizeof(buf));
 	if (ret < 0)
 		return ret;
-	*out = (struct rte_flow_parser_output *)simple_buf.data;
+	*out = (struct rte_flow_parser_output *)buf;
 	return 0;
 }
 
@@ -15123,9 +14954,23 @@ rte_flow_parser_parse_actions_str(const char *src,
 	return 0;
 }
 
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_create, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_destroy, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_set_default_ops, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_reset_defaults, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_vxlan_encap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_nvgre_encap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_l2_encap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_l2_decap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_mplsogre_encap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_mplsogre_decap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_mplsoudp_encap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_mplsoudp_decap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_raw_encap_conf_get, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_raw_decap_conf_get, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmdline_register, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_flow_tok, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_set_raw_tok, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_flow_dispatch, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_set_raw_dispatch, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_init, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_parse, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_run, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_parse_attr_str, 26.0);

@@ -16,8 +16,6 @@
 extern "C" {
 #endif
 
-struct rte_flow_parser;
-
 /* Shared limits used across parser helpers. */
 #define ACTION_RAW_ENCAP_MAX_DATA 512
 #define RAW_ENCAP_CONFS_MAX_NUM 8
@@ -29,9 +27,9 @@ struct rte_flow_parser;
 #define ACTION_VXLAN_ENCAP_ITEMS_NUM 6
 #define ACTION_NVGRE_ENCAP_ITEMS_NUM 5
 
-/* Reset parser defaults and clear stored caches (parser == NULL uses default parser). */
+/* Reset parser defaults and clear stored caches. */
 __rte_experimental void
-rte_flow_parser_reset_defaults(struct rte_flow_parser *parser);
+rte_flow_parser_reset_defaults(void);
 
 struct rte_flow_parser_vxlan_encap_conf {
 	uint32_t select_ipv4:1;
@@ -114,23 +112,23 @@ struct rte_flow_parser_mplsoudp_decap_conf {
 	uint32_t select_vlan:1;
 };
 
-/* Accessors for mutable encap/decap configurations (parser == NULL uses default parser). */
+/* Accessors for mutable encap/decap configurations. */
 __rte_experimental struct rte_flow_parser_vxlan_encap_conf *
-rte_flow_parser_vxlan_encap_conf(struct rte_flow_parser *parser);
+rte_flow_parser_vxlan_encap_conf(void);
 __rte_experimental struct rte_flow_parser_nvgre_encap_conf *
-rte_flow_parser_nvgre_encap_conf(struct rte_flow_parser *parser);
+rte_flow_parser_nvgre_encap_conf(void);
 __rte_experimental struct rte_flow_parser_l2_encap_conf *
-rte_flow_parser_l2_encap_conf(struct rte_flow_parser *parser);
+rte_flow_parser_l2_encap_conf(void);
 __rte_experimental struct rte_flow_parser_l2_decap_conf *
-rte_flow_parser_l2_decap_conf(struct rte_flow_parser *parser);
+rte_flow_parser_l2_decap_conf(void);
 __rte_experimental struct rte_flow_parser_mplsogre_encap_conf *
-rte_flow_parser_mplsogre_encap_conf(struct rte_flow_parser *parser);
+rte_flow_parser_mplsogre_encap_conf(void);
 __rte_experimental struct rte_flow_parser_mplsogre_decap_conf *
-rte_flow_parser_mplsogre_decap_conf(struct rte_flow_parser *parser);
+rte_flow_parser_mplsogre_decap_conf(void);
 __rte_experimental struct rte_flow_parser_mplsoudp_encap_conf *
-rte_flow_parser_mplsoudp_encap_conf(struct rte_flow_parser *parser);
+rte_flow_parser_mplsoudp_encap_conf(void);
 __rte_experimental struct rte_flow_parser_mplsoudp_decap_conf *
-rte_flow_parser_mplsoudp_decap_conf(struct rte_flow_parser *parser);
+rte_flow_parser_mplsoudp_decap_conf(void);
 
 /* Raw encap/decap configuration accessors. */
 __rte_experimental
@@ -1186,36 +1184,18 @@ struct rte_flow_parser_ops {
 };
 
 /**
- * Create a flow parser instance.
+ * Initialize the global flow parser with callback ops.
  *
  * @param ops
- *   Callback table providing query/command hooks. May be NULL to use only
- *   defaults.
+ *   Callback table providing query/command hooks. May be NULL.
  * @param userdata
  *   Opaque pointer returned to all callbacks.
  * @return
- *   New parser instance or NULL on error.
+ *   0 on success, negative errno on error.
  */
 __rte_experimental
-struct rte_flow_parser *
-rte_flow_parser_create(const struct rte_flow_parser_ops *ops,
+int rte_flow_parser_init(const struct rte_flow_parser_ops *ops,
 			 void *userdata);
-
-/**
- * Destroy a flow parser instance.
- *
- * @param parser
- *   Parser handle returned by rte_flow_parser_create().
- */
-__rte_experimental
-void rte_flow_parser_destroy(struct rte_flow_parser *parser);
-
-/**
- * Set default ops for the global parser (testpmd integration helper).
- */
-__rte_experimental
-int rte_flow_parser_set_default_ops(const struct rte_flow_parser_ops *ops,
-				    void *userdata);
 
 /**
  * Register cmdline instances so the parser can drive dynamic tokens and
@@ -1243,8 +1223,6 @@ void rte_flow_parser_cmd_set_raw_dispatch(struct rte_flow_parser_output *out);
 /**
  * Parse a flow CLI string.
  *
- * @param parser
- *   Parser instance (may be NULL to use the default one).
  * @param src
  *   NUL-terminated string containing one or more flow commands.
  * @param result
@@ -1256,15 +1234,13 @@ void rte_flow_parser_cmd_set_raw_dispatch(struct rte_flow_parser_output *out);
  *   small, or a negative errno-style value on other errors.
  */
 __rte_experimental
-int rte_flow_parser_parse(struct rte_flow_parser *parser, const char *src,
+int rte_flow_parser_parse(const char *src,
 			 struct rte_flow_parser_output *result,
 			 size_t result_size);
 
 /**
  * Parse and execute a flow CLI string using installed command ops.
  *
- * @param parser
- *   Parser instance (may be NULL to use the default one).
  * @param src
  *   NUL-terminated string containing one or more flow commands.
  * @return
@@ -1272,7 +1248,7 @@ int rte_flow_parser_parse(struct rte_flow_parser *parser, const char *src,
  *   on other errors.
  */
 __rte_experimental
-int rte_flow_parser_run(struct rte_flow_parser *parser, const char *src);
+int rte_flow_parser_run(const char *src);
 
 /**
  * Parse only flow attributes from a CLI snippet.

@@ -834,54 +834,5 @@ static const struct rte_flow_parser_ops parser_ops = {
 int
 testpmd_flow_parser_init(void)
 {
-	rte_flow_parser_reset_defaults(NULL);
-	return rte_flow_parser_set_default_ops(&parser_ops, NULL);
-}
-
-struct rte_flow_parser_vxlan_encap_conf *
-testpmd_vxlan_encap_conf(void)
-{
-	return rte_flow_parser_vxlan_encap_conf(NULL);
-}
-
-struct rte_flow_parser_nvgre_encap_conf *
-testpmd_nvgre_encap_conf(void)
-{
-	return rte_flow_parser_nvgre_encap_conf(NULL);
-}
-
-struct rte_flow_parser_l2_encap_conf *
-testpmd_l2_encap_conf(void)
-{
-	return rte_flow_parser_l2_encap_conf(NULL);
-}
-
-struct rte_flow_parser_l2_decap_conf *
-testpmd_l2_decap_conf(void)
-{
-	return rte_flow_parser_l2_decap_conf(NULL);
-}
-
-struct rte_flow_parser_mplsogre_encap_conf *
-testpmd_mplsogre_encap_conf(void)
-{
-	return rte_flow_parser_mplsogre_encap_conf(NULL);
-}
-
-struct rte_flow_parser_mplsogre_decap_conf *
-testpmd_mplsogre_decap_conf(void)
-{
-	return rte_flow_parser_mplsogre_decap_conf(NULL);
-}
-
-struct rte_flow_parser_mplsoudp_encap_conf *
-testpmd_mplsoudp_encap_conf(void)
-{
-	return rte_flow_parser_mplsoudp_encap_conf(NULL);
-}
-
-struct rte_flow_parser_mplsoudp_decap_conf *
-testpmd_mplsoudp_decap_conf(void)
-{
-	return rte_flow_parser_mplsoudp_decap_conf(NULL);
+	return rte_flow_parser_init(&parser_ops, NULL);
 }
