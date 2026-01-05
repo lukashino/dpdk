@@ -38,8 +38,6 @@
 #define RSS_HASH_KEY_LENGTH 64
 #endif
 
-struct context;
-
 /** Storage for struct rte_flow_action_raw_encap. */
 struct action_raw_encap_data {
 	struct rte_flow_action_raw_encap conf;
@@ -212,21 +210,12 @@ struct rte_flow_parser_ctx {
 	struct rte_flow_action_ethdev sample_represented_port[RAW_SAMPLE_CONFS_MAX_NUM];
 };
 
-static inline void
-parser_ctx_reset_defaults(struct rte_flow_parser_ctx *ctx)
-{
-	if (!ctx)
-		return;
-	memset(ctx, 0, sizeof(*ctx));
-	ctx->vxlan_encap_conf = rte_flow_parser_default_vxlan_encap_conf;
-	ctx->nvgre_encap_conf = rte_flow_parser_default_nvgre_encap_conf;
-	ctx->l2_encap_conf = rte_flow_parser_default_l2_encap_conf;
-	ctx->l2_decap_conf = rte_flow_parser_default_l2_decap_conf;
-	ctx->mplsogre_encap_conf = rte_flow_parser_default_mplsogre_encap_conf;
-	ctx->mplsogre_decap_conf = rte_flow_parser_default_mplsogre_decap_conf;
-	ctx->mplsoudp_encap_conf = rte_flow_parser_default_mplsoudp_encap_conf;
-	ctx->mplsoudp_decap_conf = rte_flow_parser_default_mplsoudp_decap_conf;
-}
+struct rte_flow_parser {
+	const struct rte_flow_parser_ops *ops;
+	struct rte_flow_parser_ctx ctx;
+};
+
+static struct rte_flow_parser parser;
 
 static void
 parser_ctx_update_fields(uint8_t *buf, struct rte_flow_item *item,
@@ -420,14 +409,13 @@ parser_ctx_item_default_mask(const struct rte_flow_item *item)
 }
 
 static int
-parser_ctx_setup_vxlan_encap_data(struct rte_flow_parser_ctx *ctx,
-				       struct action_vxlan_encap_data *data)
+parser_ctx_setup_vxlan_encap_data(struct action_vxlan_encap_data *data)
 {
 	struct rte_flow_parser_vxlan_encap_conf *conf;
 
-	if (!ctx || !data)
+	if (!data)
 		return -EINVAL;
-	conf = &ctx->vxlan_encap_conf;
+	conf = &parser.ctx.vxlan_encap_conf;
 	*data = (struct action_vxlan_encap_data){
 		.conf = (struct rte_flow_action_vxlan_encap){
 			.definition = data->items,
@@ -531,14 +519,13 @@ parser_ctx_setup_vxlan_encap_data(struct rte_flow_parser_ctx *ctx,
 }
 
 static int
-parser_ctx_setup_nvgre_encap_data(struct rte_flow_parser_ctx *ctx,
-				        struct action_nvgre_encap_data *data)
+parser_ctx_setup_nvgre_encap_data(struct action_nvgre_encap_data *data)
 {
 	struct rte_flow_parser_nvgre_encap_conf *conf;
 
-	if (!ctx || !data)
+	if (!data)
 		return -EINVAL;
-	conf = &ctx->nvgre_encap_conf;
+	conf = &parser.ctx.nvgre_encap_conf;
 	memset(data, 0, sizeof(*data));
 	data->conf.definition = data->items;
 	data->items[0] = (struct rte_flow_item){
@@ -594,9 +581,9 @@ parser_ctx_setup_nvgre_encap_data(struct rte_flow_parser_ctx *ctx,
 }
 
 static int
-parser_ctx_set_raw_common(struct rte_flow_parser_ctx *ctx, bool encap,
-			    uint16_t idx, const struct rte_flow_item pattern[],
-			    uint32_t pattern_n)
+parser_ctx_set_raw_common(bool encap, uint16_t idx,
+			  const struct rte_flow_item pattern[],
+			  uint32_t pattern_n)
 {
 	uint32_t n = pattern_n;
 	int i = 0;
@@ -611,14 +598,14 @@ parser_ctx_set_raw_common(struct rte_flow_parser_ctx *ctx, bool encap,
 	const void *src_spec;
 	struct rte_flow_item *items = (struct rte_flow_item *)(uintptr_t)pattern;
 
-	if (!ctx || idx >= RAW_ENCAP_CONFS_MAX_NUM)
+	if (idx >= RAW_ENCAP_CONFS_MAX_NUM)
 		return -EINVAL;
 	if (encap) {
-		total_size = &ctx->raw_encap_confs[idx].size;
-		data = (uint8_t *)&ctx->raw_encap_confs[idx].data;
+		total_size = &parser.ctx.raw_encap_confs[idx].size;
+		data = (uint8_t *)&parser.ctx.raw_encap_confs[idx].data;
 	} else {
-		total_size = &ctx->raw_decap_confs[idx].size;
-		data = (uint8_t *)&ctx->raw_decap_confs[idx].data;
+		total_size = &parser.ctx.raw_decap_confs[idx].size;
+		data = (uint8_t *)&parser.ctx.raw_decap_confs[idx].data;
 	}
 	*total_size = 0;
 	memset(data, 0x00, ACTION_RAW_ENCAP_MAX_DATA);
@@ -816,49 +803,33 @@ error:
 	return -EINVAL;
 }
 
-static int
-parser_ctx_set_raw_encap(struct rte_flow_parser_ctx *ctx, uint16_t index,
-			 const struct rte_flow_item pattern[],
-			 uint32_t pattern_n)
+const struct rte_flow_action_raw_encap *
+rte_flow_parser_raw_encap_conf_get(uint16_t index)
 {
-	return parser_ctx_set_raw_common(ctx, true, index, pattern, pattern_n);
-}
-
-static int
-parser_ctx_set_raw_decap(struct rte_flow_parser_ctx *ctx, uint16_t index,
-			 const struct rte_flow_item pattern[],
-			 uint32_t pattern_n)
-{
-	return parser_ctx_set_raw_common(ctx, false, index, pattern, pattern_n);
-}
-
-static const struct rte_flow_action_raw_encap *
-parser_ctx_raw_encap_conf_get(struct rte_flow_parser_ctx *ctx, uint16_t index)
-{
-	if (!ctx || index >= RAW_ENCAP_CONFS_MAX_NUM)
+	if (index >= RAW_ENCAP_CONFS_MAX_NUM)
 		return NULL;
-	ctx->raw_encap_conf_cache[index] = (struct rte_flow_action_raw_encap){
-		.data = ctx->raw_encap_confs[index].data,
-		.size = ctx->raw_encap_confs[index].size,
-		.preserve = ctx->raw_encap_confs[index].preserve,
+	parser.ctx.raw_encap_conf_cache[index] = (struct rte_flow_action_raw_encap){
+		.data = parser.ctx.raw_encap_confs[index].data,
+		.size = parser.ctx.raw_encap_confs[index].size,
+		.preserve = parser.ctx.raw_encap_confs[index].preserve,
 	};
-	return &ctx->raw_encap_conf_cache[index];
+	return &parser.ctx.raw_encap_conf_cache[index];
 }
 
-static const struct rte_flow_action_raw_decap *
-parser_ctx_raw_decap_conf_get(struct rte_flow_parser_ctx *ctx, uint16_t index)
+const struct rte_flow_action_raw_decap *
+rte_flow_parser_raw_decap_conf_get(uint16_t index)
 {
-	if (!ctx || index >= RAW_ENCAP_CONFS_MAX_NUM)
+	if (index >= RAW_ENCAP_CONFS_MAX_NUM)
 		return NULL;
-	ctx->raw_decap_conf_cache[index] = (struct rte_flow_action_raw_decap){
-		.data = ctx->raw_decap_confs[index].data,
-		.size = ctx->raw_decap_confs[index].size,
+	parser.ctx.raw_decap_conf_cache[index] = (struct rte_flow_action_raw_decap){
+		.data = parser.ctx.raw_decap_confs[index].data,
+		.size = parser.ctx.raw_decap_confs[index].size,
 	};
-	return &ctx->raw_decap_conf_cache[index];
+	return &parser.ctx.raw_decap_conf_cache[index];
 }
 
 static int
-parser_ctx_set_ipv6_ext_push(struct rte_flow_parser_ctx *ctx, uint16_t idx,
+parser_ctx_set_ipv6_ext_push(uint16_t idx,
 			     const struct rte_flow_item pattern[],
 			     uint32_t pattern_n)
 {
@@ -869,11 +840,11 @@ parser_ctx_set_ipv6_ext_push(struct rte_flow_parser_ctx *ctx, uint16_t idx,
 	uint8_t *type;
 	size_t *total_size;
 
-	if (!ctx || idx >= IPV6_EXT_PUSH_CONFS_MAX_NUM)
+	if (idx >= IPV6_EXT_PUSH_CONFS_MAX_NUM)
 		return -EINVAL;
-	data = (uint8_t *)&ctx->ipv6_ext_push_confs[idx].data;
-	type = (uint8_t *)&ctx->ipv6_ext_push_confs[idx].type;
-	total_size = &ctx->ipv6_ext_push_confs[idx].size;
+	data = (uint8_t *)&parser.ctx.ipv6_ext_push_confs[idx].data;
+	type = (uint8_t *)&parser.ctx.ipv6_ext_push_confs[idx].type;
+	total_size = &parser.ctx.ipv6_ext_push_confs[idx].size;
 	*total_size = 0;
 	memset(data, 0x00, ACTION_IPV6_EXT_PUSH_MAX_DATA);
 	for (i = pattern_n; i > 0; --i) {
@@ -920,51 +891,49 @@ error:
 }
 
 static int
-parser_ctx_set_ipv6_ext_remove(struct rte_flow_parser_ctx *ctx, uint16_t idx,
+parser_ctx_set_ipv6_ext_remove(uint16_t idx,
 			       const struct rte_flow_item pattern[],
 			       uint32_t pattern_n)
 {
 	const struct rte_flow_item_ipv6_ext *ipv6_ext;
 
-	if (!ctx || pattern_n != 1 ||
+	if (pattern_n != 1 ||
 	    pattern[0].type != RTE_FLOW_ITEM_TYPE_IPV6_EXT ||
 	    pattern[0].spec == NULL || idx >= IPV6_EXT_PUSH_CONFS_MAX_NUM)
 		return -EINVAL;
 	ipv6_ext = pattern[0].spec;
-	ctx->ipv6_ext_remove_confs[idx].type = ipv6_ext->next_hdr;
+	parser.ctx.ipv6_ext_remove_confs[idx].type = ipv6_ext->next_hdr;
 	return 0;
 }
 
 static const struct rte_flow_action_ipv6_ext_push *
-parser_ctx_ipv6_ext_push_conf_get(struct rte_flow_parser_ctx *ctx,
-				  uint16_t index)
+parser_ctx_ipv6_ext_push_conf_get(uint16_t index)
 {
-	if (!ctx || index >= IPV6_EXT_PUSH_CONFS_MAX_NUM)
+	if (index >= IPV6_EXT_PUSH_CONFS_MAX_NUM)
 		return NULL;
-	ctx->ipv6_ext_push_action_cache[index] =
+	parser.ctx.ipv6_ext_push_action_cache[index] =
 		(struct rte_flow_action_ipv6_ext_push){
-			.data = ctx->ipv6_ext_push_confs[index].data,
-			.size = ctx->ipv6_ext_push_confs[index].size,
-			.type = ctx->ipv6_ext_push_confs[index].type,
+			.data = parser.ctx.ipv6_ext_push_confs[index].data,
+			.size = parser.ctx.ipv6_ext_push_confs[index].size,
+			.type = parser.ctx.ipv6_ext_push_confs[index].type,
 		};
-	return &ctx->ipv6_ext_push_action_cache[index];
+	return &parser.ctx.ipv6_ext_push_action_cache[index];
 }
 
 static const struct rte_flow_action_ipv6_ext_remove *
-parser_ctx_ipv6_ext_remove_conf_get(struct rte_flow_parser_ctx *ctx,
-				    uint16_t index)
+parser_ctx_ipv6_ext_remove_conf_get(uint16_t index)
 {
-	if (!ctx || index >= IPV6_EXT_PUSH_CONFS_MAX_NUM)
+	if (index >= IPV6_EXT_PUSH_CONFS_MAX_NUM)
 		return NULL;
-	ctx->ipv6_ext_remove_action_cache[index] =
+	parser.ctx.ipv6_ext_remove_action_cache[index] =
 		(struct rte_flow_action_ipv6_ext_remove){
-			.type = ctx->ipv6_ext_remove_confs[index].type,
+			.type = parser.ctx.ipv6_ext_remove_confs[index].type,
 		};
-	return &ctx->ipv6_ext_remove_action_cache[index];
+	return &parser.ctx.ipv6_ext_remove_action_cache[index];
 }
 
 static int
-parser_ctx_set_sample_actions(struct rte_flow_parser_ctx *ctx, uint16_t idx,
+parser_ctx_set_sample_actions(uint16_t idx,
 			      const struct rte_flow_action actions[],
 			      uint32_t actions_n)
 {
@@ -974,9 +943,9 @@ parser_ctx_set_sample_actions(struct rte_flow_parser_ctx *ctx, uint16_t idx,
 	uint32_t max_size = sizeof(struct rte_flow_action) *
 		ACTION_SAMPLE_ACTIONS_NUM;
 
-	if (!ctx || idx >= RAW_SAMPLE_CONFS_MAX_NUM)
+	if (idx >= RAW_SAMPLE_CONFS_MAX_NUM)
 		return -EINVAL;
-	data = (struct rte_flow_action *)&ctx->raw_sample_confs[idx].data;
+	data = (struct rte_flow_action *)&parser.ctx.raw_sample_confs[idx].data;
 	memset(data, 0x00, max_size);
 	for (i = 0; i < actions_n; i++) {
 		struct rte_flow_action action = actions[i];
@@ -987,81 +956,79 @@ parser_ctx_set_sample_actions(struct rte_flow_parser_ctx *ctx, uint16_t idx,
 		switch (action.type) {
 		case RTE_FLOW_ACTION_TYPE_MARK:
 			size = sizeof(struct rte_flow_action_mark);
-			rte_memcpy(&ctx->sample_mark[idx], action.conf, size);
-			action.conf = &ctx->sample_mark[idx];
+			rte_memcpy(&parser.ctx.sample_mark[idx], action.conf, size);
+			action.conf = &parser.ctx.sample_mark[idx];
 			break;
 		case RTE_FLOW_ACTION_TYPE_COUNT:
 			size = sizeof(struct rte_flow_action_count);
-			rte_memcpy(&ctx->sample_count[idx], action.conf, size);
-			action.conf = &ctx->sample_count[idx];
+			rte_memcpy(&parser.ctx.sample_count[idx], action.conf, size);
+			action.conf = &parser.ctx.sample_count[idx];
 			break;
 		case RTE_FLOW_ACTION_TYPE_QUEUE:
 			size = sizeof(struct rte_flow_action_queue);
-			rte_memcpy(&ctx->sample_queue[idx], action.conf, size);
-			action.conf = &ctx->sample_queue[idx];
+			rte_memcpy(&parser.ctx.sample_queue[idx], action.conf, size);
+			action.conf = &parser.ctx.sample_queue[idx];
 			break;
 		case RTE_FLOW_ACTION_TYPE_RSS:
 			size = sizeof(struct rte_flow_action_rss);
 			rss = action.conf;
-			rte_memcpy(&ctx->sample_rss_data[idx].conf, rss, size);
+			rte_memcpy(&parser.ctx.sample_rss_data[idx].conf, rss, size);
 			if (rss->key_len && rss->key) {
-				ctx->sample_rss_data[idx].conf.key =
-					ctx->sample_rss_data[idx].key;
+				parser.ctx.sample_rss_data[idx].conf.key =
+					parser.ctx.sample_rss_data[idx].key;
 				rte_memcpy((void *)(uintptr_t)
-					 ctx->sample_rss_data[idx].conf.key,
+					 parser.ctx.sample_rss_data[idx].conf.key,
 					   rss->key,
 					   sizeof(uint8_t) * rss->key_len);
 			}
 			if (rss->queue_num && rss->queue) {
-				ctx->sample_rss_data[idx].conf.queue =
-					ctx->sample_rss_data[idx].queue;
+				parser.ctx.sample_rss_data[idx].conf.queue =
+					parser.ctx.sample_rss_data[idx].queue;
 				rte_memcpy((void *)(uintptr_t)
-					 ctx->sample_rss_data[idx].conf.queue,
+					 parser.ctx.sample_rss_data[idx].conf.queue,
 					   rss->queue,
 					   sizeof(uint16_t) * rss->queue_num);
 			}
-			action.conf = &ctx->sample_rss_data[idx].conf;
+			action.conf = &parser.ctx.sample_rss_data[idx].conf;
 			break;
 		case RTE_FLOW_ACTION_TYPE_RAW_ENCAP:
 			size = sizeof(struct rte_flow_action_raw_encap);
-			rte_memcpy(&ctx->sample_encap[idx], action.conf, size);
-			action.conf = &ctx->sample_encap[idx];
+			rte_memcpy(&parser.ctx.sample_encap[idx], action.conf, size);
+			action.conf = &parser.ctx.sample_encap[idx];
 			break;
 		case RTE_FLOW_ACTION_TYPE_PORT_ID:
 			size = sizeof(struct rte_flow_action_port_id);
-			rte_memcpy(&ctx->sample_port_id[idx], action.conf, size);
-			action.conf = &ctx->sample_port_id[idx];
+			rte_memcpy(&parser.ctx.sample_port_id[idx], action.conf, size);
+			action.conf = &parser.ctx.sample_port_id[idx];
 			break;
 		case RTE_FLOW_ACTION_TYPE_PF:
 			break;
 		case RTE_FLOW_ACTION_TYPE_VF:
 			size = sizeof(struct rte_flow_action_vf);
-			rte_memcpy(&ctx->sample_vf[idx], action.conf, size);
-			action.conf = &ctx->sample_vf[idx];
+			rte_memcpy(&parser.ctx.sample_vf[idx], action.conf, size);
+			action.conf = &parser.ctx.sample_vf[idx];
 			break;
 		case RTE_FLOW_ACTION_TYPE_VXLAN_ENCAP:
 			size = sizeof(struct rte_flow_action_vxlan_encap);
-			parser_ctx_setup_vxlan_encap_data(ctx,
-						    &ctx->sample_vxlan_encap[idx]);
-			action.conf = &ctx->sample_vxlan_encap[idx].conf;
+			parser_ctx_setup_vxlan_encap_data(&parser.ctx.sample_vxlan_encap[idx]);
+			action.conf = &parser.ctx.sample_vxlan_encap[idx].conf;
 			break;
 		case RTE_FLOW_ACTION_TYPE_NVGRE_ENCAP:
 			size = sizeof(struct rte_flow_action_nvgre_encap);
-			parser_ctx_setup_nvgre_encap_data(ctx,
-						    &ctx->sample_nvgre_encap[idx]);
-			action.conf = &ctx->sample_nvgre_encap[idx];
+			parser_ctx_setup_nvgre_encap_data(&parser.ctx.sample_nvgre_encap[idx]);
+			action.conf = &parser.ctx.sample_nvgre_encap[idx];
 			break;
 		case RTE_FLOW_ACTION_TYPE_PORT_REPRESENTOR:
 			size = sizeof(struct rte_flow_action_ethdev);
-			rte_memcpy(&ctx->sample_port_representor[idx],
+			rte_memcpy(&parser.ctx.sample_port_representor[idx],
 				   action.conf, size);
-			action.conf = &ctx->sample_port_representor[idx];
+			action.conf = &parser.ctx.sample_port_representor[idx];
 			break;
 		case RTE_FLOW_ACTION_TYPE_REPRESENTED_PORT:
 			size = sizeof(struct rte_flow_action_ethdev);
-			rte_memcpy(&ctx->sample_represented_port[idx],
+			rte_memcpy(&parser.ctx.sample_represented_port[idx],
 				   action.conf, size);
-			action.conf = &ctx->sample_represented_port[idx];
+			action.conf = &parser.ctx.sample_represented_port[idx];
 			break;
 		default:
 			return -EINVAL;
@@ -1072,42 +1039,28 @@ parser_ctx_set_sample_actions(struct rte_flow_parser_ctx *ctx, uint16_t idx,
 	return 0;
 }
 
-static const struct rte_flow_action *
-parser_ctx_sample_actions_get(struct rte_flow_parser_ctx *ctx, uint16_t index)
-{
-	if (!ctx || index >= RAW_SAMPLE_CONFS_MAX_NUM)
-		return NULL;
-	return ctx->raw_sample_confs[index].data;
-}
-
 struct rte_flow_action_conntrack conntrack_context;
-
-struct rte_flow_parser {
-	const struct rte_flow_parser_ops *ops;
-	struct context *flow_ctx;
-	struct rte_flow_parser_ctx ctx;
-};
-
-static struct rte_flow_parser parser;
-
-static inline struct rte_flow_parser_ctx *
-parser_ctx(void)
-{
-	return &parser.ctx;
-}
-
-int
-rte_flow_parser_init(const struct rte_flow_parser_ops *ops)
-{
-	parser.ops = ops;
-	parser_ctx_reset_defaults(&parser.ctx);
-	return 0;
-}
 
 __rte_experimental void
 rte_flow_parser_reset_defaults(void)
 {
-	parser_ctx_reset_defaults(&parser.ctx);
+	memset(&parser.ctx, 0, sizeof(parser.ctx));
+	parser.ctx.vxlan_encap_conf = rte_flow_parser_default_vxlan_encap_conf;
+	parser.ctx.nvgre_encap_conf = rte_flow_parser_default_nvgre_encap_conf;
+	parser.ctx.l2_encap_conf = rte_flow_parser_default_l2_encap_conf;
+	parser.ctx.l2_decap_conf = rte_flow_parser_default_l2_decap_conf;
+	parser.ctx.mplsogre_encap_conf = rte_flow_parser_default_mplsogre_encap_conf;
+	parser.ctx.mplsogre_decap_conf = rte_flow_parser_default_mplsogre_decap_conf;
+	parser.ctx.mplsoudp_encap_conf = rte_flow_parser_default_mplsoudp_encap_conf;
+	parser.ctx.mplsoudp_decap_conf = rte_flow_parser_default_mplsoudp_decap_conf;
+}
+
+__rte_experimental int
+rte_flow_parser_init(const struct rte_flow_parser_ops *ops)
+{
+	parser.ops = ops;
+	rte_flow_parser_reset_defaults();
+	return 0;
 }
 
 __rte_experimental struct rte_flow_parser_vxlan_encap_conf *
@@ -1869,9 +1822,7 @@ parser_command_set_raw_encap(uint16_t index,
 			     const struct rte_flow_item pattern[],
 			     uint32_t pattern_n)
 {
-	struct rte_flow_parser_ctx *ctx = parser_ctx();
-
-	if (parser_ctx_set_raw_encap(ctx, index, pattern, pattern_n) == 0)
+	if (parser_ctx_set_raw_common(true, index, pattern, pattern_n) == 0)
 		return;
 	fprintf(stderr, "Error - set_raw_encap failed for index %u\n", index);
 }
@@ -1881,9 +1832,7 @@ parser_command_set_raw_decap(uint16_t index,
 			     const struct rte_flow_item pattern[],
 			     uint32_t pattern_n)
 {
-	struct rte_flow_parser_ctx *ctx = parser_ctx();
-
-	if (parser_ctx_set_raw_decap(ctx, index, pattern, pattern_n) == 0)
+	if (parser_ctx_set_raw_common(false, index, pattern, pattern_n) == 0)
 		return;
 	fprintf(stderr, "Error - set_raw_decap failed for index %u\n", index);
 }
@@ -1893,9 +1842,7 @@ parser_command_set_sample_actions(uint16_t index,
 				  const struct rte_flow_action actions[],
 				  uint32_t actions_n)
 {
-	struct rte_flow_parser_ctx *ctx = parser_ctx();
-
-	if (parser_ctx_set_sample_actions(ctx, index, actions, actions_n) == 0)
+	if (parser_ctx_set_sample_actions(index, actions, actions_n) == 0)
 		return;
 	fprintf(stderr, "Error - set_sample_actions failed for index %u\n", index);
 }
@@ -1905,9 +1852,7 @@ parser_command_set_ipv6_ext_push(uint16_t index,
 				 const struct rte_flow_item pattern[],
 				 uint32_t pattern_n)
 {
-	struct rte_flow_parser_ctx *ctx = parser_ctx();
-
-	if (parser_ctx_set_ipv6_ext_push(ctx, index, pattern, pattern_n) == 0)
+	if (parser_ctx_set_ipv6_ext_push(index, pattern, pattern_n) == 0)
 		return;
 	fprintf(stderr, "Error - set_ipv6_ext_push failed for index %u\n", index);
 }
@@ -1917,41 +1862,9 @@ parser_command_set_ipv6_ext_remove(uint16_t index,
 				   const struct rte_flow_item pattern[],
 				   uint32_t pattern_n)
 {
-	struct rte_flow_parser_ctx *ctx = parser_ctx();
-
-	if (parser_ctx_set_ipv6_ext_remove(ctx, index, pattern, pattern_n) == 0)
+	if (parser_ctx_set_ipv6_ext_remove(index, pattern, pattern_n) == 0)
 		return;
 	fprintf(stderr, "Error - set_ipv6_ext_remove failed for index %u\n", index);
-}
-
-const struct rte_flow_action_raw_encap *
-rte_flow_parser_raw_encap_conf_get(uint16_t index)
-{
-	return parser_ctx_raw_encap_conf_get(parser_ctx(), index);
-}
-
-const struct rte_flow_action_raw_decap *
-rte_flow_parser_raw_decap_conf_get(uint16_t index)
-{
-	return parser_ctx_raw_decap_conf_get(parser_ctx(), index);
-}
-
-static const struct rte_flow_action *
-parser_sample_actions_get(uint16_t index)
-{
-	return parser_ctx_sample_actions_get(parser_ctx(), index);
-}
-
-static const struct rte_flow_action_ipv6_ext_push *
-parser_ipv6_ext_push_conf_get(uint16_t index)
-{
-	return parser_ctx_ipv6_ext_push_conf_get(parser_ctx(), index);
-}
-
-static const struct rte_flow_action_ipv6_ext_remove *
-parser_ipv6_ext_remove_conf_get(uint16_t index)
-{
-	return parser_ctx_ipv6_ext_remove_conf_get(parser_ctx(), index);
 }
 
 /** Maximum size for pattern in struct rte_flow_item_raw. */
@@ -2103,9 +2016,7 @@ static struct context default_parser_context;
 static inline struct context *
 parser_cmd_context(void)
 {
-	if (!parser.flow_ctx)
-		parser.flow_ctx = &default_parser_context;
-	return parser.flow_ctx;
+	return &default_parser_context;
 }
 
 /** Static initializer for the next field. */
@@ -11235,7 +11146,7 @@ parse_vc_action_ipv6_ext_remove(struct context *ctx, const struct token *token,
 	/* Copy the headers to the buffer. */
 	ipv6_ext_remove_data = ctx->object;
 	const struct rte_flow_action_ipv6_ext_remove *conf =
-		parser_ipv6_ext_remove_conf_get(0);
+		parser_ctx_ipv6_ext_remove_conf_get(0);
 
 	if (!conf) {
 		fprintf(stderr, "Error - ipv6 ext remove index 0 is empty\n");
@@ -11278,7 +11189,7 @@ parse_vc_action_ipv6_ext_remove_index(struct context *ctx, const struct token *t
 	action_ipv6_ext_remove_data = ctx->object;
 	idx = action_ipv6_ext_remove_data->idx;
 	const struct rte_flow_action_ipv6_ext_remove *conf =
-		parser_ipv6_ext_remove_conf_get(idx);
+		parser_ctx_ipv6_ext_remove_conf_get(idx);
 
 	if (!conf) {
 		fprintf(stderr, "Error - ipv6 ext remove index %u is empty\n",
@@ -11315,7 +11226,7 @@ parse_vc_action_ipv6_ext_push(struct context *ctx, const struct token *token,
 	/* Copy the headers to the buffer. */
 	ipv6_ext_push_data = ctx->object;
 	const struct rte_flow_action_ipv6_ext_push *conf =
-		parser_ipv6_ext_push_conf_get(0);
+		parser_ctx_ipv6_ext_push_conf_get(0);
 
 	if (!conf || !conf->data || !conf->size) {
 		fprintf(stderr, "Error - ipv6 ext push index 0 is empty\n");
@@ -11358,7 +11269,7 @@ parse_vc_action_ipv6_ext_push_index(struct context *ctx, const struct token *tok
 	action_ipv6_ext_push_data = ctx->object;
 	idx = action_ipv6_ext_push_data->idx;
 	const struct rte_flow_action_ipv6_ext_push *conf =
-		parser_ipv6_ext_push_conf_get(idx);
+		parser_ctx_ipv6_ext_push_conf_get(idx);
 
 	if (!conf) {
 		fprintf(stderr, "Error - ipv6 ext push index %u is empty\n",
@@ -11452,7 +11363,10 @@ parse_vc_action_sample_index(struct context *ctx, const struct token *token,
 	action = &out->args.vc.actions[out->args.vc.actions_n - 1];
 	action_sample_data = ctx->object;
 	idx = action_sample_data->idx;
-	actions = parser_sample_actions_get(idx);
+	if (idx >= RAW_SAMPLE_CONFS_MAX_NUM)
+		actions = NULL;
+	else
+		actions = parser.ctx.raw_sample_confs[idx].data;
 	if (!actions) {
 		fprintf(stderr, "Error - sample actions index %u is empty\n",
 			idx);
@@ -14911,7 +14825,6 @@ rte_flow_parser_parse_actions_str(const char *src,
 	return 0;
 }
 
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_reset_defaults, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_vxlan_encap_conf, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_nvgre_encap_conf, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_l2_encap_conf, 26.0);
@@ -14928,6 +14841,7 @@ RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_set_raw_tok, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_flow_dispatch, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_set_raw_dispatch, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_init, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_reset_defaults, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_parse, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_run, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_parse_attr_str, 26.0);
