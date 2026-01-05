@@ -17,7 +17,6 @@ extern "C" {
 #endif
 
 struct rte_flow_parser;
-struct rte_flow_parser_ctx;
 
 /* Shared limits used across parser helpers. */
 #define ACTION_RAW_ENCAP_MAX_DATA 512
@@ -30,13 +29,9 @@ struct rte_flow_parser_ctx;
 #define ACTION_VXLAN_ENCAP_ITEMS_NUM 6
 #define ACTION_NVGRE_ENCAP_ITEMS_NUM 5
 
-/* Parser context lifecycle and shared state helpers. */
-__rte_experimental struct rte_flow_parser_ctx *
-rte_flow_parser_ctx_create(void);
-__rte_experimental void rte_flow_parser_ctx_destroy(
-	struct rte_flow_parser_ctx *ctx);
-__rte_experimental void rte_flow_parser_ctx_reset_defaults(
-	struct rte_flow_parser_ctx *ctx);
+/* Reset parser defaults and clear stored caches (parser == NULL uses default parser). */
+__rte_experimental void
+rte_flow_parser_reset_defaults(struct rte_flow_parser *parser);
 
 struct rte_flow_parser_vxlan_encap_conf {
 	uint32_t select_ipv4:1;
@@ -119,38 +114,25 @@ struct rte_flow_parser_mplsoudp_decap_conf {
 	uint32_t select_vlan:1;
 };
 
-/* Accessors for mutable encap/decap configurations. */
+/* Accessors for mutable encap/decap configurations (parser == NULL uses default parser). */
 __rte_experimental struct rte_flow_parser_vxlan_encap_conf *
-rte_flow_parser_ctx_vxlan_encap_conf(struct rte_flow_parser_ctx *ctx);
+rte_flow_parser_vxlan_encap_conf(struct rte_flow_parser *parser);
 __rte_experimental struct rte_flow_parser_nvgre_encap_conf *
-rte_flow_parser_ctx_nvgre_encap_conf(struct rte_flow_parser_ctx *ctx);
+rte_flow_parser_nvgre_encap_conf(struct rte_flow_parser *parser);
 __rte_experimental struct rte_flow_parser_l2_encap_conf *
-rte_flow_parser_ctx_l2_encap_conf(struct rte_flow_parser_ctx *ctx);
+rte_flow_parser_l2_encap_conf(struct rte_flow_parser *parser);
 __rte_experimental struct rte_flow_parser_l2_decap_conf *
-rte_flow_parser_ctx_l2_decap_conf(struct rte_flow_parser_ctx *ctx);
+rte_flow_parser_l2_decap_conf(struct rte_flow_parser *parser);
 __rte_experimental struct rte_flow_parser_mplsogre_encap_conf *
-rte_flow_parser_ctx_mplsogre_encap_conf(struct rte_flow_parser_ctx *ctx);
+rte_flow_parser_mplsogre_encap_conf(struct rte_flow_parser *parser);
 __rte_experimental struct rte_flow_parser_mplsogre_decap_conf *
-rte_flow_parser_ctx_mplsogre_decap_conf(struct rte_flow_parser_ctx *ctx);
+rte_flow_parser_mplsogre_decap_conf(struct rte_flow_parser *parser);
 __rte_experimental struct rte_flow_parser_mplsoudp_encap_conf *
-rte_flow_parser_ctx_mplsoudp_encap_conf(struct rte_flow_parser_ctx *ctx);
+rte_flow_parser_mplsoudp_encap_conf(struct rte_flow_parser *parser);
 __rte_experimental struct rte_flow_parser_mplsoudp_decap_conf *
-rte_flow_parser_ctx_mplsoudp_decap_conf(struct rte_flow_parser_ctx *ctx);
+rte_flow_parser_mplsoudp_decap_conf(struct rte_flow_parser *parser);
 
-/* Raw encap/decap and extension state management. */
-__rte_experimental int rte_flow_parser_ctx_set_raw_encap(
-	struct rte_flow_parser_ctx *ctx, uint16_t index,
-	const struct rte_flow_item pattern[], uint32_t pattern_n);
-__rte_experimental int rte_flow_parser_ctx_set_raw_decap(
-	struct rte_flow_parser_ctx *ctx, uint16_t index,
-	const struct rte_flow_item pattern[], uint32_t pattern_n);
-__rte_experimental const struct rte_flow_action_raw_encap *
-rte_flow_parser_ctx_raw_encap_conf_get(struct rte_flow_parser_ctx *ctx,
-	uint16_t index);
-__rte_experimental const struct rte_flow_action_raw_decap *
-rte_flow_parser_ctx_raw_decap_conf_get(struct rte_flow_parser_ctx *ctx,
-	uint16_t index);
-
+/* Raw encap/decap configuration accessors. */
 __rte_experimental
 const struct rte_flow_action_raw_encap *
 rte_flow_parser_raw_encap_conf_get(uint16_t index);
@@ -158,26 +140,6 @@ rte_flow_parser_raw_encap_conf_get(uint16_t index);
 __rte_experimental
 const struct rte_flow_action_raw_decap *
 rte_flow_parser_raw_decap_conf_get(uint16_t index);
-
-__rte_experimental int rte_flow_parser_ctx_set_ipv6_ext_push(
-	struct rte_flow_parser_ctx *ctx, uint16_t index,
-	const struct rte_flow_item pattern[], uint32_t pattern_n);
-__rte_experimental int rte_flow_parser_ctx_set_ipv6_ext_remove(
-	struct rte_flow_parser_ctx *ctx, uint16_t index,
-	const struct rte_flow_item pattern[], uint32_t pattern_n);
-__rte_experimental const struct rte_flow_action_ipv6_ext_push *
-rte_flow_parser_ctx_ipv6_ext_push_conf_get(struct rte_flow_parser_ctx *ctx,
-	uint16_t index);
-__rte_experimental const struct rte_flow_action_ipv6_ext_remove *
-rte_flow_parser_ctx_ipv6_ext_remove_conf_get(struct rte_flow_parser_ctx *ctx,
-	uint16_t index);
-
-__rte_experimental int rte_flow_parser_ctx_set_sample_actions(
-	struct rte_flow_parser_ctx *ctx, uint16_t index,
-	const struct rte_flow_action actions[], uint32_t actions_n);
-__rte_experimental const struct rte_flow_action *
-rte_flow_parser_ctx_sample_actions_get(struct rte_flow_parser_ctx *ctx,
-	uint16_t index);
 
 /**
  * Tunnel steering/match flags used by the parser.

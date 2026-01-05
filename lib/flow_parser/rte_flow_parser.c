@@ -218,6 +218,7 @@ parser_ctx_reset_defaults(struct rte_flow_parser_ctx *ctx)
 {
 	if (!ctx)
 		return;
+	memset(ctx, 0, sizeof(*ctx));
 	ctx->vxlan_encap_conf = rte_flow_parser_default_vxlan_encap_conf;
 	ctx->nvgre_encap_conf = rte_flow_parser_default_nvgre_encap_conf;
 	ctx->l2_encap_conf = rte_flow_parser_default_l2_encap_conf;
@@ -226,77 +227,6 @@ parser_ctx_reset_defaults(struct rte_flow_parser_ctx *ctx)
 	ctx->mplsogre_decap_conf = rte_flow_parser_default_mplsogre_decap_conf;
 	ctx->mplsoudp_encap_conf = rte_flow_parser_default_mplsoudp_encap_conf;
 	ctx->mplsoudp_decap_conf = rte_flow_parser_default_mplsoudp_decap_conf;
-}
-
-__rte_experimental struct rte_flow_parser_ctx *
-rte_flow_parser_ctx_create(void)
-{
-	struct rte_flow_parser_ctx *ctx = calloc(1, sizeof(*ctx));
-
-	if (!ctx)
-		return NULL;
-	parser_ctx_reset_defaults(ctx);
-	return ctx;
-}
-
-__rte_experimental void
-rte_flow_parser_ctx_destroy(struct rte_flow_parser_ctx *ctx)
-{
-	free(ctx);
-}
-
-__rte_experimental void
-rte_flow_parser_ctx_reset_defaults(struct rte_flow_parser_ctx *ctx)
-{
-	parser_ctx_reset_defaults(ctx);
-}
-
-__rte_experimental struct rte_flow_parser_vxlan_encap_conf *
-rte_flow_parser_ctx_vxlan_encap_conf(struct rte_flow_parser_ctx *ctx)
-{
-	return ctx ? &ctx->vxlan_encap_conf : NULL;
-}
-
-__rte_experimental struct rte_flow_parser_nvgre_encap_conf *
-rte_flow_parser_ctx_nvgre_encap_conf(struct rte_flow_parser_ctx *ctx)
-{
-	return ctx ? &ctx->nvgre_encap_conf : NULL;
-}
-
-__rte_experimental struct rte_flow_parser_l2_encap_conf *
-rte_flow_parser_ctx_l2_encap_conf(struct rte_flow_parser_ctx *ctx)
-{
-	return ctx ? &ctx->l2_encap_conf : NULL;
-}
-
-__rte_experimental struct rte_flow_parser_l2_decap_conf *
-rte_flow_parser_ctx_l2_decap_conf(struct rte_flow_parser_ctx *ctx)
-{
-	return ctx ? &ctx->l2_decap_conf : NULL;
-}
-
-__rte_experimental struct rte_flow_parser_mplsogre_encap_conf *
-rte_flow_parser_ctx_mplsogre_encap_conf(struct rte_flow_parser_ctx *ctx)
-{
-	return ctx ? &ctx->mplsogre_encap_conf : NULL;
-}
-
-__rte_experimental struct rte_flow_parser_mplsogre_decap_conf *
-rte_flow_parser_ctx_mplsogre_decap_conf(struct rte_flow_parser_ctx *ctx)
-{
-	return ctx ? &ctx->mplsogre_decap_conf : NULL;
-}
-
-__rte_experimental struct rte_flow_parser_mplsoudp_encap_conf *
-rte_flow_parser_ctx_mplsoudp_encap_conf(struct rte_flow_parser_ctx *ctx)
-{
-	return ctx ? &ctx->mplsoudp_encap_conf : NULL;
-}
-
-__rte_experimental struct rte_flow_parser_mplsoudp_decap_conf *
-rte_flow_parser_ctx_mplsoudp_decap_conf(struct rte_flow_parser_ctx *ctx)
-{
-	return ctx ? &ctx->mplsoudp_decap_conf : NULL;
 }
 
 static void
@@ -887,27 +817,24 @@ error:
 	return -EINVAL;
 }
 
-__rte_experimental int
-rte_flow_parser_ctx_set_raw_encap(struct rte_flow_parser_ctx *ctx,
-				 uint16_t index,
-				 const struct rte_flow_item pattern[],
-				 uint32_t pattern_n)
+static int
+parser_ctx_set_raw_encap(struct rte_flow_parser_ctx *ctx, uint16_t index,
+			 const struct rte_flow_item pattern[],
+			 uint32_t pattern_n)
 {
 	return parser_ctx_set_raw_common(ctx, true, index, pattern, pattern_n);
 }
 
-__rte_experimental int
-rte_flow_parser_ctx_set_raw_decap(struct rte_flow_parser_ctx *ctx,
-				 uint16_t index,
-				 const struct rte_flow_item pattern[],
-				 uint32_t pattern_n)
+static int
+parser_ctx_set_raw_decap(struct rte_flow_parser_ctx *ctx, uint16_t index,
+			 const struct rte_flow_item pattern[],
+			 uint32_t pattern_n)
 {
 	return parser_ctx_set_raw_common(ctx, false, index, pattern, pattern_n);
 }
 
-__rte_experimental const struct rte_flow_action_raw_encap *
-rte_flow_parser_ctx_raw_encap_conf_get(struct rte_flow_parser_ctx *ctx,
-					      uint16_t index)
+static const struct rte_flow_action_raw_encap *
+parser_ctx_raw_encap_conf_get(struct rte_flow_parser_ctx *ctx, uint16_t index)
 {
 	if (!ctx || index >= RAW_ENCAP_CONFS_MAX_NUM)
 		return NULL;
@@ -919,9 +846,8 @@ rte_flow_parser_ctx_raw_encap_conf_get(struct rte_flow_parser_ctx *ctx,
 	return &ctx->raw_encap_conf_cache[index];
 }
 
-__rte_experimental const struct rte_flow_action_raw_decap *
-rte_flow_parser_ctx_raw_decap_conf_get(struct rte_flow_parser_ctx *ctx,
-					      uint16_t index)
+static const struct rte_flow_action_raw_decap *
+parser_ctx_raw_decap_conf_get(struct rte_flow_parser_ctx *ctx, uint16_t index)
 {
 	if (!ctx || index >= RAW_ENCAP_CONFS_MAX_NUM)
 		return NULL;
@@ -932,11 +858,10 @@ rte_flow_parser_ctx_raw_decap_conf_get(struct rte_flow_parser_ctx *ctx,
 	return &ctx->raw_decap_conf_cache[index];
 }
 
-__rte_experimental int
-rte_flow_parser_ctx_set_ipv6_ext_push(struct rte_flow_parser_ctx *ctx,
-				    uint16_t idx,
-				    const struct rte_flow_item pattern[],
-				    uint32_t pattern_n)
+static int
+parser_ctx_set_ipv6_ext_push(struct rte_flow_parser_ctx *ctx, uint16_t idx,
+			     const struct rte_flow_item pattern[],
+			     uint32_t pattern_n)
 {
 	uint32_t i = 0;
 	const struct rte_flow_item *item;
@@ -995,11 +920,10 @@ error:
 	return -EINVAL;
 }
 
-__rte_experimental int
-rte_flow_parser_ctx_set_ipv6_ext_remove(struct rte_flow_parser_ctx *ctx,
-				      uint16_t idx,
-				      const struct rte_flow_item pattern[],
-				      uint32_t pattern_n)
+static int
+parser_ctx_set_ipv6_ext_remove(struct rte_flow_parser_ctx *ctx, uint16_t idx,
+			       const struct rte_flow_item pattern[],
+			       uint32_t pattern_n)
 {
 	const struct rte_flow_item_ipv6_ext *ipv6_ext;
 
@@ -1012,9 +936,9 @@ rte_flow_parser_ctx_set_ipv6_ext_remove(struct rte_flow_parser_ctx *ctx,
 	return 0;
 }
 
-__rte_experimental const struct rte_flow_action_ipv6_ext_push *
-rte_flow_parser_ctx_ipv6_ext_push_conf_get(struct rte_flow_parser_ctx *ctx,
-					       uint16_t index)
+static const struct rte_flow_action_ipv6_ext_push *
+parser_ctx_ipv6_ext_push_conf_get(struct rte_flow_parser_ctx *ctx,
+				  uint16_t index)
 {
 	if (!ctx || index >= IPV6_EXT_PUSH_CONFS_MAX_NUM)
 		return NULL;
@@ -1027,9 +951,9 @@ rte_flow_parser_ctx_ipv6_ext_push_conf_get(struct rte_flow_parser_ctx *ctx,
 	return &ctx->ipv6_ext_push_action_cache[index];
 }
 
-__rte_experimental const struct rte_flow_action_ipv6_ext_remove *
-rte_flow_parser_ctx_ipv6_ext_remove_conf_get(struct rte_flow_parser_ctx *ctx,
-					         uint16_t index)
+static const struct rte_flow_action_ipv6_ext_remove *
+parser_ctx_ipv6_ext_remove_conf_get(struct rte_flow_parser_ctx *ctx,
+				    uint16_t index)
 {
 	if (!ctx || index >= IPV6_EXT_PUSH_CONFS_MAX_NUM)
 		return NULL;
@@ -1040,11 +964,10 @@ rte_flow_parser_ctx_ipv6_ext_remove_conf_get(struct rte_flow_parser_ctx *ctx,
 	return &ctx->ipv6_ext_remove_action_cache[index];
 }
 
-__rte_experimental int
-rte_flow_parser_ctx_set_sample_actions(struct rte_flow_parser_ctx *ctx,
-				     uint16_t idx,
-				     const struct rte_flow_action actions[],
-				     uint32_t actions_n)
+static int
+parser_ctx_set_sample_actions(struct rte_flow_parser_ctx *ctx, uint16_t idx,
+			      const struct rte_flow_action actions[],
+			      uint32_t actions_n)
 {
 	uint32_t i;
 	struct rte_flow_action *data;
@@ -1150,9 +1073,8 @@ rte_flow_parser_ctx_set_sample_actions(struct rte_flow_parser_ctx *ctx,
 	return 0;
 }
 
-__rte_experimental const struct rte_flow_action *
-rte_flow_parser_ctx_sample_actions_get(struct rte_flow_parser_ctx *ctx,
-				       uint16_t index)
+static const struct rte_flow_action *
+parser_ctx_sample_actions_get(struct rte_flow_parser_ctx *ctx, uint16_t index)
 {
 	if (!ctx || index >= RAW_SAMPLE_CONFS_MAX_NUM)
 		return NULL;
@@ -1165,6 +1087,7 @@ struct rte_flow_parser {
 	const struct rte_flow_parser_ops *ops;
 	void *userdata;
 	struct context *flow_ctx;
+	struct rte_flow_parser_ctx ctx;
 };
 
 static struct rte_flow_parser default_parser;
@@ -1185,9 +1108,23 @@ parser_pop_current(struct rte_flow_parser *parser)
 	parser_inst = parser ? parser : &default_parser;
 }
 
-static inline void *parser_userdata(void)
+static inline void *
+parser_cb_userdata(void)
 {
 	return parser_inst ? parser_inst->userdata : NULL;
+}
+
+static inline struct rte_flow_parser_ctx *
+parser_ctx_get(struct rte_flow_parser *parser)
+{
+	struct rte_flow_parser *p = parser ? parser : &default_parser;
+	return &p->ctx;
+}
+
+static inline struct rte_flow_parser_ctx *
+parser_ctx_current(void)
+{
+	return parser_ctx_get(parser_inst);
 }
 
 int
@@ -1197,6 +1134,62 @@ rte_flow_parser_set_default_ops(const struct rte_flow_parser_ops *ops,
 	default_parser.ops = ops;
 	default_parser.userdata = userdata;
 	return 0;
+}
+
+__rte_experimental void
+rte_flow_parser_reset_defaults(struct rte_flow_parser *parser)
+{
+	struct rte_flow_parser *p = parser ? parser : &default_parser;
+
+	parser_ctx_reset_defaults(&p->ctx);
+}
+
+__rte_experimental struct rte_flow_parser_vxlan_encap_conf *
+rte_flow_parser_vxlan_encap_conf(struct rte_flow_parser *parser)
+{
+	return &parser_ctx_get(parser)->vxlan_encap_conf;
+}
+
+__rte_experimental struct rte_flow_parser_nvgre_encap_conf *
+rte_flow_parser_nvgre_encap_conf(struct rte_flow_parser *parser)
+{
+	return &parser_ctx_get(parser)->nvgre_encap_conf;
+}
+
+__rte_experimental struct rte_flow_parser_l2_encap_conf *
+rte_flow_parser_l2_encap_conf(struct rte_flow_parser *parser)
+{
+	return &parser_ctx_get(parser)->l2_encap_conf;
+}
+
+__rte_experimental struct rte_flow_parser_l2_decap_conf *
+rte_flow_parser_l2_decap_conf(struct rte_flow_parser *parser)
+{
+	return &parser_ctx_get(parser)->l2_decap_conf;
+}
+
+__rte_experimental struct rte_flow_parser_mplsogre_encap_conf *
+rte_flow_parser_mplsogre_encap_conf(struct rte_flow_parser *parser)
+{
+	return &parser_ctx_get(parser)->mplsogre_encap_conf;
+}
+
+__rte_experimental struct rte_flow_parser_mplsogre_decap_conf *
+rte_flow_parser_mplsogre_decap_conf(struct rte_flow_parser *parser)
+{
+	return &parser_ctx_get(parser)->mplsogre_decap_conf;
+}
+
+__rte_experimental struct rte_flow_parser_mplsoudp_encap_conf *
+rte_flow_parser_mplsoudp_encap_conf(struct rte_flow_parser *parser)
+{
+	return &parser_ctx_get(parser)->mplsoudp_encap_conf;
+}
+
+__rte_experimental struct rte_flow_parser_mplsoudp_decap_conf *
+rte_flow_parser_mplsoudp_decap_conf(struct rte_flow_parser *parser)
+{
+	return &parser_ctx_get(parser)->mplsoudp_decap_conf;
 }
 
 static inline const struct rte_flow_parser_ops_query *
@@ -1209,73 +1202,49 @@ parser_query_ops(void)
 static inline const struct rte_flow_parser_vxlan_encap_conf *
 parser_vxlan_conf(void)
 {
-	struct rte_flow_parser_ctx *ctx = parser_userdata();
-
-	return ctx ? &ctx->vxlan_encap_conf :
-		&rte_flow_parser_default_vxlan_encap_conf;
+	return &parser_ctx_current()->vxlan_encap_conf;
 }
 
 static inline const struct rte_flow_parser_nvgre_encap_conf *
 parser_nvgre_conf(void)
 {
-	struct rte_flow_parser_ctx *ctx = parser_userdata();
-
-	return ctx ? &ctx->nvgre_encap_conf :
-		&rte_flow_parser_default_nvgre_encap_conf;
+	return &parser_ctx_current()->nvgre_encap_conf;
 }
 
 static inline const struct rte_flow_parser_l2_encap_conf *
 parser_l2_encap_conf_get(void)
 {
-	struct rte_flow_parser_ctx *ctx = parser_userdata();
-
-	return ctx ? &ctx->l2_encap_conf :
-		&rte_flow_parser_default_l2_encap_conf;
+	return &parser_ctx_current()->l2_encap_conf;
 }
 
 static inline const struct rte_flow_parser_l2_decap_conf *
 parser_l2_decap_conf_get(void)
 {
-	struct rte_flow_parser_ctx *ctx = parser_userdata();
-
-	return ctx ? &ctx->l2_decap_conf :
-		&rte_flow_parser_default_l2_decap_conf;
+	return &parser_ctx_current()->l2_decap_conf;
 }
 
 static inline const struct rte_flow_parser_mplsogre_encap_conf *
 parser_mplsogre_encap_conf_get(void)
 {
-	struct rte_flow_parser_ctx *ctx = parser_userdata();
-
-	return ctx ? &ctx->mplsogre_encap_conf :
-		&rte_flow_parser_default_mplsogre_encap_conf;
+	return &parser_ctx_current()->mplsogre_encap_conf;
 }
 
 static inline const struct rte_flow_parser_mplsogre_decap_conf *
 parser_mplsogre_decap_conf_get(void)
 {
-	struct rte_flow_parser_ctx *ctx = parser_userdata();
-
-	return ctx ? &ctx->mplsogre_decap_conf :
-		&rte_flow_parser_default_mplsogre_decap_conf;
+	return &parser_ctx_current()->mplsogre_decap_conf;
 }
 
 static inline const struct rte_flow_parser_mplsoudp_encap_conf *
 parser_mplsoudp_encap_conf_get(void)
 {
-	struct rte_flow_parser_ctx *ctx = parser_userdata();
-
-	return ctx ? &ctx->mplsoudp_encap_conf :
-		&rte_flow_parser_default_mplsoudp_encap_conf;
+	return &parser_ctx_current()->mplsoudp_encap_conf;
 }
 
 static inline const struct rte_flow_parser_mplsoudp_decap_conf *
 parser_mplsoudp_decap_conf_get(void)
 {
-	struct rte_flow_parser_ctx *ctx = parser_userdata();
-
-	return ctx ? &ctx->mplsoudp_decap_conf :
-		&rte_flow_parser_default_mplsoudp_decap_conf;
+	return &parser_ctx_current()->mplsoudp_decap_conf;
 }
 
 static inline const struct rte_flow_parser_ops_command *
@@ -1292,7 +1261,7 @@ parser_verbose_level(void)
 
 	if (!ops || !ops->verbose_level_get)
 		return 0;
-	return ops->verbose_level_get(parser_userdata());
+	return ops->verbose_level_get(parser_cb_userdata());
 }
 
 static inline int
@@ -1302,7 +1271,7 @@ parser_port_id_is_invalid(uint16_t port_id)
 
 	if (!ops || !ops->port_validate)
 		return 0;
-	return ops->port_validate(port_id, parser_userdata());
+	return ops->port_validate(port_id, parser_cb_userdata());
 }
 
 static inline uint16_t
@@ -1312,7 +1281,7 @@ parser_flow_rule_count(uint16_t port_id)
 
 	if (!ops || !ops->flow_rule_count)
 		return 0;
-	return ops->flow_rule_count(port_id, parser_userdata());
+	return ops->flow_rule_count(port_id, parser_cb_userdata());
 }
 
 static inline int
@@ -1323,7 +1292,7 @@ parser_flow_rule_id_get(uint16_t port_id, unsigned int index, uint64_t *rule_id)
 	if (!ops || !ops->flow_rule_id_get)
 		return -1;
 	return ops->flow_rule_id_get(port_id, index, rule_id,
-				     parser_userdata());
+				     parser_cb_userdata());
 }
 
 static inline uint16_t
@@ -1333,7 +1302,7 @@ parser_pattern_template_count(uint16_t port_id)
 
 	if (!ops || !ops->pattern_template_count)
 		return 0;
-	return ops->pattern_template_count(port_id, parser_userdata());
+	return ops->pattern_template_count(port_id, parser_cb_userdata());
 }
 
 static inline int
@@ -1345,7 +1314,7 @@ parser_pattern_template_id_get(uint16_t port_id, unsigned int index,
 	if (!ops || !ops->pattern_template_id_get)
 		return -1;
 	return ops->pattern_template_id_get(port_id, index, template_id,
-					    parser_userdata());
+					    parser_cb_userdata());
 }
 
 static inline uint16_t
@@ -1355,7 +1324,7 @@ parser_actions_template_count(uint16_t port_id)
 
 	if (!ops || !ops->actions_template_count)
 		return 0;
-	return ops->actions_template_count(port_id, parser_userdata());
+	return ops->actions_template_count(port_id, parser_cb_userdata());
 }
 
 static inline int
@@ -1367,7 +1336,7 @@ parser_actions_template_id_get(uint16_t port_id, unsigned int index,
 	if (!ops || !ops->actions_template_id_get)
 		return -1;
 	return ops->actions_template_id_get(port_id, index, template_id,
-					    parser_userdata());
+					    parser_cb_userdata());
 }
 
 static inline uint16_t
@@ -1377,7 +1346,7 @@ parser_table_count(uint16_t port_id)
 
 	if (!ops || !ops->table_count)
 		return 0;
-	return ops->table_count(port_id, parser_userdata());
+	return ops->table_count(port_id, parser_cb_userdata());
 }
 
 static inline int
@@ -1387,7 +1356,7 @@ parser_table_id_get(uint16_t port_id, unsigned int index, uint32_t *table_id)
 
 	if (!ops || !ops->table_id_get)
 		return -1;
-	return ops->table_id_get(port_id, index, table_id, parser_userdata());
+	return ops->table_id_get(port_id, index, table_id, parser_cb_userdata());
 }
 
 static inline uint16_t
@@ -1397,7 +1366,7 @@ parser_queue_count(uint16_t port_id)
 
 	if (!ops || !ops->queue_count)
 		return 0;
-	return ops->queue_count(port_id, parser_userdata());
+	return ops->queue_count(port_id, parser_cb_userdata());
 }
 
 static inline uint16_t
@@ -1407,7 +1376,7 @@ parser_rss_queue_count(uint16_t port_id)
 
 	if (!ops || !ops->rss_queue_count)
 		return 0;
-	return ops->rss_queue_count(port_id, parser_userdata());
+	return ops->rss_queue_count(port_id, parser_cb_userdata());
 }
 
 static inline struct rte_flow_template_table *
@@ -1417,7 +1386,7 @@ parser_table_get(uint16_t port_id, uint32_t table_id)
 
 	if (!ops || !ops->table_get)
 		return NULL;
-	return ops->table_get(port_id, table_id, parser_userdata());
+	return ops->table_get(port_id, table_id, parser_cb_userdata());
 }
 
 static inline struct rte_flow_action_handle *
@@ -1428,7 +1397,7 @@ parser_action_handle_get(uint16_t port_id, uint32_t action_id)
 	if (!ops || !ops->action_handle_get)
 		return NULL;
 	return ops->action_handle_get(port_id, action_id,
-				      parser_userdata());
+				      parser_cb_userdata());
 }
 
 static inline struct rte_flow_meter_profile *
@@ -1439,7 +1408,7 @@ parser_meter_profile_get(uint16_t port_id, uint32_t profile_id)
 	if (!ops || !ops->meter_profile_get)
 		return NULL;
 	return ops->meter_profile_get(port_id, profile_id,
-				      parser_userdata());
+				      parser_cb_userdata());
 }
 
 static inline struct rte_flow_meter_policy *
@@ -1449,7 +1418,7 @@ parser_meter_policy_get(uint16_t port_id, uint32_t policy_id)
 
 	if (!ops || !ops->meter_policy_get)
 		return NULL;
-	return ops->meter_policy_get(port_id, policy_id, parser_userdata());
+	return ops->meter_policy_get(port_id, policy_id, parser_cb_userdata());
 }
 
 static inline struct rte_flow_item_flex_handle *
@@ -1459,7 +1428,7 @@ parser_flex_handle_get(uint16_t port_id, uint16_t flex_id)
 
 	if (!ops || !ops->flex_handle_get)
 		return NULL;
-	return ops->flex_handle_get(port_id, flex_id, parser_userdata());
+	return ops->flex_handle_get(port_id, flex_id, parser_cb_userdata());
 }
 
 static inline int
@@ -1472,7 +1441,7 @@ parser_flex_pattern_get(uint16_t pattern_id,
 	if (!ops || !ops->flex_pattern_get)
 		return -1;
 	return ops->flex_pattern_get(pattern_id, spec, mask,
-				     parser_userdata());
+				     parser_cb_userdata());
 }
 
 static inline void
@@ -1481,7 +1450,7 @@ parser_command_flow_get_info(rte_port_id_t port_id)
 	const struct rte_flow_parser_ops_command *ops = parser_command_ops();
 
 	if (ops && ops->flow_get_info)
-		ops->flow_get_info(port_id, parser_userdata());
+		ops->flow_get_info(port_id, parser_cb_userdata());
 }
 
 static inline void
@@ -1494,7 +1463,7 @@ parser_command_flow_configure(rte_port_id_t port_id,
 
 	if (ops && ops->flow_configure)
 		ops->flow_configure(port_id, port_attr, nb_queue, queue_attr,
-				    parser_userdata());
+				    parser_cb_userdata());
 }
 
 static inline void
@@ -1506,7 +1475,7 @@ parser_command_flow_pattern_template_create(rte_port_id_t port_id, uint32_t id,
 
 	if (ops && ops->flow_pattern_template_create)
 		ops->flow_pattern_template_create(port_id, id, attr, pattern,
-						  parser_userdata());
+						  parser_cb_userdata());
 }
 
 static inline void
@@ -1518,7 +1487,7 @@ parser_command_flow_pattern_template_destroy(rte_port_id_t port_id,
 
 	if (ops && ops->flow_pattern_template_destroy)
 		ops->flow_pattern_template_destroy(port_id, nb_id, id,
-						   parser_userdata());
+						   parser_cb_userdata());
 }
 
 static inline void
@@ -1531,7 +1500,7 @@ parser_command_flow_actions_template_create(rte_port_id_t port_id, uint32_t id,
 
 	if (ops && ops->flow_actions_template_create)
 		ops->flow_actions_template_create(port_id, id, attr, actions,
-						  masks, parser_userdata());
+						  masks, parser_cb_userdata());
 }
 
 static inline void
@@ -1543,7 +1512,7 @@ parser_command_flow_actions_template_destroy(rte_port_id_t port_id,
 
 	if (ops && ops->flow_actions_template_destroy)
 		ops->flow_actions_template_destroy(port_id, nb_id, id,
-						   parser_userdata());
+						   parser_cb_userdata());
 }
 
 static inline void
@@ -1560,7 +1529,7 @@ parser_command_flow_template_table_create(rte_port_id_t port_id, uint32_t table_
 		ops->flow_template_table_create(port_id, table_id, attr,
 						nb_pattern, pattern_id,
 						nb_action, action_id,
-						parser_userdata());
+						parser_cb_userdata());
 }
 
 static inline void
@@ -1572,7 +1541,7 @@ parser_command_flow_template_table_destroy(rte_port_id_t port_id,
 
 	if (ops && ops->flow_template_table_destroy)
 		ops->flow_template_table_destroy(port_id, nb_id, id,
-						 parser_userdata());
+						 parser_cb_userdata());
 }
 
 static inline void
@@ -1583,7 +1552,7 @@ parser_command_flow_template_table_resize_complete(rte_port_id_t port_id,
 
 	if (ops && ops->flow_template_table_resize_complete)
 		ops->flow_template_table_resize_complete(port_id, table_id,
-							 parser_userdata());
+							 parser_cb_userdata());
 }
 
 static inline void
@@ -1595,7 +1564,7 @@ parser_command_queue_group_set_miss_actions(rte_port_id_t port_id,
 
 	if (ops && ops->queue_group_set_miss_actions)
 		ops->queue_group_set_miss_actions(port_id, attr, actions,
-						  parser_userdata());
+						  parser_cb_userdata());
 }
 
 static inline void
@@ -1606,7 +1575,7 @@ parser_command_flow_template_table_resize(rte_port_id_t port_id, uint32_t table_
 
 	if (ops && ops->flow_template_table_resize)
 		ops->flow_template_table_resize(port_id, table_id, nb_rules,
-						parser_userdata());
+						parser_cb_userdata());
 }
 
 static inline void
@@ -1623,7 +1592,7 @@ parser_command_queue_flow_create(rte_port_id_t port_id, rte_queue_id_t queue,
 		ops->queue_flow_create(port_id, queue, postpone, table_id,
 				       rule_id, pattern_templ_id,
 				       actions_templ_id, pattern, actions,
-				       parser_userdata());
+				       parser_cb_userdata());
 }
 
 static inline void
@@ -1635,7 +1604,7 @@ parser_command_queue_flow_destroy(rte_port_id_t port_id, rte_queue_id_t queue,
 
 	if (ops && ops->queue_flow_destroy)
 		ops->queue_flow_destroy(port_id, queue, postpone, rule_n,
-					rule, is_user_id, parser_userdata());
+					rule, is_user_id, parser_cb_userdata());
 }
 
 static inline void
@@ -1646,7 +1615,7 @@ parser_command_queue_flow_update_resized(rte_port_id_t port_id, rte_queue_id_t q
 
 	if (ops && ops->queue_flow_update_resized)
 		ops->queue_flow_update_resized(port_id, queue, postpone,
-					       rule_id, parser_userdata());
+					       rule_id, parser_cb_userdata());
 }
 
 static inline void
@@ -1660,7 +1629,7 @@ parser_command_queue_flow_update(rte_port_id_t port_id, rte_queue_id_t queue,
 	if (ops && ops->queue_flow_update)
 		ops->queue_flow_update(port_id, queue, postpone, rule_id,
 				       action_templ_id, actions,
-				       parser_userdata());
+				       parser_cb_userdata());
 }
 
 static inline void
@@ -1669,7 +1638,7 @@ parser_command_queue_flow_push(rte_port_id_t port_id, rte_queue_id_t queue)
 	const struct rte_flow_parser_ops_command *ops = parser_command_ops();
 
 	if (ops && ops->queue_flow_push)
-		ops->queue_flow_push(port_id, queue, parser_userdata());
+		ops->queue_flow_push(port_id, queue, parser_cb_userdata());
 }
 
 static inline void
@@ -1678,7 +1647,7 @@ parser_command_queue_flow_pull(rte_port_id_t port_id, rte_queue_id_t queue)
 	const struct rte_flow_parser_ops_command *ops = parser_command_ops();
 
 	if (ops && ops->queue_flow_pull)
-		ops->queue_flow_pull(port_id, queue, parser_userdata());
+		ops->queue_flow_pull(port_id, queue, parser_cb_userdata());
 }
 
 static inline void
@@ -1690,7 +1659,7 @@ parser_command_flow_hash_calc(rte_port_id_t port_id, uint32_t table_id,
 
 	if (ops && ops->flow_hash_calc)
 		ops->flow_hash_calc(port_id, table_id, pattern_templ_id,
-				    pattern, parser_userdata());
+				    pattern, parser_cb_userdata());
 }
 
 static inline void
@@ -1702,7 +1671,7 @@ parser_command_flow_hash_calc_encap(rte_port_id_t port_id,
 
 	if (ops && ops->flow_hash_calc_encap)
 		ops->flow_hash_calc_encap(port_id, field, pattern,
-					  parser_userdata());
+					  parser_cb_userdata());
 }
 
 static inline void
@@ -1712,7 +1681,7 @@ parser_command_queue_flow_aged(rte_port_id_t port_id, rte_queue_id_t queue, bool
 
 	if (ops && ops->queue_flow_aged)
 		ops->queue_flow_aged(port_id, queue, destroy,
-				     parser_userdata());
+				     parser_cb_userdata());
 }
 
 static inline void
@@ -1727,7 +1696,7 @@ parser_command_queue_action_handle_create(rte_port_id_t port_id, rte_queue_id_t 
 	if (ops && ops->queue_action_handle_create)
 		ops->queue_action_handle_create(port_id, queue, postpone,
 						group, is_list, conf, actions,
-						parser_userdata());
+						parser_cb_userdata());
 }
 
 static inline void
@@ -1740,7 +1709,7 @@ parser_command_queue_action_handle_destroy(rte_port_id_t port_id, rte_queue_id_t
 	if (ops && ops->queue_action_handle_destroy)
 		ops->queue_action_handle_destroy(port_id, queue, postpone,
 						 nb_id, id,
-						 parser_userdata());
+						 parser_cb_userdata());
 }
 
 static inline void
@@ -1753,7 +1722,7 @@ parser_command_queue_action_handle_update(rte_port_id_t port_id, rte_queue_id_t 
 	if (ops && ops->queue_action_handle_update)
 		ops->queue_action_handle_update(port_id, queue, postpone,
 						group, actions,
-						parser_userdata());
+						parser_cb_userdata());
 }
 
 static inline void
@@ -1764,7 +1733,7 @@ parser_command_queue_action_handle_query(rte_port_id_t port_id, rte_queue_id_t q
 
 	if (ops && ops->queue_action_handle_query)
 		ops->queue_action_handle_query(port_id, queue, postpone,
-					       action_id, parser_userdata());
+					       action_id, parser_cb_userdata());
 }
 
 static inline void
@@ -1780,7 +1749,7 @@ parser_command_queue_action_handle_query_update(rte_port_id_t port_id,
 		ops->queue_action_handle_query_update(port_id, queue, postpone,
 						      action_id, qu_mode,
 						      actions,
-						      parser_userdata());
+						      parser_cb_userdata());
 }
 
 static inline void
@@ -1793,7 +1762,7 @@ parser_command_action_handle_create(rte_port_id_t port_id, uint32_t group,
 
 	if (ops && ops->action_handle_create)
 		ops->action_handle_create(port_id, group, is_list, conf,
-					  actions, parser_userdata());
+					  actions, parser_cb_userdata());
 }
 
 static inline void
@@ -1804,7 +1773,7 @@ parser_command_action_handle_destroy(rte_port_id_t port_id, uint32_t nb_id,
 
 	if (ops && ops->action_handle_destroy)
 		ops->action_handle_destroy(port_id, nb_id, id,
-					   parser_userdata());
+					   parser_cb_userdata());
 }
 
 static inline void
@@ -1815,7 +1784,7 @@ parser_command_action_handle_update(rte_port_id_t port_id, uint32_t group,
 
 	if (ops && ops->action_handle_update)
 		ops->action_handle_update(port_id, group, actions,
-					  parser_userdata());
+					  parser_cb_userdata());
 }
 
 static inline void
@@ -1825,7 +1794,7 @@ parser_command_action_handle_query(rte_port_id_t port_id, uint32_t action_id)
 
 	if (ops && ops->action_handle_query)
 		ops->action_handle_query(port_id, action_id,
-					 parser_userdata());
+					 parser_cb_userdata());
 }
 
 static inline void
@@ -1838,7 +1807,7 @@ parser_command_action_handle_query_update(rte_port_id_t port_id,
 
 	if (ops && ops->action_handle_query_update)
 		ops->action_handle_query_update(port_id, action_id, qu_mode,
-						actions, parser_userdata());
+						actions, parser_cb_userdata());
 }
 
 static inline void
@@ -1852,7 +1821,7 @@ parser_command_flow_validate(rte_port_id_t port_id,
 
 	if (ops && ops->flow_validate)
 		ops->flow_validate(port_id, attr, pattern, actions,
-				   tunnel_ops, parser_userdata());
+				   tunnel_ops, parser_cb_userdata());
 }
 
 static inline void
@@ -1867,7 +1836,7 @@ parser_command_flow_create(rte_port_id_t port_id,
 
 	if (ops && ops->flow_create)
 		ops->flow_create(port_id, attr, pattern, actions, tunnel_ops,
-				 user_id, parser_userdata());
+				 user_id, parser_cb_userdata());
 }
 
 static inline void
@@ -1878,7 +1847,7 @@ parser_command_flow_destroy(rte_port_id_t port_id, uint32_t nb_rule,
 
 	if (ops && ops->flow_destroy)
 		ops->flow_destroy(port_id, nb_rule, rule, is_user_id,
-				  parser_userdata());
+				  parser_cb_userdata());
 }
 
 static inline void
@@ -1890,7 +1859,7 @@ parser_command_flow_update(rte_port_id_t port_id, uint32_t rule_id,
 
 	if (ops && ops->flow_update)
 		ops->flow_update(port_id, rule_id, actions, user_id,
-				 parser_userdata());
+				 parser_cb_userdata());
 }
 
 static inline void
@@ -1899,7 +1868,7 @@ parser_command_flow_flush(rte_port_id_t port_id)
 	const struct rte_flow_parser_ops_command *ops = parser_command_ops();
 
 	if (ops && ops->flow_flush)
-		ops->flow_flush(port_id, parser_userdata());
+		ops->flow_flush(port_id, parser_cb_userdata());
 }
 
 static inline void
@@ -1910,7 +1879,7 @@ parser_command_flow_dump(rte_port_id_t port_id, bool all, uint64_t rule,
 
 	if (ops && ops->flow_dump)
 		ops->flow_dump(port_id, all, rule, file, is_user_id,
-			       parser_userdata());
+			       parser_cb_userdata());
 }
 
 static inline void
@@ -1921,7 +1890,7 @@ parser_command_flow_query(rte_port_id_t port_id, uint64_t rule,
 
 	if (ops && ops->flow_query)
 		ops->flow_query(port_id, rule, action, is_user_id,
-				parser_userdata());
+				parser_cb_userdata());
 }
 
 static inline void
@@ -1931,7 +1900,7 @@ parser_command_flow_list(rte_port_id_t port_id, uint32_t group_n,
 	const struct rte_flow_parser_ops_command *ops = parser_command_ops();
 
 	if (ops && ops->flow_list)
-		ops->flow_list(port_id, group_n, group, parser_userdata());
+		ops->flow_list(port_id, group_n, group, parser_cb_userdata());
 }
 
 static inline void
@@ -1940,7 +1909,7 @@ parser_command_flow_isolate(rte_port_id_t port_id, int set)
 	const struct rte_flow_parser_ops_command *ops = parser_command_ops();
 
 	if (ops && ops->flow_isolate)
-		ops->flow_isolate(port_id, set, parser_userdata());
+		ops->flow_isolate(port_id, set, parser_cb_userdata());
 }
 
 static inline void
@@ -1949,7 +1918,7 @@ parser_command_flow_aged(rte_port_id_t port_id, int destroy)
 	const struct rte_flow_parser_ops_command *ops = parser_command_ops();
 
 	if (ops && ops->flow_aged)
-		ops->flow_aged(port_id, destroy, parser_userdata());
+		ops->flow_aged(port_id, destroy, parser_cb_userdata());
 }
 
 static inline void
@@ -1960,7 +1929,7 @@ parser_command_flow_tunnel_create(rte_port_id_t port_id,
 
 	if (ops && ops->flow_tunnel_create)
 		ops->flow_tunnel_create(port_id, ops_conf,
-					parser_userdata());
+					parser_cb_userdata());
 }
 
 static inline void
@@ -1969,7 +1938,7 @@ parser_command_flow_tunnel_destroy(rte_port_id_t port_id, uint32_t id)
 	const struct rte_flow_parser_ops_command *ops = parser_command_ops();
 
 	if (ops && ops->flow_tunnel_destroy)
-		ops->flow_tunnel_destroy(port_id, id, parser_userdata());
+		ops->flow_tunnel_destroy(port_id, id, parser_cb_userdata());
 }
 
 static inline void
@@ -1978,7 +1947,7 @@ parser_command_flow_tunnel_list(rte_port_id_t port_id)
 	const struct rte_flow_parser_ops_command *ops = parser_command_ops();
 
 	if (ops && ops->flow_tunnel_list)
-		ops->flow_tunnel_list(port_id, parser_userdata());
+		ops->flow_tunnel_list(port_id, parser_cb_userdata());
 }
 
 static inline void
@@ -1989,7 +1958,7 @@ parser_command_meter_policy_add(rte_port_id_t port_id, uint32_t policy_id,
 
 	if (ops && ops->meter_policy_add)
 		ops->meter_policy_add(port_id, policy_id, actions,
-				      parser_userdata());
+				      parser_cb_userdata());
 }
 
 static inline void
@@ -2000,7 +1969,7 @@ parser_command_flex_item_create(rte_port_id_t port_id, uint16_t token,
 
 	if (ops && ops->flex_item_create)
 		ops->flex_item_create(port_id, token, filename,
-				      parser_userdata());
+				      parser_cb_userdata());
 }
 
 static inline void
@@ -2009,7 +1978,7 @@ parser_command_flex_item_destroy(rte_port_id_t port_id, uint16_t token)
 	const struct rte_flow_parser_ops_command *ops = parser_command_ops();
 
 	if (ops && ops->flex_item_destroy)
-		ops->flex_item_destroy(port_id, token, parser_userdata());
+		ops->flex_item_destroy(port_id, token, parser_cb_userdata());
 }
 
 static inline void
@@ -2017,10 +1986,9 @@ parser_command_set_raw_encap(uint16_t index,
 			     const struct rte_flow_item pattern[],
 			     uint32_t pattern_n)
 {
-	struct rte_flow_parser_ctx *ctx = parser_userdata();
+	struct rte_flow_parser_ctx *ctx = parser_ctx_current();
 
-	if (ctx && rte_flow_parser_ctx_set_raw_encap(ctx, index, pattern,
-						    pattern_n) == 0)
+	if (parser_ctx_set_raw_encap(ctx, index, pattern, pattern_n) == 0)
 		return;
 	fprintf(stderr, "Error - set_raw_encap failed for index %u\n", index);
 }
@@ -2030,10 +1998,9 @@ parser_command_set_raw_decap(uint16_t index,
 			     const struct rte_flow_item pattern[],
 			     uint32_t pattern_n)
 {
-	struct rte_flow_parser_ctx *ctx = parser_userdata();
+	struct rte_flow_parser_ctx *ctx = parser_ctx_current();
 
-	if (ctx && rte_flow_parser_ctx_set_raw_decap(ctx, index, pattern,
-						    pattern_n) == 0)
+	if (parser_ctx_set_raw_decap(ctx, index, pattern, pattern_n) == 0)
 		return;
 	fprintf(stderr, "Error - set_raw_decap failed for index %u\n", index);
 }
@@ -2043,10 +2010,9 @@ parser_command_set_sample_actions(uint16_t index,
 				  const struct rte_flow_action actions[],
 				  uint32_t actions_n)
 {
-	struct rte_flow_parser_ctx *ctx = parser_userdata();
+	struct rte_flow_parser_ctx *ctx = parser_ctx_current();
 
-	if (ctx && rte_flow_parser_ctx_set_sample_actions(ctx, index, actions,
-							 actions_n) == 0)
+	if (parser_ctx_set_sample_actions(ctx, index, actions, actions_n) == 0)
 		return;
 	fprintf(stderr, "Error - set_sample_actions failed for index %u\n", index);
 }
@@ -2056,10 +2022,9 @@ parser_command_set_ipv6_ext_push(uint16_t index,
 				 const struct rte_flow_item pattern[],
 				 uint32_t pattern_n)
 {
-	struct rte_flow_parser_ctx *ctx = parser_userdata();
+	struct rte_flow_parser_ctx *ctx = parser_ctx_current();
 
-	if (ctx && rte_flow_parser_ctx_set_ipv6_ext_push(ctx, index, pattern,
-							pattern_n) == 0)
+	if (parser_ctx_set_ipv6_ext_push(ctx, index, pattern, pattern_n) == 0)
 		return;
 	fprintf(stderr, "Error - set_ipv6_ext_push failed for index %u\n", index);
 }
@@ -2069,10 +2034,9 @@ parser_command_set_ipv6_ext_remove(uint16_t index,
 				   const struct rte_flow_item pattern[],
 				   uint32_t pattern_n)
 {
-	struct rte_flow_parser_ctx *ctx = parser_userdata();
+	struct rte_flow_parser_ctx *ctx = parser_ctx_current();
 
-	if (ctx && rte_flow_parser_ctx_set_ipv6_ext_remove(ctx, index, pattern,
-							  pattern_n) == 0)
+	if (parser_ctx_set_ipv6_ext_remove(ctx, index, pattern, pattern_n) == 0)
 		return;
 	fprintf(stderr, "Error - set_ipv6_ext_remove failed for index %u\n", index);
 }
@@ -2080,13 +2044,13 @@ parser_command_set_ipv6_ext_remove(uint16_t index,
 static inline const struct rte_flow_action_raw_encap *
 parser_raw_encap_conf_get(uint16_t index)
 {
-	return rte_flow_parser_ctx_raw_encap_conf_get(parser_userdata(), index);
+	return parser_ctx_raw_encap_conf_get(parser_ctx_current(), index);
 }
 
 static inline const struct rte_flow_action_raw_decap *
 parser_raw_decap_conf_get(uint16_t index)
 {
-	return rte_flow_parser_ctx_raw_decap_conf_get(parser_userdata(), index);
+	return parser_ctx_raw_decap_conf_get(parser_ctx_current(), index);
 }
 
 const struct rte_flow_action_raw_encap *
@@ -2101,46 +2065,34 @@ rte_flow_parser_raw_decap_conf_get(uint16_t index)
 	return parser_raw_decap_conf_get(index);
 }
 
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_create, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_destroy, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_reset_defaults, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_reset_defaults, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_vxlan_encap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_nvgre_encap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_l2_encap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_l2_decap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_mplsogre_encap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_mplsogre_decap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_mplsoudp_encap_conf, 26.0);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_mplsoudp_decap_conf, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_raw_encap_conf_get, 26.0);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_raw_decap_conf_get, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_vxlan_encap_conf, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_nvgre_encap_conf, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_l2_encap_conf, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_l2_decap_conf, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_mplsogre_encap_conf, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_mplsogre_decap_conf, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_mplsoudp_encap_conf, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_mplsoudp_decap_conf, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_set_raw_encap, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_set_raw_decap, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_raw_encap_conf_get, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_raw_decap_conf_get, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_set_ipv6_ext_push, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_set_ipv6_ext_remove, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_ipv6_ext_push_conf_get, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_ipv6_ext_remove_conf_get, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_set_sample_actions, 26.0);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ctx_sample_actions_get, 26.0);
 
 static const struct rte_flow_action *
 parser_sample_actions_get(uint16_t index)
 {
-	return rte_flow_parser_ctx_sample_actions_get(parser_userdata(), index);
+	return parser_ctx_sample_actions_get(parser_ctx_current(), index);
 }
 
 static const struct rte_flow_action_ipv6_ext_push *
 parser_ipv6_ext_push_conf_get(uint16_t index)
 {
-	return rte_flow_parser_ctx_ipv6_ext_push_conf_get(parser_userdata(), index);
+	return parser_ctx_ipv6_ext_push_conf_get(parser_ctx_current(), index);
 }
 
 static const struct rte_flow_action_ipv6_ext_remove *
 parser_ipv6_ext_remove_conf_get(uint16_t index)
 {
-	return rte_flow_parser_ctx_ipv6_ext_remove_conf_get(parser_userdata(), index);
+	return parser_ctx_ipv6_ext_remove_conf_get(parser_ctx_current(), index);
 }
 
 /** Maximum size for pattern in struct rte_flow_item_raw. */
@@ -14938,6 +14890,7 @@ rte_flow_parser_create(const struct rte_flow_parser_ops *ops, void *userdata)
 	}
 	parser->ops = ops;
 	parser->userdata = userdata;
+	parser_ctx_reset_defaults(&parser->ctx);
 	return parser;
 }
 void
@@ -14945,11 +14898,11 @@ rte_flow_parser_destroy(struct rte_flow_parser *parser)
 {
 	if (!parser)
 		return;
+	if (parser == &default_parser)
+		return;
 	if (parser_inst == parser)
 		parser_inst = &default_parser;
-	if (parser != &default_parser) {
-		free(parser->flow_ctx);
-	}
+	free(parser->flow_ctx);
 	free(parser);
 }
 
@@ -14996,6 +14949,7 @@ rte_flow_parser_run(struct rte_flow_parser *parser, const char *src)
 {
 	uint8_t buf[4096];
 	struct rte_flow_parser_output *out = (struct rte_flow_parser_output *)buf;
+	struct rte_flow_parser *prev;
 	int ret;
 
 	ret = rte_flow_parser_parse(parser, src,
@@ -15003,6 +14957,7 @@ rte_flow_parser_run(struct rte_flow_parser *parser, const char *src)
 				    sizeof(buf));
 	if (ret < 0)
 		return ret;
+	prev = parser_push_current(parser);
 	switch (out->command) {
 	case RTE_FLOW_PARSER_CMD_SET_SAMPLE_ACTIONS:
 	case RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_PUSH:
@@ -15015,6 +14970,7 @@ rte_flow_parser_run(struct rte_flow_parser *parser, const char *src)
 		cmd_flow_parsed(out);
 		break;
 	}
+	parser_pop_current(prev);
 	return 0;
 }
 
@@ -15073,6 +15029,29 @@ parser_format_cmd(char **dst, const char *prefix, const char *body,
 	return 0;
 }
 
+static bool
+parser_str_has_trailing_end(const char *src)
+{
+	const char *p;
+	const char *q;
+
+	if (!src)
+		return false;
+	p = src + strlen(src);
+	while (p > src && isspace((unsigned char)p[-1]))
+		p--;
+	if (p - src < 3)
+		return false;
+	if (strncmp(p - 3, "end", 3) != 0)
+		return false;
+	q = p - 3;
+	while (q > src && isspace((unsigned char)q[-1]))
+		q--;
+	if (q <= src || q[-1] != '/')
+		return false;
+	return true;
+}
+
 int
 rte_flow_parser_parse_attr_str(const char *src, struct rte_flow_attr *attr)
 {
@@ -15125,12 +15104,14 @@ rte_flow_parser_parse_actions_str(const char *src,
 {
 	struct rte_flow_parser_output *out;
 	char *cmd = NULL;
+	const char *suffix;
 	int ret;
 
 	if (!src || !actions || !actions_n)
 		return -EINVAL;
+	suffix = parser_str_has_trailing_end(src) ? "" : " / end";
 	ret = parser_format_cmd(&cmd, "flow validate 0 ingress pattern eth / end actions ",
-				src, " / end");
+				src, suffix);
 	if (ret)
 		return ret;
 	ret = parser_simple_parse(cmd, &out);

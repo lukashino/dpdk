@@ -97,11 +97,11 @@ Two callback tables are provided at creation time:
 
 Implement only the callbacks your application needs; unused hooks may be NULL.
 Encapsulation templates and caches (VXLAN/NVGRE/L2/MPLS* templates, raw
-encap/decap, IPv6 extension, and sample actions) are stored in
-``struct rte_flow_parser_ctx`` and consumed directly by the parser. They can
-be modified through ``rte_flow_parser_ctx_*`` helpers, and the ``set raw*``,
+encap/decap, IPv6 extension, and sample actions) are stored inside the parser
+instance and consumed directly by the parser. They can be modified through
+the ``rte_flow_parser_*_conf()`` helpers, and the ``set raw*``,
 ``set sample_actions`` and ``set ipv6_ext_*`` commands update the active
-context.
+parser instance.
 
 Lightweight Parsing Helpers
 ---------------------------
@@ -130,8 +130,7 @@ built-in defaults:
 * RSS type string table from ethdev (``rte_eth_rss_type_info_get()``) and
   default hash fields (``RTE_ETH_RSS_IP``).
 * Raw encap/decap, IPv6 extension, and sample action caches are empty until
-  configured (e.g. via ``rte_flow_parser_ctx_set_*`` helpers or the ``set``
-  commands).
+  configured via the ``set`` commands.
 
 Example Usage
 -------------

@@ -18,14 +18,6 @@
 #include "testpmd.h"
 #include "flow_parser.h"
 
-static struct rte_flow_parser_ctx *parser_ctx;
-
-static void
-flow_parser_reset_defaults(void)
-{
-	rte_flow_parser_ctx_reset_defaults(parser_ctx);
-}
-
 static struct rte_port *
 parser_port_get(uint16_t port_id)
 {
@@ -842,75 +834,54 @@ static const struct rte_flow_parser_ops parser_ops = {
 int
 testpmd_flow_parser_init(void)
 {
-	if (!parser_ctx) {
-		parser_ctx = rte_flow_parser_ctx_create();
-		if (!parser_ctx)
-			return -ENOMEM;
-	}
-	flow_parser_reset_defaults();
-	return rte_flow_parser_set_default_ops(&parser_ops, parser_ctx);
+	rte_flow_parser_reset_defaults(NULL);
+	return rte_flow_parser_set_default_ops(&parser_ops, NULL);
 }
 
 struct rte_flow_parser_vxlan_encap_conf *
 testpmd_vxlan_encap_conf(void)
 {
-	if (parser_ctx == NULL)
-		return NULL;
-	return rte_flow_parser_ctx_vxlan_encap_conf(parser_ctx);
+	return rte_flow_parser_vxlan_encap_conf(NULL);
 }
 
 struct rte_flow_parser_nvgre_encap_conf *
 testpmd_nvgre_encap_conf(void)
 {
-	if (parser_ctx == NULL)
-		return NULL;
-	return rte_flow_parser_ctx_nvgre_encap_conf(parser_ctx);
+	return rte_flow_parser_nvgre_encap_conf(NULL);
 }
 
 struct rte_flow_parser_l2_encap_conf *
 testpmd_l2_encap_conf(void)
 {
-	if (parser_ctx == NULL)
-		return NULL;
-	return rte_flow_parser_ctx_l2_encap_conf(parser_ctx);
+	return rte_flow_parser_l2_encap_conf(NULL);
 }
 
 struct rte_flow_parser_l2_decap_conf *
 testpmd_l2_decap_conf(void)
 {
-	if (parser_ctx == NULL)
-		return NULL;
-	return rte_flow_parser_ctx_l2_decap_conf(parser_ctx);
+	return rte_flow_parser_l2_decap_conf(NULL);
 }
 
 struct rte_flow_parser_mplsogre_encap_conf *
 testpmd_mplsogre_encap_conf(void)
 {
-	if (parser_ctx == NULL)
-		return NULL;
-	return rte_flow_parser_ctx_mplsogre_encap_conf(parser_ctx);
+	return rte_flow_parser_mplsogre_encap_conf(NULL);
 }
 
 struct rte_flow_parser_mplsogre_decap_conf *
 testpmd_mplsogre_decap_conf(void)
 {
-	if (parser_ctx == NULL)
-		return NULL;
-	return rte_flow_parser_ctx_mplsogre_decap_conf(parser_ctx);
+	return rte_flow_parser_mplsogre_decap_conf(NULL);
 }
 
 struct rte_flow_parser_mplsoudp_encap_conf *
 testpmd_mplsoudp_encap_conf(void)
 {
-	if (parser_ctx == NULL)
-		return NULL;
-	return rte_flow_parser_ctx_mplsoudp_encap_conf(parser_ctx);
+	return rte_flow_parser_mplsoudp_encap_conf(NULL);
 }
 
 struct rte_flow_parser_mplsoudp_decap_conf *
 testpmd_mplsoudp_decap_conf(void)
 {
-	if (parser_ctx == NULL)
-		return NULL;
-	return rte_flow_parser_ctx_mplsoudp_decap_conf(parser_ctx);
+	return rte_flow_parser_mplsoudp_decap_conf(NULL);
 }
