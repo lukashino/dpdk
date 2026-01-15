@@ -3923,7 +3923,9 @@ static const struct token token_list[] = {
 	[RTE_FLOW_PARSER_CMD_ZERO] = {
 		.name = "RTE_FLOW_PARSER_CMD_ZERO",
 		.help = "null entry, abused as the entry point",
-		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_FLOW, RTE_FLOW_PARSER_CMD_ADD)),
+		.next = NEXT(NEXT_ENTRY(RTE_FLOW_PARSER_CMD_FLOW,
+					RTE_FLOW_PARSER_CMD_SET,
+					RTE_FLOW_PARSER_CMD_ADD)),
 	},
 	[RTE_FLOW_PARSER_CMD_END] = {
 		.name = "",
