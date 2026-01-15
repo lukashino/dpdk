@@ -9737,7 +9737,7 @@ parse_vc_spec(struct context *ctx, const struct token *token,
 	data_size = ctx->objdata / 3; /* spec, last, mask */
 	/* Point to selected object. */
 	ctx->object = out->args.vc.data + (data_size * index);
-	if (objmask != NULL) {
+	if (objmask != 0) {
 		ctx->objmask = out->args.vc.data + (data_size * 2); /* mask */
 		item->mask = ctx->objmask;
 	} else
@@ -12683,7 +12683,7 @@ parse_hex_string(const char *src, uint8_t *dst, uint32_t *size)
 
 		snprintf(tmp, read_lim + 1, "%s", src);
 		*dst = strtoul(tmp, &end, 16);
-		if (*end != "\0") {
+		if (*end != '\0') {
 			*dst = 0;
 			*size = (uint32_t)(dst - head);
 			return -1;
@@ -14058,7 +14058,7 @@ cmd_flow_parse(cmdline_parse_token_hdr_t *hdr, const char *src, void *result,
 		token = next;
 		break;
 	}
-	if (list[i] == NULL)
+	if (list[i] == RTE_FLOW_PARSER_CMD_ZERO)
 		return -1;
 	--ctx->next_num;
 	/* Push subsequent tokens if any. */
@@ -14713,7 +14713,7 @@ rte_flow_parser_parse(const char *src,
 	} while (ret > 0 && *pos);
 	if (ret < 0)
 		return ret;
-	if (*pos != "\0")
+	if (*pos != '\0')
 		return -EINVAL;
 	return 0;
 }
