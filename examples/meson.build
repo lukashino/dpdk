@@ -17,6 +17,7 @@ all_examples = [
         'eventdev_pipeline',
         'fips_validation',
         'flow_filtering',
+        'flow_pattern_parse',
         'helloworld',
         'ip_fragmentation',
         'ip_pipeline',

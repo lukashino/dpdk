@@ -21,6 +21,7 @@
 #include <cmdline_parse_string.h>
 #include <cmdline_parse_num.h>
 #include <rte_flow.h>
+#include <rte_flow_pattern_parser.h>
 #include <rte_hexdump.h>
 #include <rte_vxlan.h>
 #include <rte_gre.h>
@@ -1591,6 +1592,12 @@ static const enum index next_async_pattern_subcmd[] = {
 	ZERO,
 };
 
+/*
+ * Pattern item arrays.
+ * The canonical grammar definition lives in rte_flow_pattern_items.inc
+ * and rte_flow_pattern_tokens.inc (shared with the pattern parser library).
+ * These inline definitions must stay in sync with the .inc files.
+ */
 static const enum index item_param[] = {
 	ITEM_PARAM_IS,
 	ITEM_PARAM_SPEC,
@@ -13187,6 +13194,39 @@ flow_parse(const char *src, void *result, unsigned int size,
 	*pattern = ((struct buffer *)result)->args.vc.pattern;
 	*actions = ((struct buffer *)result)->args.vc.actions;
 	return (ret >= 0 && !strlen(src)) ? 0 : -1;
+}
+
+/**
+ * Parse a pattern-only string using the rte_flow_pattern_parser library.
+ *
+ * This delegates pattern parsing to the public library API so that
+ * the same parsing logic is shared with external applications.
+ *
+ * @param src
+ *   Pattern string in testpmd syntax, e.g.
+ *   "eth / ipv4 dst is 192.168.1.1 / end"
+ * @param[out] pattern
+ *   On success, points to a heap-allocated rte_flow_item array.
+ *   Caller must free via rte_flow_pattern_free().
+ * @return
+ *   0 on success, negative errno on failure.
+ */
+int
+flow_parse_pattern(const char *src, struct rte_flow_item **pattern)
+{
+	struct rte_flow_pattern_parser *parser;
+	struct rte_flow_error error;
+	int ret;
+
+	parser = rte_flow_pattern_parser_create();
+	if (!parser)
+		return -ENOMEM;
+	ret = rte_flow_pattern_parse(parser, src, pattern, &error);
+	if (ret < 0)
+		fprintf(stderr, "pattern parse error: %s\n",
+			error.message ? error.message : "(unknown)");
+	rte_flow_pattern_parser_destroy(parser);
+	return ret;
 }
 
 /** Return number of completion entries (cmdline API). */

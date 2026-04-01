@@ -9,6 +9,14 @@ DPDK Release 26.03
 New Features
 ------------
 
+* **Added rte_flow pattern string parser library.**
+
+  Added a new public API in the ethdev library for parsing human-readable
+  rte_flow pattern strings (testpmd syntax) into ``struct rte_flow_item``
+  arrays. This allows external applications like Suricata IDS to parse
+  flow pattern strings without depending on testpmd code. The API includes
+  pattern parsing, memory management, and tab-completion support.
+
 * **Added custom memory allocation hooks in ACL library.**
 
   Added a hook API mechanism

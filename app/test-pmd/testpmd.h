@@ -1293,6 +1293,8 @@ extern int flow_parse(const char *src, void *result, unsigned int size,
 		      struct rte_flow_attr **attr,
 		      struct rte_flow_item **pattern,
 		      struct rte_flow_action **actions);
+extern int flow_parse_pattern(const char *src,
+			      struct rte_flow_item **pattern);
 int setup_hairpin_queues(portid_t pi, portid_t p_pi, uint16_t cnt_pi);
 int hairpin_bind(uint16_t cfg_pi, portid_t *pl, portid_t *peer_pl);
 void hairpin_map_usage(void);
