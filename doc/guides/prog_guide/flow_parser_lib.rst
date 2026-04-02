@@ -43,6 +43,26 @@ valid until the next parse call on the same thread.
    ``rte_flow_parser_apply()`` for applying parser-internal commands, and
    cmdline token callbacks for building interactive command interfaces.
 
+Example Usage
+-------------
+
+``examples/flow_parsing/main.c`` demonstrates the lightweight parsing helpers:
+
+* Parse flow attributes with ``rte_flow_parser_parse_attr_str()``.
+* Parse match patterns with ``rte_flow_parser_parse_pattern_str()``.
+* Parse flow actions with ``rte_flow_parser_parse_actions_str()``.
+* Print parsed results showing the structured data.
+
+Build and run the example::
+
+  meson configure -Dexamples=flow_parsing build
+  ninja -C build
+  ./build/examples/dpdk-flow_parsing
+
+The output shows each parsed flow component, demonstrating that the parser
+is decoupled from testpmd and usable in standalone applications without
+requiring EAL initialization.
+
 One-Shot Flow Rule Parsing
 --------------------------
 
