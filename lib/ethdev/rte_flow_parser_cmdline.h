@@ -9,10 +9,9 @@
  * Flow Parser Library - Full Command Parsing and Cmdline Integration
  *
  * This header exposes the complete flow command parser, including the
- * rte_flow_parser_parse() function for parsing full flow CLI strings,
- * the rte_flow_parser_apply() function for applying parser-internal
- * commands, and cmdline token integration for building testpmd-like
- * interactive command lines.
+ * rte_flow_parser_parse() function for parsing full flow CLI strings
+ * and cmdline token integration for building testpmd-like interactive
+ * command lines.
  *
  * For simple string-to-flow parsing, use the lightweight helpers in
  * rte_flow_parser.h instead.
@@ -38,14 +37,6 @@ extern "C" {
 #define ACTION_RAW_ENCAP_MAX_DATA 512
 /** Maximum number of raw encap/decap configuration slots. */
 #define RAW_ENCAP_CONFS_MAX_NUM 8
-/** Maximum size in bytes of an IPv6 extension push header blob. */
-#define ACTION_IPV6_EXT_PUSH_MAX_DATA 512
-/** Maximum number of IPv6 extension push configuration slots. */
-#define IPV6_EXT_PUSH_CONFS_MAX_NUM 8
-/** Maximum number of sub-actions in a sample action. */
-#define ACTION_SAMPLE_ACTIONS_NUM 10
-/** Maximum number of sample action configuration slots. */
-#define RAW_SAMPLE_CONFS_MAX_NUM 8
 /** Maximum number of RSS queues in a single action. */
 #define ACTION_RSS_QUEUE_NUM 128
 /** Number of flow items in a VXLAN encap action definition. */
@@ -246,7 +237,7 @@ enum rte_flow_parser_command {
 	/* Meter policy */
 	RTE_FLOW_PARSER_CMD_ACTION_POL_G,
 
-	/* Set commands (used by apply) */
+	/* Set commands */
 	RTE_FLOW_PARSER_CMD_SET_RAW_ENCAP,
 	RTE_FLOW_PARSER_CMD_SET_RAW_DECAP,
 	RTE_FLOW_PARSER_CMD_SET_SAMPLE_ACTIONS,
@@ -350,10 +341,10 @@ struct rte_flow_parser_output {
 /**
  * Parse a flow CLI string.
  *
- * Parses a complete flow or set command string and fills the output buffer.
- * Parser-internal commands (set raw_encap, set raw_decap, set sample_actions,
- * set ipv6_ext_push, set ipv6_ext_remove, indirect_action flow_conf create)
- * are automatically applied via rte_flow_parser_apply().
+ * Parses a complete flow command string and fills the output buffer.
+ * The indirect_action flow_conf create command is handled internally;
+ * all other commands are returned in the output buffer for the
+ * application to dispatch.
  *
  * @warning Not thread-safe. Uses global static storage shared across all
  * threads; concurrent calls from different threads will corrupt state.
@@ -372,25 +363,6 @@ __rte_experimental
 int rte_flow_parser_parse(const char *src,
 			  struct rte_flow_parser_output *result,
 			  size_t result_size);
-
-/**
- * Apply parser-internal commands from a parsed output buffer.
- *
- * Handles SET commands (raw_encap, raw_decap, sample_actions,
- * ipv6_ext_push, ipv6_ext_remove) and indirect_action flow_conf create.
- * This is called automatically by rte_flow_parser_parse(); applications
- * only need to call it explicitly when constructing output buffers manually.
- *
- * @warning Not thread-safe. Modifies global static storage shared across
- * all threads.
- *
- * @param in
- *   Parsed output buffer.
- * @return
- *   0 on success, negative errno on failure.
- */
-__rte_experimental
-int rte_flow_parser_apply(const struct rte_flow_parser_output *in);
 
 /**
  * Dispatch callback type for parsed flow commands.
@@ -423,8 +395,7 @@ typedef void (*rte_flow_parser_dispatch_t)(const struct rte_flow_parser_output *
  * @param set_raw
  *   cmdline instance for set commands (tokens[0] must be NULL).
  * @param dispatch
- *   Application callback invoked for parsed flow commands.
- *   Not called for SET commands (those are auto-applied internally).
+ *   Application callback invoked for parsed flow and SET commands.
  */
 __rte_experimental
 void rte_flow_parser_cmdline_register(cmdline_parse_inst_t *flow,
@@ -465,11 +436,11 @@ __rte_experimental
 void rte_flow_parser_cmd_flow_cb(void *arg0, struct cmdline *cl, void *arg2);
 
 /**
- * Cmdline callback for set commands (raw_encap, raw_decap, etc.).
+ * Cmdline callback for set commands (raw_encap, raw_decap).
  *
- * Same usage as rte_flow_parser_cmd_flow_cb(). Parser-internal
- * commands are auto-applied via rte_flow_parser_apply(); no dispatch
- * callback is invoked.
+ * Same usage as rte_flow_parser_cmd_flow_cb(). Dispatches the parsed
+ * SET_RAW_ENCAP or SET_RAW_DECAP command to the application callback
+ * registered via rte_flow_parser_cmdline_register().
  *
  * @param arg0
  *   Token header pointer or parsed output buffer.
@@ -571,7 +542,7 @@ struct rte_flow_parser_mplsoudp_decap_conf *rte_flow_parser_mplsoudp_decap_conf(
  * Get raw encap configuration for the given slot index.
  *
  * Returns a snapshot of the raw encap data previously stored by
- * parsing a "set raw_encap <index> ..." command.
+ * rte_flow_parser_raw_encap_conf_set() or the cmdline SET callback.
  *
  * @param index
  *   Slot index (0 to RAW_ENCAP_CONFS_MAX_NUM - 1).
@@ -579,13 +550,13 @@ struct rte_flow_parser_mplsoudp_decap_conf *rte_flow_parser_mplsoudp_decap_conf(
  *   Pointer to raw encap configuration, or NULL if index is out of range.
  */
 __rte_experimental
-const struct rte_flow_action_raw_encap *rte_flow_parser_raw_encap_conf_get(uint16_t index);
+const struct rte_flow_action_raw_encap *rte_flow_parser_raw_encap_conf(uint16_t index);
 
 /**
  * Get raw decap configuration for the given slot index.
  *
  * Returns a snapshot of the raw decap data previously stored by
- * parsing a "set raw_decap <index> ..." command.
+ * rte_flow_parser_raw_decap_conf_set() or the cmdline SET callback.
  *
  * @param index
  *   Slot index (0 to RAW_ENCAP_CONFS_MAX_NUM - 1).
@@ -593,7 +564,104 @@ const struct rte_flow_action_raw_encap *rte_flow_parser_raw_encap_conf_get(uint1
  *   Pointer to raw decap configuration, or NULL if index is out of range.
  */
 __rte_experimental
-const struct rte_flow_action_raw_decap *rte_flow_parser_raw_decap_conf_get(uint16_t index);
+const struct rte_flow_action_raw_decap *rte_flow_parser_raw_decap_conf(uint16_t index);
+
+/**
+ * Set raw encap configuration for the given slot index.
+ *
+ * Converts a flow item pattern into a raw encap header blob and stores
+ * it in the given configuration slot. Trailing END items in the
+ * pattern array are stripped automatically.
+ *
+ * @warning Not thread-safe. Modifies global static storage.
+ *
+ * @param index
+ *   Slot index (0 to RAW_ENCAP_CONFS_MAX_NUM - 1).
+ * @param pattern
+ *   Array of flow items describing the encap header layers.
+ * @param pattern_n
+ *   Number of elements in the pattern array.
+ * @return
+ *   0 on success, negative errno on failure.
+ */
+__rte_experimental
+int rte_flow_parser_raw_encap_conf_set(uint16_t index,
+				       const struct rte_flow_item pattern[],
+				       uint32_t pattern_n);
+
+/**
+ * Set raw decap configuration for the given slot index.
+ *
+ * Converts a flow item pattern into a raw decap header blob and stores
+ * it in the given configuration slot. Trailing END items in the
+ * pattern array are stripped automatically.
+ *
+ * @warning Not thread-safe. Modifies global static storage.
+ *
+ * @param index
+ *   Slot index (0 to RAW_ENCAP_CONFS_MAX_NUM - 1).
+ * @param pattern
+ *   Array of flow items describing the decap header layers.
+ * @param pattern_n
+ *   Number of elements in the pattern array.
+ * @return
+ *   0 on success, negative errno on failure.
+ */
+__rte_experimental
+int rte_flow_parser_raw_decap_conf_set(uint16_t index,
+				       const struct rte_flow_item pattern[],
+				       uint32_t pattern_n);
+
+/**
+ * Set IPv6 extension push configuration for the given slot index.
+ *
+ * @param index
+ *   Slot index (0 to 7).
+ * @param pattern
+ *   Array of flow items (ipv6_ext + ipv6_routing_ext).
+ * @param pattern_n
+ *   Number of entries in @p pattern.
+ * @return
+ *   0 on success or a negative errno-style value on error.
+ */
+__rte_experimental
+int rte_flow_parser_ipv6_ext_push_set(uint16_t index,
+				      const struct rte_flow_item *pattern,
+				      uint32_t pattern_n);
+
+/**
+ * Set IPv6 extension remove configuration for the given slot index.
+ *
+ * @param index
+ *   Slot index (0 to 7).
+ * @param pattern
+ *   Array of flow items (single ipv6_ext item).
+ * @param pattern_n
+ *   Number of entries in @p pattern.
+ * @return
+ *   0 on success or a negative errno-style value on error.
+ */
+__rte_experimental
+int rte_flow_parser_ipv6_ext_remove_set(uint16_t index,
+					const struct rte_flow_item *pattern,
+					uint32_t pattern_n);
+
+/**
+ * Set sample actions configuration for the given slot index.
+ *
+ * @param index
+ *   Slot index (0 to 7).
+ * @param actions
+ *   Array of flow actions for the sample action.
+ * @param actions_n
+ *   Number of entries in @p actions.
+ * @return
+ *   0 on success or a negative errno-style value on error.
+ */
+__rte_experimental
+int rte_flow_parser_sample_actions_set(uint16_t index,
+				       const struct rte_flow_action *actions,
+				       uint32_t actions_n);
 
 /**
  * Get the conntrack action context.

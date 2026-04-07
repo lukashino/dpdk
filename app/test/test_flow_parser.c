@@ -406,28 +406,21 @@ test_flow_parser_internal_indirect_action(void)
 	const struct rte_flow_action *actions;
 	const struct rte_flow_action_sample *sample_conf;
 	const struct rte_flow_action_ethdev *repr;
-	struct rte_flow_action sample_actions[ACTION_SAMPLE_ACTIONS_NUM];
 	uint32_t actions_n;
 	int ret;
 
+	/* Pre-configure sample actions via the setter API. */
 	ret = rte_flow_parser_parse_actions_str(
 		"port_representor port_id 0xffff / end",
 		&actions, &actions_n);
 	TEST_ASSERT_SUCCESS(ret, "parse sample actions failed: %s",
 		strerror(-ret));
-	TEST_ASSERT(actions_n <= RTE_DIM(sample_actions),
-		"sample actions too long");
-	memcpy(sample_actions, actions,
-		sizeof(struct rte_flow_action) * actions_n);
-	memset(out, 0, sizeof(*out));
-	out->command = RTE_FLOW_PARSER_CMD_SET_SAMPLE_ACTIONS;
-	out->port = 1;
-	out->args.vc.actions = sample_actions;
-	out->args.vc.actions_n = actions_n;
-	ret = rte_flow_parser_apply(out);
-	TEST_ASSERT_SUCCESS(ret, "apply sample actions failed: %s",
+
+	ret = rte_flow_parser_sample_actions_set(1, actions, actions_n);
+	TEST_ASSERT_SUCCESS(ret, "sample_actions_set failed: %s",
 		strerror(-ret));
 
+	/* Parse an indirect_action that references sample index 1. */
 	ret = rte_flow_parser_parse(flow_indirect_sample, out, sizeof(outbuf));
 	TEST_ASSERT_SUCCESS(ret, "indirect sample parse failed: %s",
 		strerror(-ret));
@@ -453,7 +446,8 @@ test_flow_parser_internal_indirect_action(void)
 	TEST_ASSERT_EQUAL(repr->port_id, 0xffff,
 		"indirect sample port representor id mismatch");
 	TEST_ASSERT_EQUAL(sample_conf->actions[1].type,
-		RTE_FLOW_ACTION_TYPE_END, "indirect sample actions should end");
+		RTE_FLOW_ACTION_TYPE_END,
+		"indirect sample actions should end");
 
 	return TEST_SUCCESS;
 }
@@ -645,12 +639,12 @@ test_flow_parser_internal_modify_field_count(void)
 static int
 test_flow_parser_internal_raw_decap_rss(void)
 {
-	char set_raw_decap[96];
 	char flow_raw_decap_rss[160];
 	const uint16_t raw_decap_index = 0;
 	uint8_t outbuf[8192];
 	struct rte_flow_parser_output *out = (void *)outbuf;
-	const struct rte_flow_item_vxlan *vxlan_spec;
+	const struct rte_flow_item *items;
+	uint32_t items_n;
 	const struct rte_flow_action_raw_decap *raw_decap_action;
 	const struct rte_flow_action_rss *rss_conf;
 	const struct rte_flow_action_raw_decap *decap_conf;
@@ -659,43 +653,35 @@ test_flow_parser_internal_raw_decap_rss(void)
 	int len;
 	int ret;
 
-	len = snprintf(set_raw_decap, sizeof(set_raw_decap),
-		"set raw_decap %u vxlan vni is 33 / end_set",
-		raw_decap_index);
-	TEST_ASSERT(len > 0 && len < (int)sizeof(set_raw_decap),
-		"set raw_decap command truncated");
+	/* Use the setter API: parse pattern, then set raw decap config. */
+	ret = rte_flow_parser_parse_pattern_str(
+		"vxlan vni is 33 / end", &items, &items_n);
+	TEST_ASSERT_SUCCESS(ret, "pattern parse failed: %s", strerror(-ret));
+
+	ret = rte_flow_parser_raw_decap_conf_set(raw_decap_index,
+		items, items_n);
+	TEST_ASSERT_SUCCESS(ret, "raw_decap_conf_set failed: %s",
+		strerror(-ret));
+
+	/* Verify the stored config via getter. */
+	decap_conf = rte_flow_parser_raw_decap_conf(raw_decap_index);
+	TEST_ASSERT_NOT_NULL(decap_conf, "raw_decap config missing");
+	TEST_ASSERT(decap_conf->size >= sizeof(struct rte_vxlan_hdr),
+		"raw_decap config size too small: %zu", decap_conf->size);
+	vxlan_hdr = (const struct rte_vxlan_hdr *)decap_conf->data;
+	vni = ((uint32_t)vxlan_hdr->vni[0] << 16) |
+	      ((uint32_t)vxlan_hdr->vni[1] << 8) |
+	      (uint32_t)vxlan_hdr->vni[2];
+	TEST_ASSERT_EQUAL(vni, 33,
+		"raw_decap vxlan vni expected 33, got %u", vni);
+
+	/* Parse a flow rule that uses the stored raw_decap config. */
 	len = snprintf(flow_raw_decap_rss, sizeof(flow_raw_decap_rss),
 		"flow create 0 ingress pattern eth / ipv4 / end "
 		"actions raw_decap index %u / rss / end",
 		raw_decap_index);
 	TEST_ASSERT(len > 0 && len < (int)sizeof(flow_raw_decap_rss),
 		"flow raw_decap rss command truncated");
-
-	ret = rte_flow_parser_parse(set_raw_decap, out, sizeof(outbuf));
-	TEST_ASSERT_SUCCESS(ret, "set raw_decap parse failed: %s",
-		strerror(-ret));
-	TEST_ASSERT_EQUAL(out->command, RTE_FLOW_PARSER_CMD_SET_RAW_DECAP,
-		"expected SET_RAW_DECAP command, got %d", out->command);
-	TEST_ASSERT_EQUAL(out->port, raw_decap_index,
-		"expected raw_decap index %u, got %u",
-		raw_decap_index, out->port);
-	TEST_ASSERT(out->args.vc.pattern_n >= 1,
-		"expected at least 1 pattern item, got %u",
-		out->args.vc.pattern_n);
-	TEST_ASSERT_EQUAL(out->args.vc.pattern[0].type,
-		RTE_FLOW_ITEM_TYPE_VXLAN,
-		"pattern[0] expected VXLAN, got %d",
-		out->args.vc.pattern[0].type);
-	vxlan_spec = out->args.vc.pattern[0].spec;
-	TEST_ASSERT_NOT_NULL(vxlan_spec, "vxlan spec missing");
-	vni = ((uint32_t)vxlan_spec->hdr.vni[0] << 16) |
-	      ((uint32_t)vxlan_spec->hdr.vni[1] << 8) |
-	      (uint32_t)vxlan_spec->hdr.vni[2];
-	TEST_ASSERT_EQUAL(vni, 33, "vxlan vni expected 33, got %u", vni);
-
-	ret = rte_flow_parser_apply(out);
-	TEST_ASSERT_SUCCESS(ret, "apply raw encap failed: %s",
-		strerror(-ret));
 
 	ret = rte_flow_parser_parse(flow_raw_decap_rss, out, sizeof(outbuf));
 	TEST_ASSERT_SUCCESS(ret, "flow raw_decap rss parse failed: %s",
@@ -735,24 +721,6 @@ test_flow_parser_internal_raw_decap_rss(void)
 	TEST_ASSERT_EQUAL(out->args.vc.actions[2].type,
 		RTE_FLOW_ACTION_TYPE_END, "actions[2] not END");
 
-	decap_conf = rte_flow_parser_raw_decap_conf_get(raw_decap_index);
-	TEST_ASSERT_NOT_NULL(decap_conf, "raw_decap config missing");
-	TEST_ASSERT_NOT_NULL(decap_conf->data, "raw_decap config data missing");
-	TEST_ASSERT_EQUAL(decap_conf->size, raw_decap_action->size,
-		"raw_decap size mismatch: %zu vs %zu",
-		decap_conf->size, raw_decap_action->size);
-	TEST_ASSERT_EQUAL(decap_conf->data, raw_decap_action->data,
-		"raw_decap data pointer mismatch");
-	TEST_ASSERT(decap_conf->size >= sizeof(struct rte_vxlan_hdr),
-		"raw_decap config size too small: %zu",
-		decap_conf->size);
-	vxlan_hdr = (const struct rte_vxlan_hdr *)decap_conf->data;
-	vni = ((uint32_t)vxlan_hdr->vni[0] << 16) |
-	      ((uint32_t)vxlan_hdr->vni[1] << 8) |
-	      (uint32_t)vxlan_hdr->vni[2];
-	TEST_ASSERT_EQUAL(vni, 33,
-		"raw_decap vxlan vni expected 33, got %u", vni);
-
 	return TEST_SUCCESS;
 }
 
@@ -778,10 +746,6 @@ test_flow_parser_internal_invalid_args(void)
 	/* Test zero-length output buffer */
 	ret = rte_flow_parser_parse("flow list 0", (void *)outbuf, 0);
 	TEST_ASSERT_EQUAL(ret, -ENOBUFS, "zero-length output buffer not rejected");
-
-	/* Test rte_flow_parser_apply with NULL argument */
-	ret = rte_flow_parser_apply(NULL);
-	TEST_ASSERT_EQUAL(ret, -EINVAL, "apply(NULL) should return -EINVAL");
 
 	return TEST_SUCCESS;
 }
@@ -1058,10 +1022,84 @@ test_flow_parser_encap_accessors(void)
 	TEST_ASSERT_EQUAL(vxlan2->vni[0], 0x12, "vxlan vni not persisted");
 
 	/* raw_encap/decap accessors: out-of-range returns NULL */
-	TEST_ASSERT_NULL(rte_flow_parser_raw_encap_conf_get(RAW_ENCAP_CONFS_MAX_NUM),
+	TEST_ASSERT_NULL(rte_flow_parser_raw_encap_conf(RAW_ENCAP_CONFS_MAX_NUM),
 		"raw_encap out-of-range should be NULL");
-	TEST_ASSERT_NULL(rte_flow_parser_raw_decap_conf_get(RAW_ENCAP_CONFS_MAX_NUM),
+	TEST_ASSERT_NULL(rte_flow_parser_raw_decap_conf(RAW_ENCAP_CONFS_MAX_NUM),
 		"raw_decap out-of-range should be NULL");
+
+	return TEST_SUCCESS;
+}
+
+static int
+test_flow_parser_raw_encap_setter(void)
+{
+	const struct rte_flow_item *items;
+	uint32_t items_n;
+	const struct rte_flow_action_raw_encap *conf;
+	int ret;
+
+	ret = rte_flow_parser_parse_pattern_str(
+		"eth / ipv4 / udp / vxlan / end", &items, &items_n);
+	TEST_ASSERT_SUCCESS(ret, "pattern parse failed: %s", strerror(-ret));
+
+	ret = rte_flow_parser_raw_encap_conf_set(0, items, items_n);
+	TEST_ASSERT_SUCCESS(ret, "raw_encap_conf_set failed: %s",
+		strerror(-ret));
+
+	conf = rte_flow_parser_raw_encap_conf(0);
+	TEST_ASSERT_NOT_NULL(conf, "raw_encap config missing after set");
+	TEST_ASSERT_NOT_NULL(conf->data, "raw_encap data missing");
+	TEST_ASSERT(conf->size > 0, "raw_encap size is 0");
+	TEST_ASSERT(conf->size >= 50,
+		"raw_encap size too small for eth/ipv4/udp/vxlan: %zu",
+		conf->size);
+
+	return TEST_SUCCESS;
+}
+
+static int
+test_flow_parser_raw_decap_setter(void)
+{
+	const struct rte_flow_item *items;
+	uint32_t items_n;
+	const struct rte_flow_action_raw_decap *conf;
+	int ret;
+
+	ret = rte_flow_parser_parse_pattern_str(
+		"eth / end", &items, &items_n);
+	TEST_ASSERT_SUCCESS(ret, "pattern parse failed: %s", strerror(-ret));
+
+	ret = rte_flow_parser_raw_decap_conf_set(0, items, items_n);
+	TEST_ASSERT_SUCCESS(ret, "raw_decap_conf_set failed: %s",
+		strerror(-ret));
+
+	conf = rte_flow_parser_raw_decap_conf(0);
+	TEST_ASSERT_NOT_NULL(conf, "raw_decap config missing after set");
+	TEST_ASSERT_NOT_NULL(conf->data, "raw_decap data missing");
+	TEST_ASSERT(conf->size >= 14,
+		"raw_decap size too small for eth: %zu", conf->size);
+
+	return TEST_SUCCESS;
+}
+
+static int
+test_flow_parser_raw_setter_boundary(void)
+{
+	const struct rte_flow_item *items;
+	uint32_t items_n;
+	int ret;
+
+	ret = rte_flow_parser_parse_pattern_str(
+		"eth / end", &items, &items_n);
+	TEST_ASSERT_SUCCESS(ret, "pattern parse failed");
+
+	ret = rte_flow_parser_raw_encap_conf_set(RAW_ENCAP_CONFS_MAX_NUM,
+		items, items_n);
+	TEST_ASSERT(ret < 0, "out-of-range index should fail");
+
+	ret = rte_flow_parser_raw_decap_conf_set(RAW_ENCAP_CONFS_MAX_NUM,
+		items, items_n);
+	TEST_ASSERT(ret < 0, "out-of-range index should fail");
 
 	return TEST_SUCCESS;
 }
@@ -1110,6 +1148,13 @@ static struct unit_test_suite flow_parser_tests = {
 		/* Accessor tests */
 		TEST_CASE_ST(flow_parser_case_setup, NULL,
 			test_flow_parser_encap_accessors),
+		/* Setter tests */
+		TEST_CASE_ST(flow_parser_case_setup, NULL,
+			test_flow_parser_raw_encap_setter),
+		TEST_CASE_ST(flow_parser_case_setup, NULL,
+			test_flow_parser_raw_decap_setter),
+		TEST_CASE_ST(flow_parser_case_setup, NULL,
+			test_flow_parser_raw_setter_boundary),
 		TEST_CASES_END()
 	}
 };

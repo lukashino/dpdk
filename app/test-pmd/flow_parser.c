@@ -279,6 +279,36 @@ testpmd_flow_dispatch(const struct rte_flow_parser_output *in)
 	case RTE_FLOW_PARSER_CMD_FLEX_ITEM_DESTROY:
 		flex_item_destroy(in->port, in->args.flex.token);
 		break;
+	case RTE_FLOW_PARSER_CMD_SET_RAW_ENCAP:
+		if (rte_flow_parser_raw_encap_conf_set(in->port,
+				in->args.vc.pattern,
+				in->args.vc.pattern_n) != 0)
+			fprintf(stderr, "raw encap set failed\n");
+		break;
+	case RTE_FLOW_PARSER_CMD_SET_RAW_DECAP:
+		if (rte_flow_parser_raw_decap_conf_set(in->port,
+				in->args.vc.pattern,
+				in->args.vc.pattern_n) != 0)
+			fprintf(stderr, "raw decap set failed\n");
+		break;
+	case RTE_FLOW_PARSER_CMD_SET_SAMPLE_ACTIONS:
+		if (rte_flow_parser_sample_actions_set(in->port,
+				in->args.vc.actions,
+				in->args.vc.actions_n) != 0)
+			fprintf(stderr, "sample actions set failed\n");
+		break;
+	case RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_PUSH:
+		if (rte_flow_parser_ipv6_ext_push_set(in->port,
+				in->args.vc.pattern,
+				in->args.vc.pattern_n) != 0)
+			fprintf(stderr, "ipv6_ext_push set failed\n");
+		break;
+	case RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_REMOVE:
+		if (rte_flow_parser_ipv6_ext_remove_set(in->port,
+				in->args.vc.pattern,
+				in->args.vc.pattern_n) != 0)
+			fprintf(stderr, "ipv6_ext_remove set failed\n");
+		break;
 	default:
 		fprintf(stderr, "unhandled flow parser command %d\n",
 			in->command);

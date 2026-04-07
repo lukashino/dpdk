@@ -39,8 +39,7 @@ valid until the next parse call on the same thread.
 
    Additional functions for full command parsing and cmdline integration are
    available in ``rte_flow_parser_cmdline.h``. These include
-   ``rte_flow_parser_parse()`` for parsing complete flow CLI strings,
-   ``rte_flow_parser_apply()`` for applying parser-internal commands, and
+   ``rte_flow_parser_parse()`` for parsing complete flow CLI strings and
    cmdline token callbacks for building interactive command interfaces.
 
 Example Usage
@@ -102,9 +101,9 @@ commands (create, destroy, query, template operations, etc.).
   /* out->port == 0 */
   /* out->args.vc.pattern, out->args.vc.actions populated */
 
-Parser-internal commands (``set raw_encap``, ``set raw_decap``, etc.) are
-also applied via ``rte_flow_parser_apply()`` and the state is stored internally
-in the library for reference by subsequent flow rules.
+Parser-internal commands (``set raw_encap``, ``set raw_decap``) are dispatched
+via the registered callback and the state can be stored using the setter APIs
+(``rte_flow_parser_raw_encap_conf_set()``, ``rte_flow_parser_raw_decap_conf_set()``).
 Applications dispatch the result by switching on ``out->command``.
 
 Interactive Cmdline Integration
@@ -185,6 +184,7 @@ Available accessors: ``rte_flow_parser_vxlan_encap_conf()``,
 ``rte_flow_parser_mplsoudp_decap_conf()``,
 ``rte_flow_parser_conntrack_context()``.
 
-For raw encap/decap, use ``rte_flow_parser_parse()`` with SET command strings
-(e.g., ``"set raw_encap 0 eth / ipv4 / udp / vxlan / end"``), then inspect
-the stored configuration via ``rte_flow_parser_raw_encap_conf_get()``.
+For raw encap/decap, use ``rte_flow_parser_raw_encap_conf_set()`` or
+``rte_flow_parser_raw_decap_conf_set()`` to store configuration, then inspect
+the stored data via ``rte_flow_parser_raw_encap_conf()`` or
+``rte_flow_parser_raw_decap_conf()``.

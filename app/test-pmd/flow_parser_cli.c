@@ -53,7 +53,7 @@ cmd_show_set_raw_parsed(void *parsed_result, struct cmdline *cl, void *data)
 	do {
 		if (strcmp(res->cmd_what, "raw_encap") == 0) {
 			const struct rte_flow_action_raw_encap *conf =
-				rte_flow_parser_raw_encap_conf_get(index);
+				rte_flow_parser_raw_encap_conf(index);
 
 			if (conf == NULL || conf->data == NULL || conf->size == 0) {
 				fprintf(stderr,
@@ -65,7 +65,7 @@ cmd_show_set_raw_parsed(void *parsed_result, struct cmdline *cl, void *data)
 			raw_size = conf->size;
 		} else if (strcmp(res->cmd_what, "raw_decap") == 0) {
 			const struct rte_flow_action_raw_decap *conf =
-				rte_flow_parser_raw_decap_conf_get(index);
+				rte_flow_parser_raw_decap_conf(index);
 
 			if (conf == NULL || conf->data == NULL || conf->size == 0) {
 				fprintf(stderr,
