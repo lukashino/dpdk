@@ -127,14 +127,6 @@ int rte_flow_parser_parse_flow_rule(const char *src,
 				    const struct rte_flow_action **actions,
 				    uint32_t *actions_n);
 
-/**
- * Reset parser defaults and clear stored caches.
- *
- * @warning Not thread-safe.
- */
-__rte_experimental
-void rte_flow_parser_reset_defaults(void);
-
 #ifdef __cplusplus
 }
 #endif

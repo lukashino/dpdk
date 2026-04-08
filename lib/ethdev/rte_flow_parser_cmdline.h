@@ -43,6 +43,18 @@ extern "C" {
 #define ACTION_VXLAN_ENCAP_ITEMS_NUM 6
 /** Number of flow items in an NVGRE encap action definition. */
 #define ACTION_NVGRE_ENCAP_ITEMS_NUM 5
+/** Maximum size in bytes of an IPv6 extension push header blob. */
+#define ACTION_IPV6_EXT_PUSH_MAX_DATA 512
+/** Maximum number of IPv6 extension push configuration slots. */
+#define IPV6_EXT_PUSH_CONFS_MAX_NUM 8
+/** Maximum number of sub-actions in a sample action. */
+#define ACTION_SAMPLE_ACTIONS_NUM 10
+/** Maximum number of sample action configuration slots. */
+#define RAW_SAMPLE_CONFS_MAX_NUM 8
+/** Length of an RSS hash key in bytes. */
+#ifndef RSS_HASH_KEY_LENGTH
+#define RSS_HASH_KEY_LENGTH 64
+#endif
 
 /**
  * @name Encap/decap configuration structures
@@ -145,6 +157,129 @@ struct rte_flow_parser_mplsoudp_decap_conf {
 };
 
 /** @} */
+
+/** Raw encap configuration slot (app-owned storage). */
+struct rte_flow_parser_raw_encap_data {
+	uint8_t data[ACTION_RAW_ENCAP_MAX_DATA];
+	uint8_t preserve[ACTION_RAW_ENCAP_MAX_DATA];
+	size_t size;
+};
+
+/** Raw decap configuration slot (app-owned storage). */
+struct rte_flow_parser_raw_decap_data {
+	uint8_t data[ACTION_RAW_ENCAP_MAX_DATA];
+	size_t size;
+};
+
+/** IPv6 extension push configuration slot (app-owned storage). */
+struct rte_flow_parser_ipv6_ext_push_data {
+	uint8_t data[ACTION_IPV6_EXT_PUSH_MAX_DATA];
+	size_t size;
+	uint8_t type;
+};
+
+/** IPv6 extension remove configuration slot (app-owned storage). */
+struct rte_flow_parser_ipv6_ext_remove_data {
+	uint8_t type;
+};
+
+/** VXLAN encap action data (used in sample slots). */
+struct rte_flow_parser_action_vxlan_encap_data {
+	struct rte_flow_action_vxlan_encap conf;
+	struct rte_flow_item items[ACTION_VXLAN_ENCAP_ITEMS_NUM];
+	struct rte_flow_item_eth item_eth;
+	struct rte_flow_item_vlan item_vlan;
+	union {
+		struct rte_flow_item_ipv4 item_ipv4;
+		struct rte_flow_item_ipv6 item_ipv6;
+	};
+	struct rte_flow_item_udp item_udp;
+	struct rte_flow_item_vxlan item_vxlan;
+};
+
+/** NVGRE encap action data (used in sample slots). */
+struct rte_flow_parser_action_nvgre_encap_data {
+	struct rte_flow_action_nvgre_encap conf;
+	struct rte_flow_item items[ACTION_NVGRE_ENCAP_ITEMS_NUM];
+	struct rte_flow_item_eth item_eth;
+	struct rte_flow_item_vlan item_vlan;
+	union {
+		struct rte_flow_item_ipv4 item_ipv4;
+		struct rte_flow_item_ipv6 item_ipv6;
+	};
+	struct rte_flow_item_nvgre item_nvgre;
+};
+
+/** RSS action data (used in sample slots). */
+struct rte_flow_parser_action_rss_data {
+	struct rte_flow_action_rss conf;
+	uint8_t key[RSS_HASH_KEY_LENGTH];
+	uint16_t queue[ACTION_RSS_QUEUE_NUM];
+};
+
+/** Sample actions configuration slot (app-owned storage). */
+struct rte_flow_parser_sample_slot {
+	struct rte_flow_action data[ACTION_SAMPLE_ACTIONS_NUM];
+	struct rte_flow_parser_action_vxlan_encap_data vxlan_encap;
+	struct rte_flow_parser_action_nvgre_encap_data nvgre_encap;
+	struct rte_flow_parser_action_rss_data rss_data;
+};
+
+/**
+ * Configuration registration for the flow parser.
+ *
+ * Applications must register configuration storage before using the
+ * cmdline integration (rte_flow_parser_parse, cmdline callbacks).
+ * The simple API (rte_flow_parser_parse_pattern_str, etc.) works
+ * without registration.
+ */
+struct rte_flow_parser_config {
+	/* Single-instance configs */
+	struct rte_flow_parser_vxlan_encap_conf *vxlan_encap;
+	struct rte_flow_parser_nvgre_encap_conf *nvgre_encap;
+	struct rte_flow_parser_l2_encap_conf *l2_encap;
+	struct rte_flow_parser_l2_decap_conf *l2_decap;
+	struct rte_flow_parser_mplsogre_encap_conf *mplsogre_encap;
+	struct rte_flow_parser_mplsogre_decap_conf *mplsogre_decap;
+	struct rte_flow_parser_mplsoudp_encap_conf *mplsoudp_encap;
+	struct rte_flow_parser_mplsoudp_decap_conf *mplsoudp_decap;
+	struct rte_flow_action_conntrack *conntrack;
+	/* Multi-instance configs (app-provided pointer arrays) */
+	struct {
+		struct rte_flow_parser_raw_encap_data **slots;
+		uint16_t count;
+	} raw_encap;
+	struct {
+		struct rte_flow_parser_raw_decap_data **slots;
+		uint16_t count;
+	} raw_decap;
+	struct {
+		struct rte_flow_parser_ipv6_ext_push_data **slots;
+		uint16_t count;
+	} ipv6_ext_push;
+	struct {
+		struct rte_flow_parser_ipv6_ext_remove_data **slots;
+		uint16_t count;
+	} ipv6_ext_remove;
+	struct {
+		struct rte_flow_parser_sample_slot **slots;
+		uint16_t count;
+	} sample;
+};
+
+/**
+ * Register application-owned configuration storage.
+ *
+ * Must be called before using cmdline integration APIs.
+ * The simple parsing API works without registration.
+ *
+ * @param config
+ *   Configuration with pointers to app-owned storage.
+ * @return
+ *   0 on success, negative errno on failure.
+ */
+__rte_experimental
+int rte_flow_parser_config_register(const struct rte_flow_parser_config *config);
 
 /**
  * Tunnel steering/match flags used by the parser.

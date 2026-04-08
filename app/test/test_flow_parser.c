@@ -13,6 +13,96 @@
 
 #include "test.h"
 
+/* Test-owned flow parser configuration storage */
+static struct rte_flow_parser_vxlan_encap_conf test_vxlan_conf;
+static struct rte_flow_parser_nvgre_encap_conf test_nvgre_conf;
+static struct rte_flow_parser_l2_encap_conf test_l2_encap_conf;
+static struct rte_flow_parser_l2_decap_conf test_l2_decap_conf;
+static struct rte_flow_parser_mplsogre_encap_conf test_mplsogre_encap_conf;
+static struct rte_flow_parser_mplsogre_decap_conf test_mplsogre_decap_conf;
+static struct rte_flow_parser_mplsoudp_encap_conf test_mplsoudp_encap_conf;
+static struct rte_flow_parser_mplsoudp_decap_conf test_mplsoudp_decap_conf;
+static struct rte_flow_action_conntrack test_conntrack;
+
+static struct rte_flow_parser_raw_encap_data test_raw_encap[RAW_ENCAP_CONFS_MAX_NUM];
+static struct rte_flow_parser_raw_decap_data test_raw_decap[RAW_ENCAP_CONFS_MAX_NUM];
+static struct rte_flow_parser_ipv6_ext_push_data test_ipv6_push[IPV6_EXT_PUSH_CONFS_MAX_NUM];
+static struct rte_flow_parser_ipv6_ext_remove_data test_ipv6_remove[IPV6_EXT_PUSH_CONFS_MAX_NUM];
+static struct rte_flow_parser_sample_slot test_sample[RAW_SAMPLE_CONFS_MAX_NUM];
+
+static struct rte_flow_parser_raw_encap_data *test_raw_encap_ptrs[RAW_ENCAP_CONFS_MAX_NUM];
+static struct rte_flow_parser_raw_decap_data *test_raw_decap_ptrs[RAW_ENCAP_CONFS_MAX_NUM];
+static struct rte_flow_parser_ipv6_ext_push_data *test_ipv6_push_ptrs[IPV6_EXT_PUSH_CONFS_MAX_NUM];
+static struct rte_flow_parser_ipv6_ext_remove_data *test_ipv6_remove_ptrs[IPV6_EXT_PUSH_CONFS_MAX_NUM];
+static struct rte_flow_parser_sample_slot *test_sample_ptrs[RAW_SAMPLE_CONFS_MAX_NUM];
+
+static void
+test_register_config(void)
+{
+	unsigned int i;
+
+	/* Zero all configs */
+	memset(&test_raw_encap, 0, sizeof(test_raw_encap));
+	memset(&test_raw_decap, 0, sizeof(test_raw_decap));
+	memset(&test_ipv6_push, 0, sizeof(test_ipv6_push));
+	memset(&test_ipv6_remove, 0, sizeof(test_ipv6_remove));
+	memset(&test_sample, 0, sizeof(test_sample));
+	memset(&test_conntrack, 0, sizeof(test_conntrack));
+
+	/* Initialize single-instance configs (tests use minimal defaults) */
+	test_vxlan_conf = (struct rte_flow_parser_vxlan_encap_conf){
+		.select_ipv4 = 1,
+		.udp_dst = RTE_BE16(RTE_VXLAN_DEFAULT_PORT),
+		.ipv4_src = RTE_IPV4(127, 0, 0, 1),
+		.ipv4_dst = RTE_IPV4(255, 255, 255, 255),
+		.ip_ttl = 255,
+		.eth_dst = { .addr_bytes = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff } },
+	};
+	test_nvgre_conf = (struct rte_flow_parser_nvgre_encap_conf){
+		.select_ipv4 = 1,
+		.ipv4_src = RTE_IPV4(127, 0, 0, 1),
+		.ipv4_dst = RTE_IPV4(255, 255, 255, 255),
+		.eth_dst = { .addr_bytes = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff } },
+	};
+	/* Zero-init L2/MPLS (static globals, must reset between tests) */
+	memset(&test_l2_encap_conf, 0, sizeof(test_l2_encap_conf));
+	memset(&test_l2_decap_conf, 0, sizeof(test_l2_decap_conf));
+	memset(&test_mplsogre_encap_conf, 0, sizeof(test_mplsogre_encap_conf));
+	memset(&test_mplsogre_decap_conf, 0, sizeof(test_mplsogre_decap_conf));
+	memset(&test_mplsoudp_encap_conf, 0, sizeof(test_mplsoudp_encap_conf));
+	memset(&test_mplsoudp_decap_conf, 0, sizeof(test_mplsoudp_decap_conf));
+
+	/* Populate pointer arrays */
+	for (i = 0; i < RAW_ENCAP_CONFS_MAX_NUM; i++) {
+		test_raw_encap_ptrs[i] = &test_raw_encap[i];
+		test_raw_decap_ptrs[i] = &test_raw_decap[i];
+	}
+	for (i = 0; i < IPV6_EXT_PUSH_CONFS_MAX_NUM; i++) {
+		test_ipv6_push_ptrs[i] = &test_ipv6_push[i];
+		test_ipv6_remove_ptrs[i] = &test_ipv6_remove[i];
+	}
+	for (i = 0; i < RAW_SAMPLE_CONFS_MAX_NUM; i++)
+		test_sample_ptrs[i] = &test_sample[i];
+
+	struct rte_flow_parser_config cfg = {
+		.vxlan_encap = &test_vxlan_conf,
+		.nvgre_encap = &test_nvgre_conf,
+		.l2_encap = &test_l2_encap_conf,
+		.l2_decap = &test_l2_decap_conf,
+		.mplsogre_encap = &test_mplsogre_encap_conf,
+		.mplsogre_decap = &test_mplsogre_decap_conf,
+		.mplsoudp_encap = &test_mplsoudp_encap_conf,
+		.mplsoudp_decap = &test_mplsoudp_decap_conf,
+		.conntrack = &test_conntrack,
+		.raw_encap = { test_raw_encap_ptrs, RAW_ENCAP_CONFS_MAX_NUM },
+		.raw_decap = { test_raw_decap_ptrs, RAW_ENCAP_CONFS_MAX_NUM },
+		.ipv6_ext_push = { test_ipv6_push_ptrs, IPV6_EXT_PUSH_CONFS_MAX_NUM },
+		.ipv6_ext_remove = { test_ipv6_remove_ptrs, IPV6_EXT_PUSH_CONFS_MAX_NUM },
+		.sample = { test_sample_ptrs, RAW_SAMPLE_CONFS_MAX_NUM },
+	};
+	rte_flow_parser_config_register(&cfg);
+}
+
 static int
 flow_parser_setup(void)
 {
@@ -22,19 +112,19 @@ flow_parser_setup(void)
 static int
 flow_parser_case_setup(void)
 {
-	rte_flow_parser_reset_defaults();
+	test_register_config();
 	return 0;
 }
 
 static void
 flow_parser_teardown(void)
 {
-	rte_flow_parser_reset_defaults();
+	test_register_config();
 }
 
 /*
  * =============================================================================
- * Public API Tests (rte_flow_parser.h)
+ * Simple API Tests (rte_flow_parser.h)
  * =============================================================================
  */
 
@@ -326,12 +416,12 @@ test_flow_parser_public_invalid_syntax(void)
 
 /*
  * =============================================================================
- * Internal API Tests
+ * Cmdline API Tests (rte_flow_parser_cmdline.h)
  * =============================================================================
  */
 
 static int
-test_flow_parser_internal_command_mapping(void)
+test_flow_parser_cmdline_command_mapping(void)
 {
 	static const char *create_cmd =
 		"flow create 0 ingress pattern eth / end "
@@ -396,7 +486,7 @@ test_flow_parser_internal_command_mapping(void)
 }
 
 static int
-test_flow_parser_internal_indirect_action(void)
+test_flow_parser_cmdline_indirect_action(void)
 {
 	static const char *flow_indirect_sample =
 		"flow indirect_action 0 create transfer list "
@@ -453,7 +543,7 @@ test_flow_parser_internal_indirect_action(void)
 }
 
 static int
-test_flow_parser_internal_meter(void)
+test_flow_parser_cmdline_meter(void)
 {
 	/* meter itself needs to be created beforehand; here we just test parsing */
 	static const char *flow_meter =
@@ -495,7 +585,7 @@ test_flow_parser_internal_meter(void)
 }
 
 static int
-test_flow_parser_internal_queue_set_meta(void)
+test_flow_parser_cmdline_queue_set_meta(void)
 {
 	static const char *flow_queue_meta =
 		"flow create 0 ingress pattern eth / ipv4 / tcp dst is 80 / end "
@@ -554,7 +644,7 @@ test_flow_parser_internal_queue_set_meta(void)
 }
 
 static int
-test_flow_parser_internal_modify_field_count(void)
+test_flow_parser_cmdline_modify_field_count(void)
 {
 	static const char *flow_modify_field =
 		"flow validate 1 egress pattern "
@@ -637,7 +727,7 @@ test_flow_parser_internal_modify_field_count(void)
 }
 
 static int
-test_flow_parser_internal_raw_decap_rss(void)
+test_flow_parser_cmdline_raw_decap_rss(void)
 {
 	char flow_raw_decap_rss[160];
 	const uint16_t raw_decap_index = 0;
@@ -725,7 +815,7 @@ test_flow_parser_internal_raw_decap_rss(void)
 }
 
 static int
-test_flow_parser_internal_invalid_args(void)
+test_flow_parser_cmdline_invalid_args(void)
 {
 	uint8_t outbuf[sizeof(struct rte_flow_parser_output)];
 	int ret;
@@ -751,7 +841,7 @@ test_flow_parser_internal_invalid_args(void)
 }
 
 static int
-test_flow_parser_internal_invalid_syntax(void)
+test_flow_parser_cmdline_invalid_syntax(void)
 {
 	static const char *invalid_cmd = "flow invalid 0";
 	static const char *wrong_cmd =
@@ -823,7 +913,7 @@ test_flow_parser_internal_invalid_syntax(void)
 }
 
 static int
-test_flow_parser_internal_port_id(void)
+test_flow_parser_cmdline_port_id(void)
 {
 	uint8_t outbuf[4096];
 	struct rte_flow_parser_output *out = (void *)outbuf;
@@ -847,7 +937,7 @@ test_flow_parser_internal_port_id(void)
 
 /*
  * =============================================================================
- * Public API: rte_flow_parser_parse_flow_rule()
+ * Simple API: rte_flow_parser_parse_flow_rule()
  * =============================================================================
  */
 static int
@@ -1104,57 +1194,78 @@ test_flow_parser_raw_setter_boundary(void)
 	return TEST_SUCCESS;
 }
 
+static int
+test_flow_parser_config_register_identity(void)
+{
+	struct rte_flow_parser_vxlan_encap_conf local_vxlan = { 0 };
+	struct rte_flow_parser_vxlan_encap_conf *result;
+
+	/* Register our own local config — self-contained, no prior state */
+	struct rte_flow_parser_config cfg = { .vxlan_encap = &local_vxlan };
+	TEST_ASSERT_SUCCESS(rte_flow_parser_config_register(&cfg),
+		"config_register failed");
+
+	result = rte_flow_parser_vxlan_encap_conf();
+	TEST_ASSERT(result == &local_vxlan,
+		"accessor did not return registered pointer: "
+		"got %p, expected %p", (void *)result, (void *)&local_vxlan);
+
+	return TEST_SUCCESS;
+}
+
 static struct unit_test_suite flow_parser_tests = {
 	.suite_name = "flow parser autotest",
 	.setup = flow_parser_setup,
-	.teardown = flow_parser_teardown,
+	.teardown = NULL,
 	.unit_test_cases = {
-		/* Public API tests */
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
+		/* Simple API tests (rte_flow_parser.h) */
+		TEST_CASE_ST(NULL, NULL,
 			test_flow_parser_public_attr_parsing),
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
+		TEST_CASE_ST(NULL, NULL,
 			test_flow_parser_public_pattern_parsing),
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
+		TEST_CASE_ST(NULL, NULL,
 			test_flow_parser_public_actions_parsing),
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
+		TEST_CASE_ST(NULL, NULL,
 			test_flow_parser_public_invalid_args),
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
+		TEST_CASE_ST(NULL, NULL,
 			test_flow_parser_public_invalid_syntax),
-		/* Internal API tests */
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
-			test_flow_parser_internal_command_mapping),
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
-			test_flow_parser_internal_invalid_args),
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
-			test_flow_parser_internal_invalid_syntax),
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
-			test_flow_parser_internal_port_id),
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
-			test_flow_parser_internal_indirect_action),
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
-			test_flow_parser_internal_meter),
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
-			test_flow_parser_internal_queue_set_meta),
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
-			test_flow_parser_internal_modify_field_count),
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
-			test_flow_parser_internal_raw_decap_rss),
-		/* Combined simple API test */
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
+		TEST_CASE_ST(NULL, NULL,
 			test_flow_parser_public_parse_flow_rule),
+		/* Cmdline API tests (rte_flow_parser_cmdline.h) */
+		TEST_CASE_ST(flow_parser_case_setup, flow_parser_teardown,
+			test_flow_parser_cmdline_command_mapping),
+		TEST_CASE_ST(flow_parser_case_setup, flow_parser_teardown,
+			test_flow_parser_cmdline_invalid_args),
+		TEST_CASE_ST(flow_parser_case_setup, flow_parser_teardown,
+			test_flow_parser_cmdline_invalid_syntax),
+		TEST_CASE_ST(flow_parser_case_setup, flow_parser_teardown,
+			test_flow_parser_cmdline_port_id),
+		TEST_CASE_ST(flow_parser_case_setup, flow_parser_teardown,
+			test_flow_parser_cmdline_indirect_action),
+		TEST_CASE_ST(flow_parser_case_setup, flow_parser_teardown,
+			test_flow_parser_cmdline_meter),
+		TEST_CASE_ST(flow_parser_case_setup, flow_parser_teardown,
+			test_flow_parser_cmdline_queue_set_meta),
+		TEST_CASE_ST(flow_parser_case_setup, flow_parser_teardown,
+			test_flow_parser_cmdline_modify_field_count),
+		TEST_CASE_ST(flow_parser_case_setup, flow_parser_teardown,
+			test_flow_parser_cmdline_raw_decap_rss),
 		/* Cmdline integration tests */
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
+		TEST_CASE_ST(flow_parser_case_setup, flow_parser_teardown,
 			test_flow_parser_cmdline_register),
 		/* Accessor tests */
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
+		TEST_CASE_ST(flow_parser_case_setup, flow_parser_teardown,
 			test_flow_parser_encap_accessors),
 		/* Setter tests */
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
+		TEST_CASE_ST(flow_parser_case_setup, flow_parser_teardown,
 			test_flow_parser_raw_encap_setter),
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
+		TEST_CASE_ST(flow_parser_case_setup, flow_parser_teardown,
 			test_flow_parser_raw_decap_setter),
-		TEST_CASE_ST(flow_parser_case_setup, NULL,
+		TEST_CASE_ST(flow_parser_case_setup, flow_parser_teardown,
 			test_flow_parser_raw_setter_boundary),
+		/* Config registration test */
+		TEST_CASE_ST(flow_parser_case_setup, flow_parser_teardown,
+			test_flow_parser_config_register_identity),
 		TEST_CASES_END()
 	}
 };

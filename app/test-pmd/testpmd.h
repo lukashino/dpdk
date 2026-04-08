@@ -837,6 +837,7 @@ unsigned int parse_hdrs_list(const char *str, const char *item_name,
 void launch_args_parse(int argc, char** argv);
 void cmd_reconfig_device_queue(portid_t id, uint8_t dev, uint8_t queue);
 int cmdline_read_from_file(const char *filename, bool echo);
+void testpmd_flow_parser_config_init(void);
 int init_cmdline(void);
 void prompt(void);
 void prompt_exit(void);
