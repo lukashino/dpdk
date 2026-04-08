@@ -39,17 +39,9 @@ static struct rte_flow_parser_ipv6_ext_push_data testpmd_ipv6_push[IPV6_EXT_PUSH
 static struct rte_flow_parser_ipv6_ext_remove_data testpmd_ipv6_remove[IPV6_EXT_PUSH_CONFS_MAX_NUM];
 static struct rte_flow_parser_sample_slot testpmd_sample[RAW_SAMPLE_CONFS_MAX_NUM];
 
-static struct rte_flow_parser_raw_encap_data *testpmd_raw_encap_ptrs[RAW_ENCAP_CONFS_MAX_NUM];
-static struct rte_flow_parser_raw_decap_data *testpmd_raw_decap_ptrs[RAW_ENCAP_CONFS_MAX_NUM];
-static struct rte_flow_parser_ipv6_ext_push_data *testpmd_ipv6_push_ptrs[IPV6_EXT_PUSH_CONFS_MAX_NUM];
-static struct rte_flow_parser_ipv6_ext_remove_data *testpmd_ipv6_remove_ptrs[IPV6_EXT_PUSH_CONFS_MAX_NUM];
-static struct rte_flow_parser_sample_slot *testpmd_sample_ptrs[RAW_SAMPLE_CONFS_MAX_NUM];
-
 void
 testpmd_flow_parser_config_init(void)
 {
-	unsigned int i;
-
 	/* VXLAN defaults: IPv4, standard port, placeholder addresses */
 	testpmd_vxlan_conf = (struct rte_flow_parser_vxlan_encap_conf){
 		.select_ipv4 = 1,
@@ -70,18 +62,6 @@ testpmd_flow_parser_config_init(void)
 		.ipv6_dst = RTE_IPV6(0, 0, 0, 0, 0, 0, 0, 0x1111),
 		.eth_dst = { .addr_bytes = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff } },
 	};
-	/* L2/MPLS defaults are all-zero (no special initialization needed) */
-
-	for (i = 0; i < RAW_ENCAP_CONFS_MAX_NUM; i++) {
-		testpmd_raw_encap_ptrs[i] = &testpmd_raw_encap[i];
-		testpmd_raw_decap_ptrs[i] = &testpmd_raw_decap[i];
-	}
-	for (i = 0; i < IPV6_EXT_PUSH_CONFS_MAX_NUM; i++) {
-		testpmd_ipv6_push_ptrs[i] = &testpmd_ipv6_push[i];
-		testpmd_ipv6_remove_ptrs[i] = &testpmd_ipv6_remove[i];
-	}
-	for (i = 0; i < RAW_SAMPLE_CONFS_MAX_NUM; i++)
-		testpmd_sample_ptrs[i] = &testpmd_sample[i];
 
 	struct rte_flow_parser_config cfg = {
 		.vxlan_encap = &testpmd_vxlan_conf,
@@ -93,11 +73,11 @@ testpmd_flow_parser_config_init(void)
 		.mplsoudp_encap = &testpmd_mplsoudp_encap_conf,
 		.mplsoudp_decap = &testpmd_mplsoudp_decap_conf,
 		.conntrack = &testpmd_conntrack,
-		.raw_encap = { testpmd_raw_encap_ptrs, RAW_ENCAP_CONFS_MAX_NUM },
-		.raw_decap = { testpmd_raw_decap_ptrs, RAW_ENCAP_CONFS_MAX_NUM },
-		.ipv6_ext_push = { testpmd_ipv6_push_ptrs, IPV6_EXT_PUSH_CONFS_MAX_NUM },
-		.ipv6_ext_remove = { testpmd_ipv6_remove_ptrs, IPV6_EXT_PUSH_CONFS_MAX_NUM },
-		.sample = { testpmd_sample_ptrs, RAW_SAMPLE_CONFS_MAX_NUM },
+		.raw_encap = { testpmd_raw_encap, RAW_ENCAP_CONFS_MAX_NUM },
+		.raw_decap = { testpmd_raw_decap, RAW_ENCAP_CONFS_MAX_NUM },
+		.ipv6_ext_push = { testpmd_ipv6_push, IPV6_EXT_PUSH_CONFS_MAX_NUM },
+		.ipv6_ext_remove = { testpmd_ipv6_remove, IPV6_EXT_PUSH_CONFS_MAX_NUM },
+		.sample = { testpmd_sample, RAW_SAMPLE_CONFS_MAX_NUM },
 	};
 	rte_flow_parser_config_register(&cfg);
 }

@@ -246,23 +246,23 @@ struct rte_flow_parser_config {
 	struct rte_flow_action_conntrack *conntrack;
 	/* Multi-instance configs (app-provided pointer arrays) */
 	struct {
-		struct rte_flow_parser_raw_encap_data **slots;
+		struct rte_flow_parser_raw_encap_data *slots;
 		uint16_t count;
 	} raw_encap;
 	struct {
-		struct rte_flow_parser_raw_decap_data **slots;
+		struct rte_flow_parser_raw_decap_data *slots;
 		uint16_t count;
 	} raw_decap;
 	struct {
-		struct rte_flow_parser_ipv6_ext_push_data **slots;
+		struct rte_flow_parser_ipv6_ext_push_data *slots;
 		uint16_t count;
 	} ipv6_ext_push;
 	struct {
-		struct rte_flow_parser_ipv6_ext_remove_data **slots;
+		struct rte_flow_parser_ipv6_ext_remove_data *slots;
 		uint16_t count;
 	} ipv6_ext_remove;
 	struct {
-		struct rte_flow_parser_sample_slot **slots;
+		struct rte_flow_parser_sample_slot *slots;
 		uint16_t count;
 	} sample;
 };

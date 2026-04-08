@@ -1107,18 +1107,16 @@ parser_ctx_set_raw_common(bool encap, uint16_t idx,
 
 	if (encap != 0) {
 		if (idx >= registry.raw_encap.count ||
-		    registry.raw_encap.slots == NULL ||
-		    registry.raw_encap.slots[idx] == NULL)
-			return -EINVAL;
-		total_size = &registry.raw_encap.slots[idx]->size;
-		data = (uint8_t *)&registry.raw_encap.slots[idx]->data;
+		    registry.raw_encap.slots == NULL)
+		return -EINVAL;
+		total_size = &registry.raw_encap.slots[idx].size;
+		data = (uint8_t *)&registry.raw_encap.slots[idx].data;
 	} else {
 		if (idx >= registry.raw_decap.count ||
-		    registry.raw_decap.slots == NULL ||
-		    registry.raw_decap.slots[idx] == NULL)
-			return -EINVAL;
-		total_size = &registry.raw_decap.slots[idx]->size;
-		data = (uint8_t *)&registry.raw_decap.slots[idx]->data;
+		    registry.raw_decap.slots == NULL)
+		return -EINVAL;
+		total_size = &registry.raw_decap.slots[idx].size;
+		data = (uint8_t *)&registry.raw_decap.slots[idx].data;
 	}
 	*total_size = 0;
 	memset(data, 0x00, ACTION_RAW_ENCAP_MAX_DATA);
@@ -1332,13 +1330,12 @@ const struct rte_flow_action_raw_encap *
 rte_flow_parser_raw_encap_conf(uint16_t index)
 {
 	if (index >= registry.raw_encap.count ||
-	    registry.raw_encap.slots == NULL ||
-	    registry.raw_encap.slots[index] == NULL)
+	    registry.raw_encap.slots == NULL)
 		return NULL;
 	raw_encap_cache[index] = (struct rte_flow_action_raw_encap){
-		.data = registry.raw_encap.slots[index]->data,
-		.size = registry.raw_encap.slots[index]->size,
-		.preserve = registry.raw_encap.slots[index]->preserve,
+		.data = registry.raw_encap.slots[index].data,
+		.size = registry.raw_encap.slots[index].size,
+		.preserve = registry.raw_encap.slots[index].preserve,
 	};
 	return &raw_encap_cache[index];
 }
@@ -1347,12 +1344,11 @@ const struct rte_flow_action_raw_decap *
 rte_flow_parser_raw_decap_conf(uint16_t index)
 {
 	if (index >= registry.raw_decap.count ||
-	    registry.raw_decap.slots == NULL ||
-	    registry.raw_decap.slots[index] == NULL)
+	    registry.raw_decap.slots == NULL)
 		return NULL;
 	raw_decap_cache[index] = (struct rte_flow_action_raw_decap){
-		.data = registry.raw_decap.slots[index]->data,
-		.size = registry.raw_decap.slots[index]->size,
+		.data = registry.raw_decap.slots[index].data,
+		.size = registry.raw_decap.slots[index].size,
 	};
 	return &raw_decap_cache[index];
 }
@@ -1361,14 +1357,13 @@ static const struct rte_flow_action_ipv6_ext_push *
 parser_ctx_ipv6_ext_push_conf_get(uint16_t index)
 {
 	if (index >= registry.ipv6_ext_push.count ||
-	    registry.ipv6_ext_push.slots == NULL ||
-	    registry.ipv6_ext_push.slots[index] == NULL)
+	    registry.ipv6_ext_push.slots == NULL)
 		return NULL;
 	ipv6_ext_push_cache[index] =
 		(struct rte_flow_action_ipv6_ext_push){
-			.data = registry.ipv6_ext_push.slots[index]->data,
-			.size = registry.ipv6_ext_push.slots[index]->size,
-			.type = registry.ipv6_ext_push.slots[index]->type,
+			.data = registry.ipv6_ext_push.slots[index].data,
+			.size = registry.ipv6_ext_push.slots[index].size,
+			.type = registry.ipv6_ext_push.slots[index].type,
 		};
 	return &ipv6_ext_push_cache[index];
 }
@@ -1377,12 +1372,11 @@ static const struct rte_flow_action_ipv6_ext_remove *
 parser_ctx_ipv6_ext_remove_conf_get(uint16_t index)
 {
 	if (index >= registry.ipv6_ext_remove.count ||
-	    registry.ipv6_ext_remove.slots == NULL ||
-	    registry.ipv6_ext_remove.slots[index] == NULL)
+	    registry.ipv6_ext_remove.slots == NULL)
 		return NULL;
 	ipv6_ext_remove_cache[index] =
 		(struct rte_flow_action_ipv6_ext_remove){
-			.type = registry.ipv6_ext_remove.slots[index]->type,
+			.type = registry.ipv6_ext_remove.slots[index].type,
 		};
 	return &ipv6_ext_remove_cache[index];
 }
@@ -1426,12 +1420,11 @@ parser_ctx_set_ipv6_ext_push(uint16_t idx,
 	size_t *total_size;
 
 	if (idx >= registry.ipv6_ext_push.count ||
-	    registry.ipv6_ext_push.slots == NULL ||
-	    registry.ipv6_ext_push.slots[idx] == NULL)
+	    registry.ipv6_ext_push.slots == NULL)
 		return -EINVAL;
-	data = (uint8_t *)&registry.ipv6_ext_push.slots[idx]->data;
-	type = (uint8_t *)&registry.ipv6_ext_push.slots[idx]->type;
-	total_size = &registry.ipv6_ext_push.slots[idx]->size;
+	data = (uint8_t *)&registry.ipv6_ext_push.slots[idx].data;
+	type = (uint8_t *)&registry.ipv6_ext_push.slots[idx].type;
+	total_size = &registry.ipv6_ext_push.slots[idx].size;
 	*total_size = 0;
 	memset(data, 0x00, ACTION_IPV6_EXT_PUSH_MAX_DATA);
 	for (i = pattern_n; i > 0; --i) {
@@ -1493,11 +1486,10 @@ parser_ctx_set_ipv6_ext_remove(uint16_t idx,
 	    pattern[0].type != RTE_FLOW_ITEM_TYPE_IPV6_EXT ||
 	    pattern[0].spec == NULL ||
 	    idx >= registry.ipv6_ext_remove.count ||
-	    registry.ipv6_ext_remove.slots == NULL ||
-	    registry.ipv6_ext_remove.slots[idx] == NULL)
+	    registry.ipv6_ext_remove.slots == NULL)
 		return -EINVAL;
 	ipv6_ext = pattern[0].spec;
-	registry.ipv6_ext_remove.slots[idx]->type = ipv6_ext->next_hdr;
+	registry.ipv6_ext_remove.slots[idx].type = ipv6_ext->next_hdr;
 	return 0;
 }
 
@@ -1514,25 +1506,25 @@ parser_ctx_set_sample_actions(uint16_t idx,
 
 	if (idx >= registry.sample.count ||
 	    registry.sample.slots == NULL ||
-	    registry.sample.slots[idx] == NULL ||
 	    actions_n == 0)
+
 		return -EINVAL;
 	act_num = 0;
-	sample_actions = registry.sample.slots[idx]->data;
+	sample_actions = registry.sample.slots[idx].data;
 	for (uint32_t i = 0; i < actions_n && act_num < ACTION_SAMPLE_ACTIONS_NUM - 1; i++) {
 		if (actions[i].type == RTE_FLOW_ACTION_TYPE_END)
 			break;
 		sample_actions[act_num] = actions[i];
 		switch (actions[i].type) {
 		case RTE_FLOW_ACTION_TYPE_VXLAN_ENCAP:
-			parse_setup_vxlan_encap_data(&registry.sample.slots[idx]->vxlan_encap);
+			parse_setup_vxlan_encap_data(&registry.sample.slots[idx].vxlan_encap);
 			sample_actions[act_num].conf =
-				&registry.sample.slots[idx]->vxlan_encap.conf;
+				&registry.sample.slots[idx].vxlan_encap.conf;
 			break;
 		case RTE_FLOW_ACTION_TYPE_NVGRE_ENCAP:
-			parse_setup_nvgre_encap_data(&registry.sample.slots[idx]->nvgre_encap);
+			parse_setup_nvgre_encap_data(&registry.sample.slots[idx].nvgre_encap);
 			sample_actions[act_num].conf =
-				&registry.sample.slots[idx]->nvgre_encap.conf;
+				&registry.sample.slots[idx].nvgre_encap.conf;
 			break;
 		case RTE_FLOW_ACTION_TYPE_RAW_ENCAP:
 			sample_actions[act_num].conf =
@@ -1543,20 +1535,20 @@ parser_ctx_set_sample_actions(uint16_t idx,
 			const struct rte_flow_action_rss *rss =
 				actions[i].conf;
 			if (rss != NULL) {
-				registry.sample.slots[idx]->rss_data.conf = *rss;
+				registry.sample.slots[idx].rss_data.conf = *rss;
 				if (rss->queue != NULL && rss->queue_num > 0) {
 					uint32_t qn = rss->queue_num;
 					if (qn > ACTION_RSS_QUEUE_NUM)
 						qn = ACTION_RSS_QUEUE_NUM;
-					memcpy(registry.sample.slots[idx]->rss_data.queue,
+					memcpy(registry.sample.slots[idx].rss_data.queue,
 					       rss->queue,
 					       qn * sizeof(uint16_t));
-					registry.sample.slots[idx]->rss_data.conf.queue =
-						registry.sample.slots[idx]->rss_data.queue;
-					registry.sample.slots[idx]->rss_data.conf.queue_num = qn;
+					registry.sample.slots[idx].rss_data.conf.queue =
+						registry.sample.slots[idx].rss_data.queue;
+					registry.sample.slots[idx].rss_data.conf.queue_num = qn;
 				}
 				sample_actions[act_num].conf =
-					&registry.sample.slots[idx]->rss_data.conf;
+					&registry.sample.slots[idx].rss_data.conf;
 			}
 			break;
 		}
@@ -11375,11 +11367,10 @@ parse_vc_action_sample_index(struct context *ctx, const struct token *token,
 	action_sample_data = ctx->object;
 	idx = action_sample_data->idx;
 	if (idx >= registry.sample.count ||
-	    registry.sample.slots == NULL ||
-	    registry.sample.slots[idx] == NULL)
+	    registry.sample.slots == NULL)
 		actions = NULL;
 	else
-		actions = registry.sample.slots[idx]->data;
+		actions = registry.sample.slots[idx].data;
 	if (actions == NULL)
 		return -1;
 	action_sample_data->conf.actions = actions;

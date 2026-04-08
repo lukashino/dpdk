@@ -30,17 +30,9 @@ static struct rte_flow_parser_ipv6_ext_push_data test_ipv6_push[IPV6_EXT_PUSH_CO
 static struct rte_flow_parser_ipv6_ext_remove_data test_ipv6_remove[IPV6_EXT_PUSH_CONFS_MAX_NUM];
 static struct rte_flow_parser_sample_slot test_sample[RAW_SAMPLE_CONFS_MAX_NUM];
 
-static struct rte_flow_parser_raw_encap_data *test_raw_encap_ptrs[RAW_ENCAP_CONFS_MAX_NUM];
-static struct rte_flow_parser_raw_decap_data *test_raw_decap_ptrs[RAW_ENCAP_CONFS_MAX_NUM];
-static struct rte_flow_parser_ipv6_ext_push_data *test_ipv6_push_ptrs[IPV6_EXT_PUSH_CONFS_MAX_NUM];
-static struct rte_flow_parser_ipv6_ext_remove_data *test_ipv6_remove_ptrs[IPV6_EXT_PUSH_CONFS_MAX_NUM];
-static struct rte_flow_parser_sample_slot *test_sample_ptrs[RAW_SAMPLE_CONFS_MAX_NUM];
-
 static void
 test_register_config(void)
 {
-	unsigned int i;
-
 	/* Zero all configs */
 	memset(&test_raw_encap, 0, sizeof(test_raw_encap));
 	memset(&test_raw_decap, 0, sizeof(test_raw_decap));
@@ -48,8 +40,13 @@ test_register_config(void)
 	memset(&test_ipv6_remove, 0, sizeof(test_ipv6_remove));
 	memset(&test_sample, 0, sizeof(test_sample));
 	memset(&test_conntrack, 0, sizeof(test_conntrack));
+	memset(&test_l2_encap_conf, 0, sizeof(test_l2_encap_conf));
+	memset(&test_l2_decap_conf, 0, sizeof(test_l2_decap_conf));
+	memset(&test_mplsogre_encap_conf, 0, sizeof(test_mplsogre_encap_conf));
+	memset(&test_mplsogre_decap_conf, 0, sizeof(test_mplsogre_decap_conf));
+	memset(&test_mplsoudp_encap_conf, 0, sizeof(test_mplsoudp_encap_conf));
+	memset(&test_mplsoudp_decap_conf, 0, sizeof(test_mplsoudp_decap_conf));
 
-	/* Initialize single-instance configs (tests use minimal defaults) */
 	test_vxlan_conf = (struct rte_flow_parser_vxlan_encap_conf){
 		.select_ipv4 = 1,
 		.udp_dst = RTE_BE16(RTE_VXLAN_DEFAULT_PORT),
@@ -64,25 +61,6 @@ test_register_config(void)
 		.ipv4_dst = RTE_IPV4(255, 255, 255, 255),
 		.eth_dst = { .addr_bytes = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff } },
 	};
-	/* Zero-init L2/MPLS (static globals, must reset between tests) */
-	memset(&test_l2_encap_conf, 0, sizeof(test_l2_encap_conf));
-	memset(&test_l2_decap_conf, 0, sizeof(test_l2_decap_conf));
-	memset(&test_mplsogre_encap_conf, 0, sizeof(test_mplsogre_encap_conf));
-	memset(&test_mplsogre_decap_conf, 0, sizeof(test_mplsogre_decap_conf));
-	memset(&test_mplsoudp_encap_conf, 0, sizeof(test_mplsoudp_encap_conf));
-	memset(&test_mplsoudp_decap_conf, 0, sizeof(test_mplsoudp_decap_conf));
-
-	/* Populate pointer arrays */
-	for (i = 0; i < RAW_ENCAP_CONFS_MAX_NUM; i++) {
-		test_raw_encap_ptrs[i] = &test_raw_encap[i];
-		test_raw_decap_ptrs[i] = &test_raw_decap[i];
-	}
-	for (i = 0; i < IPV6_EXT_PUSH_CONFS_MAX_NUM; i++) {
-		test_ipv6_push_ptrs[i] = &test_ipv6_push[i];
-		test_ipv6_remove_ptrs[i] = &test_ipv6_remove[i];
-	}
-	for (i = 0; i < RAW_SAMPLE_CONFS_MAX_NUM; i++)
-		test_sample_ptrs[i] = &test_sample[i];
 
 	struct rte_flow_parser_config cfg = {
 		.vxlan_encap = &test_vxlan_conf,
@@ -94,11 +72,11 @@ test_register_config(void)
 		.mplsoudp_encap = &test_mplsoudp_encap_conf,
 		.mplsoudp_decap = &test_mplsoudp_decap_conf,
 		.conntrack = &test_conntrack,
-		.raw_encap = { test_raw_encap_ptrs, RAW_ENCAP_CONFS_MAX_NUM },
-		.raw_decap = { test_raw_decap_ptrs, RAW_ENCAP_CONFS_MAX_NUM },
-		.ipv6_ext_push = { test_ipv6_push_ptrs, IPV6_EXT_PUSH_CONFS_MAX_NUM },
-		.ipv6_ext_remove = { test_ipv6_remove_ptrs, IPV6_EXT_PUSH_CONFS_MAX_NUM },
-		.sample = { test_sample_ptrs, RAW_SAMPLE_CONFS_MAX_NUM },
+		.raw_encap = { test_raw_encap, RAW_ENCAP_CONFS_MAX_NUM },
+		.raw_decap = { test_raw_decap, RAW_ENCAP_CONFS_MAX_NUM },
+		.ipv6_ext_push = { test_ipv6_push, IPV6_EXT_PUSH_CONFS_MAX_NUM },
+		.ipv6_ext_remove = { test_ipv6_remove, IPV6_EXT_PUSH_CONFS_MAX_NUM },
+		.sample = { test_sample, RAW_SAMPLE_CONFS_MAX_NUM },
 	};
 	rte_flow_parser_config_register(&cfg);
 }
