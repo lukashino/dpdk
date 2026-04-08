@@ -877,12 +877,6 @@ struct action_ipv6_ext_remove_data {
 
 static struct rte_flow_parser_config registry;
 
-/* Dynamic cache arrays (sized to registered counts) */
-static struct rte_flow_action_raw_encap *raw_encap_cache;
-static struct rte_flow_action_raw_decap *raw_decap_cache;
-static struct rte_flow_action_ipv6_ext_push *ipv6_ext_push_cache;
-static struct rte_flow_action_ipv6_ext_remove *ipv6_ext_remove_cache;
-
 static void
 parser_ctx_update_fields(uint8_t *buf, struct rte_flow_item *item,
 			   uint16_t next_proto)
@@ -1329,56 +1323,62 @@ error:
 const struct rte_flow_action_raw_encap *
 rte_flow_parser_raw_encap_conf(uint16_t index)
 {
+	static struct rte_flow_action_raw_encap snapshot;
+
 	if (index >= registry.raw_encap.count ||
 	    registry.raw_encap.slots == NULL)
 		return NULL;
-	raw_encap_cache[index] = (struct rte_flow_action_raw_encap){
+	snapshot = (struct rte_flow_action_raw_encap){
 		.data = registry.raw_encap.slots[index].data,
 		.size = registry.raw_encap.slots[index].size,
 		.preserve = registry.raw_encap.slots[index].preserve,
 	};
-	return &raw_encap_cache[index];
+	return &snapshot;
 }
 
 const struct rte_flow_action_raw_decap *
 rte_flow_parser_raw_decap_conf(uint16_t index)
 {
+	static struct rte_flow_action_raw_decap snapshot;
+
 	if (index >= registry.raw_decap.count ||
 	    registry.raw_decap.slots == NULL)
 		return NULL;
-	raw_decap_cache[index] = (struct rte_flow_action_raw_decap){
+	snapshot = (struct rte_flow_action_raw_decap){
 		.data = registry.raw_decap.slots[index].data,
 		.size = registry.raw_decap.slots[index].size,
 	};
-	return &raw_decap_cache[index];
+	return &snapshot;
 }
 
 static const struct rte_flow_action_ipv6_ext_push *
 parser_ctx_ipv6_ext_push_conf_get(uint16_t index)
 {
+	static struct rte_flow_action_ipv6_ext_push snapshot;
+
 	if (index >= registry.ipv6_ext_push.count ||
 	    registry.ipv6_ext_push.slots == NULL)
 		return NULL;
-	ipv6_ext_push_cache[index] =
-		(struct rte_flow_action_ipv6_ext_push){
-			.data = registry.ipv6_ext_push.slots[index].data,
-			.size = registry.ipv6_ext_push.slots[index].size,
-			.type = registry.ipv6_ext_push.slots[index].type,
-		};
-	return &ipv6_ext_push_cache[index];
+	snapshot = (struct rte_flow_action_ipv6_ext_push){
+		.data = registry.ipv6_ext_push.slots[index].data,
+		.size = registry.ipv6_ext_push.slots[index].size,
+		.type = registry.ipv6_ext_push.slots[index].type,
+	};
+	return &snapshot;
 }
 
 static const struct rte_flow_action_ipv6_ext_remove *
 parser_ctx_ipv6_ext_remove_conf_get(uint16_t index)
 {
+	static struct rte_flow_action_ipv6_ext_remove snapshot;
+
 	if (index >= registry.ipv6_ext_remove.count ||
 	    registry.ipv6_ext_remove.slots == NULL)
 		return NULL;
-	ipv6_ext_remove_cache[index] =
-		(struct rte_flow_action_ipv6_ext_remove){
-			.type = registry.ipv6_ext_remove.slots[index].type,
-		};
-	return &ipv6_ext_remove_cache[index];
+	snapshot = (struct rte_flow_action_ipv6_ext_remove){
+		.type = registry.ipv6_ext_remove.slots[index].type,
+	};
+	return &snapshot;
 }
 
 int
@@ -1598,23 +1598,7 @@ rte_flow_parser_config_register(const struct rte_flow_parser_config *config)
 	if (config == NULL)
 		return -EINVAL;
 
-	/* Free old caches */
-	free(raw_encap_cache);
-	free(raw_decap_cache);
-	free(ipv6_ext_push_cache);
-	free(ipv6_ext_remove_cache);
-
 	registry = *config;
-
-	/* Allocate caches sized to registered counts */
-	raw_encap_cache = calloc(registry.raw_encap.count,
-				 sizeof(*raw_encap_cache));
-	raw_decap_cache = calloc(registry.raw_decap.count,
-				 sizeof(*raw_decap_cache));
-	ipv6_ext_push_cache = calloc(registry.ipv6_ext_push.count,
-				     sizeof(*ipv6_ext_push_cache));
-	ipv6_ext_remove_cache = calloc(registry.ipv6_ext_remove.count,
-				       sizeof(*ipv6_ext_remove_cache));
 	return 0;
 }
 
