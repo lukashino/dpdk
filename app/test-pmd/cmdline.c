@@ -10421,7 +10421,7 @@ static void cmd_set_vxlan_parsed(void *parsed_result,
 {
 	struct cmd_set_vxlan_result *res = parsed_result;
 	struct rte_flow_parser_vxlan_encap_conf *vxlan_conf =
-		rte_flow_parser_vxlan_encap_conf();
+		&testpmd_vxlan_conf;
 	union {
 		uint32_t vxlan_id;
 		uint8_t vni[4];
@@ -10624,7 +10624,7 @@ static void cmd_set_nvgre_parsed(void *parsed_result,
 {
 	struct cmd_set_nvgre_result *res = parsed_result;
 	struct rte_flow_parser_nvgre_encap_conf *nvgre_conf =
-		rte_flow_parser_nvgre_encap_conf();
+		&testpmd_nvgre_conf;
 	union {
 		uint32_t nvgre_tni;
 		uint8_t tni[4];
@@ -10758,10 +10758,7 @@ static void cmd_set_l2_encap_parsed(void *parsed_result,
 {
 	struct cmd_set_l2_encap_result *res = parsed_result;
 	struct rte_flow_parser_l2_encap_conf *l2_conf =
-		rte_flow_parser_l2_encap_conf();
-
-	if (l2_conf == NULL)
-		return;
+		&testpmd_l2_encap_conf;
 
 	if (strcmp(res->l2_encap, "l2_encap") == 0)
 		l2_conf->select_vlan = 0;
@@ -10840,10 +10837,7 @@ static void cmd_set_l2_decap_parsed(void *parsed_result,
 {
 	struct cmd_set_l2_decap_result *res = parsed_result;
 	struct rte_flow_parser_l2_decap_conf *l2_conf =
-		rte_flow_parser_l2_decap_conf();
-
-	if (l2_conf == NULL)
-		return;
+		&testpmd_l2_decap_conf;
 
 	if (strcmp(res->l2_decap, "l2_decap") == 0)
 		l2_conf->select_vlan = 0;
@@ -10944,16 +10938,13 @@ static void cmd_set_mplsogre_encap_parsed(void *parsed_result,
 {
 	struct cmd_set_mplsogre_encap_result *res = parsed_result;
 	struct rte_flow_parser_mplsogre_encap_conf *mplsogre_conf =
-		rte_flow_parser_mplsogre_encap_conf();
+		&testpmd_mplsogre_encap_conf;
 	union {
 		uint32_t mplsogre_label;
 		uint8_t label[4];
 	} id = {
 		.mplsogre_label = rte_cpu_to_be_32(res->label<<12),
 	};
-
-	if (mplsogre_conf == NULL)
-		return;
 
 	if (strcmp(res->mplsogre, "mplsogre_encap") == 0)
 		mplsogre_conf->select_vlan = 0;
@@ -11062,10 +11053,7 @@ static void cmd_set_mplsogre_decap_parsed(void *parsed_result,
 {
 	struct cmd_set_mplsogre_decap_result *res = parsed_result;
 	struct rte_flow_parser_mplsogre_decap_conf *mplsogre_conf =
-		rte_flow_parser_mplsogre_decap_conf();
-
-	if (mplsogre_conf == NULL)
-		return;
+		&testpmd_mplsogre_decap_conf;
 
 	if (strcmp(res->mplsogre, "mplsogre_decap") == 0)
 		mplsogre_conf->select_vlan = 0;
@@ -11188,16 +11176,13 @@ static void cmd_set_mplsoudp_encap_parsed(void *parsed_result,
 {
 	struct cmd_set_mplsoudp_encap_result *res = parsed_result;
 	struct rte_flow_parser_mplsoudp_encap_conf *mplsoudp_conf =
-		rte_flow_parser_mplsoudp_encap_conf();
+		&testpmd_mplsoudp_encap_conf;
 	union {
 		uint32_t mplsoudp_label;
 		uint8_t label[4];
 	} id = {
 		.mplsoudp_label = rte_cpu_to_be_32(res->label<<12),
 	};
-
-	if (mplsoudp_conf == NULL)
-		return;
 
 	if (strcmp(res->mplsoudp, "mplsoudp_encap") == 0)
 		mplsoudp_conf->select_vlan = 0;
@@ -11317,10 +11302,7 @@ static void cmd_set_mplsoudp_decap_parsed(void *parsed_result,
 {
 	struct cmd_set_mplsoudp_decap_result *res = parsed_result;
 	struct rte_flow_parser_mplsoudp_decap_conf *mplsoudp_conf =
-		rte_flow_parser_mplsoudp_decap_conf();
-
-	if (mplsoudp_conf == NULL)
-		return;
+		&testpmd_mplsoudp_decap_conf;
 
 	if (strcmp(res->mplsoudp, "mplsoudp_decap") == 0)
 		mplsoudp_conf->select_vlan = 0;
@@ -11508,10 +11490,8 @@ static void cmd_set_conntrack_common_parsed(void *parsed_result,
 	__rte_unused void *data)
 {
 	struct cmd_set_conntrack_common_result *res = parsed_result;
-	struct rte_flow_action_conntrack *ct = rte_flow_parser_conntrack_context();
+	struct rte_flow_action_conntrack *ct = &testpmd_conntrack;
 
-	if (ct == NULL)
-		return;
 	/* No need to swap to big endian. */
 	ct->peer_port = res->peer_port;
 	ct->is_original_dir = res->is_original;
@@ -11660,11 +11640,9 @@ static void cmd_set_conntrack_dir_parsed(void *parsed_result,
 	__rte_unused void *data)
 {
 	struct cmd_set_conntrack_dir_result *res = parsed_result;
-	struct rte_flow_action_conntrack *ct = rte_flow_parser_conntrack_context();
+	struct rte_flow_action_conntrack *ct = &testpmd_conntrack;
 	struct rte_flow_tcp_dir_param *dir = NULL;
 
-	if (ct == NULL)
-		return;
 	if (strcmp(res->dir, "orig") == 0)
 		dir = &ct->original_dir;
 	else if (strcmp(res->dir, "rply") == 0)

@@ -1626,65 +1626,6 @@ rte_flow_parser_config_register(const struct rte_flow_parser_config *config)
 	return 0;
 }
 
-RTE_INIT(rte_flow_parser_lib_init)
-{
-	/* No default config initialization - app must register. */
-}
-
-struct rte_flow_parser_vxlan_encap_conf *
-rte_flow_parser_vxlan_encap_conf(void)
-{
-	return registry.vxlan_encap;
-}
-
-struct rte_flow_parser_nvgre_encap_conf *
-rte_flow_parser_nvgre_encap_conf(void)
-{
-	return registry.nvgre_encap;
-}
-
-struct rte_flow_parser_l2_encap_conf *
-rte_flow_parser_l2_encap_conf(void)
-{
-	return registry.l2_encap;
-}
-
-struct rte_flow_parser_l2_decap_conf *
-rte_flow_parser_l2_decap_conf(void)
-{
-	return registry.l2_decap;
-}
-
-struct rte_flow_parser_mplsogre_encap_conf *
-rte_flow_parser_mplsogre_encap_conf(void)
-{
-	return registry.mplsogre_encap;
-}
-
-struct rte_flow_parser_mplsogre_decap_conf *
-rte_flow_parser_mplsogre_decap_conf(void)
-{
-	return registry.mplsogre_decap;
-}
-
-struct rte_flow_parser_mplsoudp_encap_conf *
-rte_flow_parser_mplsoudp_encap_conf(void)
-{
-	return registry.mplsoudp_encap;
-}
-
-struct rte_flow_parser_mplsoudp_decap_conf *
-rte_flow_parser_mplsoudp_decap_conf(void)
-{
-	return registry.mplsoudp_decap;
-}
-
-struct rte_flow_action_conntrack *
-rte_flow_parser_conntrack_context(void)
-{
-	return registry.conntrack;
-}
-
 static inline int
 parser_port_id_is_invalid(uint16_t port_id)
 {
@@ -10283,7 +10224,7 @@ static int
 parse_setup_vxlan_encap_data(struct action_vxlan_encap_data *action_vxlan_encap_data)
 {
 	const struct rte_flow_parser_vxlan_encap_conf *conf =
-		rte_flow_parser_vxlan_encap_conf();
+		registry.vxlan_encap;
 	if (conf == NULL)
 		return -1;
 
@@ -10428,7 +10369,7 @@ static int
 parse_setup_nvgre_encap_data(struct action_nvgre_encap_data *action_nvgre_encap_data)
 {
 	const struct rte_flow_parser_nvgre_encap_conf *conf =
-		rte_flow_parser_nvgre_encap_conf();
+		registry.nvgre_encap;
 	if (conf == NULL)
 		return -1;
 
@@ -10539,7 +10480,7 @@ parse_vc_action_l2_encap(struct context *ctx, const struct token *token,
 	struct rte_flow_action *action;
 	struct action_raw_encap_data *action_encap_data;
 	const struct rte_flow_parser_l2_encap_conf *conf =
-		rte_flow_parser_l2_encap_conf();
+		registry.l2_encap;
 	struct rte_flow_item_eth eth = { .hdr.ether_type = 0, };
 	struct rte_flow_item_vlan vlan;
 	uint8_t *header;
@@ -10606,9 +10547,9 @@ parse_vc_action_l2_decap(struct context *ctx, const struct token *token,
 	struct rte_flow_action *action;
 	struct action_raw_decap_data *action_decap_data;
 	const struct rte_flow_parser_l2_decap_conf *conf =
-		rte_flow_parser_l2_decap_conf();
+		registry.l2_decap;
 	const struct rte_flow_parser_mplsoudp_encap_conf *mpls_conf =
-		rte_flow_parser_mplsoudp_encap_conf();
+		registry.mplsoudp_encap;
 	struct rte_flow_item_eth eth = { .hdr.ether_type = 0, };
 	struct rte_flow_item_vlan vlan;
 	uint8_t *header;
@@ -10665,7 +10606,7 @@ parse_vc_action_mplsogre_encap(struct context *ctx, const struct token *token,
 	struct rte_flow_action *action;
 	struct action_raw_encap_data *action_encap_data;
 	const struct rte_flow_parser_mplsogre_encap_conf *conf =
-		rte_flow_parser_mplsogre_encap_conf();
+		registry.mplsogre_encap;
 	struct rte_flow_item_eth eth = { .hdr.ether_type = 0, };
 	struct rte_flow_item_vlan vlan;
 	struct rte_flow_item_ipv4 ipv4;
@@ -10775,9 +10716,9 @@ parse_vc_action_mplsogre_decap(struct context *ctx, const struct token *token,
 	struct rte_flow_action *action;
 	struct action_raw_decap_data *action_decap_data;
 	const struct rte_flow_parser_mplsogre_decap_conf *conf =
-		rte_flow_parser_mplsogre_decap_conf();
+		registry.mplsogre_decap;
 	const struct rte_flow_parser_mplsogre_encap_conf *enc_conf =
-		rte_flow_parser_mplsogre_encap_conf();
+		registry.mplsogre_encap;
 	struct rte_flow_item_eth eth = { .hdr.ether_type = 0, };
 	struct rte_flow_item_vlan vlan = {.hdr.vlan_tci = 0};
 	struct rte_flow_item_ipv4 ipv4 = {
@@ -10866,7 +10807,7 @@ parse_vc_action_mplsoudp_encap(struct context *ctx, const struct token *token,
 	struct rte_flow_action *action;
 	struct action_raw_encap_data *action_encap_data;
 	const struct rte_flow_parser_mplsoudp_encap_conf *conf =
-		rte_flow_parser_mplsoudp_encap_conf();
+		registry.mplsoudp_encap;
 	struct rte_flow_item_eth eth = { .hdr.ether_type = 0, };
 	struct rte_flow_item_vlan vlan;
 	struct rte_flow_item_ipv4 ipv4;
@@ -10978,9 +10919,9 @@ parse_vc_action_mplsoudp_decap(struct context *ctx, const struct token *token,
 	struct rte_flow_action *action;
 	struct action_raw_decap_data *action_decap_data;
 	const struct rte_flow_parser_mplsoudp_decap_conf *conf =
-		rte_flow_parser_mplsoudp_decap_conf();
+		registry.mplsoudp_decap;
 	const struct rte_flow_parser_mplsoudp_encap_conf *enc_conf =
-		rte_flow_parser_mplsoudp_encap_conf();
+		registry.mplsoudp_encap;
 	struct rte_flow_item_eth eth = { .hdr.ether_type = 0, };
 	struct rte_flow_item_vlan vlan = {.hdr.vlan_tci = 0};
 	struct rte_flow_item_ipv4 ipv4 = {
@@ -11578,7 +11519,7 @@ parse_vc_action_conntrack_update(struct context *ctx, const struct token *token,
 	ct_modify = (struct rte_flow_modify_conntrack *)out->args.vc.data;
 	if (ctx->curr == PT_ACTION_CONNTRACK_UPDATE_DIR) {
 		const struct rte_flow_action_conntrack *ct =
-			rte_flow_parser_conntrack_context();
+			registry.conntrack;
 		if (ct != NULL)
 			ct_modify->new_ct.is_original_dir =
 				ct->is_original_dir;
@@ -11586,7 +11527,7 @@ parse_vc_action_conntrack_update(struct context *ctx, const struct token *token,
 	} else {
 		uint32_t old_dir;
 		const struct rte_flow_action_conntrack *ct =
-			rte_flow_parser_conntrack_context();
+			registry.conntrack;
 
 		old_dir = ct_modify->new_ct.is_original_dir;
 		if (ct != NULL)
@@ -14646,14 +14587,6 @@ RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_parse_pattern_str, 26.07);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_parse_actions_str, 26.07);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_parse, 26.07);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_config_register, 26.07);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_vxlan_encap_conf, 26.07);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_nvgre_encap_conf, 26.07);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_l2_encap_conf, 26.07);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_l2_decap_conf, 26.07);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_mplsogre_encap_conf, 26.07);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_mplsogre_decap_conf, 26.07);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_mplsoudp_encap_conf, 26.07);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_mplsoudp_decap_conf, 26.07);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_raw_encap_conf, 26.07);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_raw_decap_conf, 26.07);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_raw_encap_conf_set, 26.07);
@@ -14661,7 +14594,6 @@ RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_raw_decap_conf_set, 26.07);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ipv6_ext_push_set, 26.07);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ipv6_ext_remove_set, 26.07);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_sample_actions_set, 26.07);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_conntrack_context, 26.07);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmdline_register, 26.07);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_flow_cb, 26.07);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_set_raw_cb, 26.07);

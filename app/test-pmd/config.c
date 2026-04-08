@@ -1780,10 +1780,8 @@ action_handle_create(portid_t port_id,
 		struct rte_flow_action_conntrack *ct =
 			(struct rte_flow_action_conntrack *)(uintptr_t)(action->conf);
 		const struct rte_flow_action_conntrack *ct_ctx =
-			rte_flow_parser_conntrack_context();
+			&testpmd_conntrack;
 
-		if (ct_ctx == NULL)
-			return -1;
 		memcpy(ct, ct_ctx, sizeof(*ct));
 	}
 	pia->type = action->type;

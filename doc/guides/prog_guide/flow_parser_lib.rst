@@ -23,7 +23,7 @@ Public API
 ----------
 
 The simple API is declared in ``rte_flow_parser.h`` and consists of
-three parse helpers plus configuration accessors:
+three parse helpers plus a configuration registration function:
 
 * ``rte_flow_parser_parse_attr_str()`` - Parse flow attributes from a string.
 * ``rte_flow_parser_parse_pattern_str()`` - Parse flow pattern from a string.
@@ -165,24 +165,24 @@ Encapsulation Configuration
 ---------------------------
 
 Certain flow actions (``vxlan_encap``, ``nvgre_encap``, ``l2_encap``, etc.)
-require pre-configured tunnel parameters. Applications configure these via
-accessor functions before parsing flow rules that reference them::
+require pre-configured tunnel parameters. Applications own the config objects
+and register them via ``rte_flow_parser_config_register()``. The library reads
+from the registered pointers directly, so applications simply write to their
+own objects before parsing flow rules that reference them::
 
-  struct rte_flow_parser_vxlan_encap_conf *vxlan =
-      rte_flow_parser_vxlan_encap_conf();
-  vxlan->select_ipv4 = 1;
-  vxlan->vni[0] = 0x12;
-  vxlan->vni[1] = 0x34;
-  vxlan->vni[2] = 0x56;
+  struct rte_flow_parser_vxlan_encap_conf my_vxlan = { 0 };
+  struct rte_flow_parser_config cfg = { .vxlan_encap = &my_vxlan };
+  rte_flow_parser_config_register(&cfg);
+
+  my_vxlan.select_ipv4 = 1;
+  my_vxlan.vni[0] = 0x12;
+  my_vxlan.vni[1] = 0x34;
+  my_vxlan.vni[2] = 0x56;
   /* Now parsing "actions vxlan_encap / end" uses this config */
 
-Available accessors: ``rte_flow_parser_vxlan_encap_conf()``,
-``rte_flow_parser_nvgre_encap_conf()``, ``rte_flow_parser_l2_encap_conf()``,
-``rte_flow_parser_l2_decap_conf()``, ``rte_flow_parser_mplsogre_encap_conf()``,
-``rte_flow_parser_mplsogre_decap_conf()``,
-``rte_flow_parser_mplsoudp_encap_conf()``,
-``rte_flow_parser_mplsoudp_decap_conf()``,
-``rte_flow_parser_conntrack_context()``.
+Supported config fields: ``vxlan_encap``, ``nvgre_encap``, ``l2_encap``,
+``l2_decap``, ``mplsogre_encap``, ``mplsogre_decap``,
+``mplsoudp_encap``, ``mplsoudp_decap``, ``conntrack``.
 
 For raw encap/decap, use ``rte_flow_parser_raw_encap_conf_set()`` or
 ``rte_flow_parser_raw_decap_conf_set()`` to store configuration, then inspect

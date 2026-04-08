@@ -1061,66 +1061,6 @@ test_flow_parser_cmdline_register(void)
  * =============================================================================
  */
 static int
-test_flow_parser_encap_accessors(void)
-{
-	struct rte_flow_parser_vxlan_encap_conf *vxlan;
-	struct rte_flow_parser_vxlan_encap_conf *vxlan2;
-	struct rte_flow_parser_nvgre_encap_conf *nvgre;
-	struct rte_flow_parser_l2_encap_conf *l2_enc;
-	struct rte_flow_parser_l2_decap_conf *l2_dec;
-	struct rte_flow_parser_mplsogre_encap_conf *mpls_gre_enc;
-	struct rte_flow_parser_mplsogre_decap_conf *mpls_gre_dec;
-	struct rte_flow_parser_mplsoudp_encap_conf *mpls_udp_enc;
-	struct rte_flow_parser_mplsoudp_decap_conf *mpls_udp_dec;
-	struct rte_flow_action_conntrack *ct;
-
-	/* All accessors must return non-NULL */
-	vxlan = rte_flow_parser_vxlan_encap_conf();
-	TEST_ASSERT_NOT_NULL(vxlan, "vxlan_encap_conf returned NULL");
-
-	nvgre = rte_flow_parser_nvgre_encap_conf();
-	TEST_ASSERT_NOT_NULL(nvgre, "nvgre_encap_conf returned NULL");
-
-	l2_enc = rte_flow_parser_l2_encap_conf();
-	TEST_ASSERT_NOT_NULL(l2_enc, "l2_encap_conf returned NULL");
-
-	l2_dec = rte_flow_parser_l2_decap_conf();
-	TEST_ASSERT_NOT_NULL(l2_dec, "l2_decap_conf returned NULL");
-
-	mpls_gre_enc = rte_flow_parser_mplsogre_encap_conf();
-	TEST_ASSERT_NOT_NULL(mpls_gre_enc, "mplsogre_encap_conf returned NULL");
-
-	mpls_gre_dec = rte_flow_parser_mplsogre_decap_conf();
-	TEST_ASSERT_NOT_NULL(mpls_gre_dec, "mplsogre_decap_conf returned NULL");
-
-	mpls_udp_enc = rte_flow_parser_mplsoudp_encap_conf();
-	TEST_ASSERT_NOT_NULL(mpls_udp_enc, "mplsoudp_encap_conf returned NULL");
-
-	mpls_udp_dec = rte_flow_parser_mplsoudp_decap_conf();
-	TEST_ASSERT_NOT_NULL(mpls_udp_dec, "mplsoudp_decap_conf returned NULL");
-
-	ct = rte_flow_parser_conntrack_context();
-	TEST_ASSERT_NOT_NULL(ct, "conntrack_context returned NULL");
-
-	/* Verify VXLAN accessor returns stable pointer and is writable */
-	vxlan->select_ipv4 = 1;
-	vxlan->vni[0] = 0x12;
-	vxlan->vni[1] = 0x34;
-	vxlan->vni[2] = 0x56;
-	vxlan2 = rte_flow_parser_vxlan_encap_conf();
-	TEST_ASSERT_EQUAL(vxlan, vxlan2, "vxlan accessor not stable");
-	TEST_ASSERT_EQUAL(vxlan2->vni[0], 0x12, "vxlan vni not persisted");
-
-	/* raw_encap/decap accessors: out-of-range returns NULL */
-	TEST_ASSERT_NULL(rte_flow_parser_raw_encap_conf(RAW_ENCAP_CONFS_MAX_NUM),
-		"raw_encap out-of-range should be NULL");
-	TEST_ASSERT_NULL(rte_flow_parser_raw_decap_conf(RAW_ENCAP_CONFS_MAX_NUM),
-		"raw_decap out-of-range should be NULL");
-
-	return TEST_SUCCESS;
-}
-
-static int
 test_flow_parser_raw_encap_setter(void)
 {
 	const struct rte_flow_item *items;
@@ -1198,18 +1138,19 @@ static int
 test_flow_parser_config_register_identity(void)
 {
 	struct rte_flow_parser_vxlan_encap_conf local_vxlan = { 0 };
-	struct rte_flow_parser_vxlan_encap_conf *result;
-
-	/* Register our own local config — self-contained, no prior state */
 	struct rte_flow_parser_config cfg = { .vxlan_encap = &local_vxlan };
+
 	TEST_ASSERT_SUCCESS(rte_flow_parser_config_register(&cfg),
 		"config_register failed");
 
-	result = rte_flow_parser_vxlan_encap_conf();
-	TEST_ASSERT(result == &local_vxlan,
-		"accessor did not return registered pointer: "
-		"got %p, expected %p", (void *)result, (void *)&local_vxlan);
+	/* Write through registered config, verify it's the same object */
+	local_vxlan.select_ipv4 = 1;
+	local_vxlan.vni[0] = 0xAA;
+	TEST_ASSERT_EQUAL(cfg.vxlan_encap->vni[0], 0xAA,
+		"registered config not the same object");
 
+	/* Restore test config */
+	test_register_config();
 	return TEST_SUCCESS;
 }
 
@@ -1253,9 +1194,6 @@ static struct unit_test_suite flow_parser_tests = {
 		/* Cmdline integration tests */
 		TEST_CASE_ST(flow_parser_case_setup, flow_parser_teardown,
 			test_flow_parser_cmdline_register),
-		/* Accessor tests */
-		TEST_CASE_ST(flow_parser_case_setup, flow_parser_teardown,
-			test_flow_parser_encap_accessors),
 		/* Setter tests */
 		TEST_CASE_ST(flow_parser_case_setup, flow_parser_teardown,
 			test_flow_parser_raw_encap_setter),

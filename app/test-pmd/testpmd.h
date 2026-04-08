@@ -838,6 +838,17 @@ void launch_args_parse(int argc, char** argv);
 void cmd_reconfig_device_queue(portid_t id, uint8_t dev, uint8_t queue);
 int cmdline_read_from_file(const char *filename, bool echo);
 void testpmd_flow_parser_config_init(void);
+
+/* Application-owned flow parser configuration objects (flow_parser_cli.c) */
+extern struct rte_flow_parser_vxlan_encap_conf testpmd_vxlan_conf;
+extern struct rte_flow_parser_nvgre_encap_conf testpmd_nvgre_conf;
+extern struct rte_flow_parser_l2_encap_conf testpmd_l2_encap_conf;
+extern struct rte_flow_parser_l2_decap_conf testpmd_l2_decap_conf;
+extern struct rte_flow_parser_mplsogre_encap_conf testpmd_mplsogre_encap_conf;
+extern struct rte_flow_parser_mplsogre_decap_conf testpmd_mplsogre_decap_conf;
+extern struct rte_flow_parser_mplsoudp_encap_conf testpmd_mplsoudp_encap_conf;
+extern struct rte_flow_parser_mplsoudp_decap_conf testpmd_mplsoudp_decap_conf;
+extern struct rte_flow_action_conntrack testpmd_conntrack;
 int init_cmdline(void);
 void prompt(void);
 void prompt_exit(void);

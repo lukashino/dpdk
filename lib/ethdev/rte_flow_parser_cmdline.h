@@ -589,89 +589,12 @@ void rte_flow_parser_cmd_set_raw_cb(void *arg0, struct cmdline *cl,
 				    void *arg2);
 
 /**
- * @name Encap/decap and conntrack configuration accessors
+ * @name Multi-instance configuration accessors
  *
- * These return mutable pointers to parser-internal global state.
- * Applications use them to configure tunnel encapsulation parameters
- * (e.g., VNI, IP addresses, MAC addresses) before parsing flow rules
- * that use the corresponding encap/decap actions.
- *
- * @warning Not thread-safe. The returned pointers refer to global parser
- * state that may be modified by any subsequent parser API call.
+ * Getters and setters for indexed configuration slots (raw encap/decap,
+ * IPv6 extension push/remove, sample actions).
  * @{
  */
-
-/**
- * Get VXLAN encapsulation configuration.
- *
- * @return
- *   Pointer to mutable VXLAN encap configuration.
- */
-__rte_experimental
-struct rte_flow_parser_vxlan_encap_conf *rte_flow_parser_vxlan_encap_conf(void);
-
-/**
- * Get NVGRE encapsulation configuration.
- *
- * @return
- *   Pointer to mutable NVGRE encap configuration.
- */
-__rte_experimental
-struct rte_flow_parser_nvgre_encap_conf *rte_flow_parser_nvgre_encap_conf(void);
-
-/**
- * Get L2 encapsulation configuration.
- *
- * @return
- *   Pointer to mutable L2 encap configuration.
- */
-__rte_experimental
-struct rte_flow_parser_l2_encap_conf *rte_flow_parser_l2_encap_conf(void);
-
-/**
- * Get L2 decapsulation configuration.
- *
- * @return
- *   Pointer to mutable L2 decap configuration.
- */
-__rte_experimental
-struct rte_flow_parser_l2_decap_conf *rte_flow_parser_l2_decap_conf(void);
-
-/**
- * Get MPLSoGRE encapsulation configuration.
- *
- * @return
- *   Pointer to mutable MPLSoGRE encap configuration.
- */
-__rte_experimental
-struct rte_flow_parser_mplsogre_encap_conf *rte_flow_parser_mplsogre_encap_conf(void);
-
-/**
- * Get MPLSoGRE decapsulation configuration.
- *
- * @return
- *   Pointer to mutable MPLSoGRE decap configuration.
- */
-__rte_experimental
-struct rte_flow_parser_mplsogre_decap_conf *rte_flow_parser_mplsogre_decap_conf(void);
-
-/**
- * Get MPLSoUDP encapsulation configuration.
- *
- * @return
- *   Pointer to mutable MPLSoUDP encap configuration.
- */
-__rte_experimental
-struct rte_flow_parser_mplsoudp_encap_conf *rte_flow_parser_mplsoudp_encap_conf(void);
-
-/**
- * Get MPLSoUDP decapsulation configuration.
- *
- * @return
- *   Pointer to mutable MPLSoUDP decap configuration.
- */
-__rte_experimental
-struct rte_flow_parser_mplsoudp_decap_conf *rte_flow_parser_mplsoudp_decap_conf(void);
 
 /**
  * Get raw encap configuration for the given slot index.
@@ -797,15 +720,6 @@ __rte_experimental
 int rte_flow_parser_sample_actions_set(uint16_t index,
 				       const struct rte_flow_action *actions,
 				       uint32_t actions_n);
-
-/**
- * Get the conntrack action context.
- *
- * @return
- *   Pointer to mutable conntrack configuration.
- */
-__rte_experimental
-struct rte_flow_action_conntrack *rte_flow_parser_conntrack_context(void);
 
 /** @} */
 
