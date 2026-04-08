@@ -225,6 +225,21 @@ struct rte_flow_parser_sample_slot {
 	struct rte_flow_parser_action_rss_data rss_data;
 };
 
+/* Forward declarations needed for rte_flow_parser_config. */
+struct rte_flow_parser_output;
+
+/**
+ * Dispatch callback type for parsed flow commands.
+ *
+ * Called by rte_flow_parser_cmd_flow_cb() after the cmdline library
+ * finishes parsing a complete flow command. The application implements
+ * this to act on the parsed result (e.g., call port_flow_create()).
+ *
+ * @param in
+ *   Parsed output buffer containing the command and its arguments.
+ */
+typedef void (*rte_flow_parser_dispatch_t)(const struct rte_flow_parser_output *in);
+
 /**
  * Configuration registration for the flow parser.
  *
@@ -265,6 +280,10 @@ struct rte_flow_parser_config {
 		struct rte_flow_parser_sample_slot *slots;
 		uint16_t count;
 	} sample;
+
+	/* Cmdline integration (optional, may be NULL) */
+	cmdline_parse_inst_t *cmd_flow; /**< cmdline instance for flow. */
+	rte_flow_parser_dispatch_t dispatch; /**< Dispatch callback. */
 };
 
 /**
@@ -372,12 +391,6 @@ enum rte_flow_parser_command {
 	/* Meter policy */
 	RTE_FLOW_PARSER_CMD_ACTION_POL_G,
 
-	/* Set commands */
-	RTE_FLOW_PARSER_CMD_SET_RAW_ENCAP,
-	RTE_FLOW_PARSER_CMD_SET_RAW_DECAP,
-	RTE_FLOW_PARSER_CMD_SET_SAMPLE_ACTIONS,
-	RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_PUSH,
-	RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_REMOVE,
 	RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_FLOW_CONF_CREATE,
 };
 
@@ -500,44 +513,6 @@ int rte_flow_parser_parse(const char *src,
 			  size_t result_size);
 
 /**
- * Dispatch callback type for parsed flow commands.
- *
- * Called by rte_flow_parser_cmd_flow_cb() after the cmdline library
- * finishes parsing a complete flow command. The application implements
- * this to act on the parsed result (e.g., call port_flow_create()).
- *
- * @param in
- *   Parsed output buffer containing the command and its arguments.
- */
-typedef void (*rte_flow_parser_dispatch_t)(const struct rte_flow_parser_output *in);
-
-/**
- * Register cmdline instances and flow dispatch callback.
- *
- * Stores references to the application's cmdline_parse_inst_t
- * structures so that the library can:
- *   - detect the first-token position for context initialization,
- *   - update inst->help_str dynamically for context-sensitive help.
- *
- * @note The library writes to flow->help_str and set_raw->help_str
- * during interactive parsing. The instances must remain valid for
- * the lifetime of the cmdline session.
- *
- * @warning Not thread-safe.
- *
- * @param flow
- *   cmdline instance for flow commands (tokens[0] must be NULL).
- * @param set_raw
- *   cmdline instance for set commands (tokens[0] must be NULL).
- * @param dispatch
- *   Application callback invoked for parsed flow and SET commands.
- */
-__rte_experimental
-void rte_flow_parser_cmdline_register(cmdline_parse_inst_t *flow,
-				      cmdline_parse_inst_t *set_raw,
-				      rte_flow_parser_dispatch_t dispatch);
-
-/**
  * Cmdline callback for flow commands.
  *
  * Suitable for direct use as the .f member of a cmdline_parse_inst_t
@@ -571,22 +546,45 @@ __rte_experimental
 void rte_flow_parser_cmd_flow_cb(void *arg0, struct cmdline *cl, void *arg2);
 
 /**
- * Cmdline callback for set commands (raw_encap, raw_decap).
+ * Kind of items to parse in a SET context.
+ */
+enum rte_flow_parser_set_item_kind {
+	RTE_FLOW_PARSER_SET_ITEMS_PATTERN,   /**< Pattern items (next_item). */
+	RTE_FLOW_PARSER_SET_ITEMS_ACTION,    /**< Action items (sample). */
+	RTE_FLOW_PARSER_SET_ITEMS_IPV6_EXT,  /**< IPv6 extension items. */
+};
+
+/**
+ * Initialize parse context for item tokenization in SET commands.
  *
- * Same usage as rte_flow_parser_cmd_flow_cb(). Dispatches the parsed
- * SET_RAW_ENCAP or SET_RAW_DECAP command to the application callback
- * registered via rte_flow_parser_cmdline_register().
+ * Sets up the internal parser context so that subsequent
+ * rte_flow_parser_set_item_tok() calls parse pattern or action items.
+ * The caller is responsible for initializing its own output buffer
+ * before calling this function.
  *
- * @param arg0
- *   Token header pointer or parsed output buffer.
- * @param cl
- *   Cmdline handle; NULL for token population, non-NULL for dispatch.
- * @param arg2
- *   Token slot address or inst->data.
+ * @param kind
+ *   Which item list to push (pattern, action, or ipv6_ext).
+ * @param object
+ *   Object pointer used by item parse callbacks (typically the aligned
+ *   area inside the caller's output buffer). May be NULL for
+ *   completion-only (matching pass).
+ * @param size
+ *   Size of the object area (reserved for future use).
  */
 __rte_experimental
-void rte_flow_parser_cmd_set_raw_cb(void *arg0, struct cmdline *cl,
-				    void *arg2);
+void rte_flow_parser_set_ctx_init(enum rte_flow_parser_set_item_kind kind,
+				  void *object, unsigned int size);
+
+/**
+ * Populate the next dynamic token for SET item parsing.
+ * Provides tab completion for pattern/action items.
+ * Sets *hdr to NULL when end_set is detected (command complete).
+ *
+ * @param hdr
+ *   Pointer to token header pointer to populate.
+ */
+__rte_experimental
+void rte_flow_parser_set_item_tok(cmdline_parse_token_hdr_t **hdr);
 
 /**
  * @name Multi-instance configuration accessors

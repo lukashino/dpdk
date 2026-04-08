@@ -14424,12 +14424,8 @@ init_cmdline(void)
 	unsigned int count;
 	unsigned int i;
 
-	/* Register app-owned config storage before cmdline setup. */
+	/* Register app-owned config storage and cmdline integration. */
 	testpmd_flow_parser_config_init();
-
-	/* dynamic flow/set tokens managed by librte_flow_parser. */
-	rte_flow_parser_cmdline_register(&cmd_flow, &cmd_set_raw,
-				       testpmd_flow_dispatch);
 
 	/* initialize non-constant commands */
 	cmd_set_fwd_mode_init();

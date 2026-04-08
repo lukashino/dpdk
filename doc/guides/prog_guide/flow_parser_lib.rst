@@ -116,7 +116,7 @@ protocol used by the DPDK cmdline library.
 
 Setup requires three steps:
 
-1. Declare ``cmdline_parse_inst_t`` instances using the library callbacks::
+1. Declare a ``cmdline_parse_inst_t`` instance using the library callback::
 
      #include <rte_flow_parser_cmdline.h>
 
@@ -125,12 +125,7 @@ Setup requires three steps:
          .tokens = { NULL },  /* dynamic tokens */
      };
 
-     cmdline_parse_inst_t cmd_set_raw = {
-         .f = rte_flow_parser_cmd_set_raw_cb,
-         .tokens = { NULL },  /* dynamic tokens */
-     };
-
-2. Register instances and provide a dispatch callback::
+2. Register the instance and provide a dispatch callback::
 
      static void
      my_dispatch(const struct rte_flow_parser_output *out)
@@ -146,14 +141,24 @@ Setup requires three steps:
          }
      }
 
-     rte_flow_parser_cmdline_register(&cmd_flow, &cmd_set_raw,
-                                      my_dispatch);
+     /* Include cmd_flow and dispatch in the config registration: */
+     struct rte_flow_parser_config cfg = {
+         /* ... encap/decap storage pointers ... */
+         .cmd_flow = &cmd_flow,
+         .dispatch = my_dispatch,
+     };
+     rte_flow_parser_config_register(&cfg);
 
-3. Add ``cmd_flow`` and ``cmd_set_raw`` to the cmdline context array.
+3. Add ``cmd_flow`` to the cmdline context array.
 
-The library handles token population, tab completion, and context-sensitive
-help automatically. When a complete command is parsed, the library calls
-the registered dispatch function. SET commands are auto-applied internally.
+SET commands (``set raw_encap``, ``set sample_actions``, etc.) are
+application-owned. The library provides ``rte_flow_parser_set_item_tok()``
+for pattern/action item tokenization with tab completion; the application
+handles keyword/subcommand/index parsing itself.
+
+The library handles flow command token population, tab completion, and
+context-sensitive help automatically. When a complete flow command is
+parsed, the library calls the registered dispatch function.
 
 .. note::
 

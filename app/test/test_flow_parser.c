@@ -30,6 +30,10 @@ static struct rte_flow_parser_ipv6_ext_push_data test_ipv6_push[IPV6_EXT_PUSH_CO
 static struct rte_flow_parser_ipv6_ext_remove_data test_ipv6_remove[IPV6_EXT_PUSH_CONFS_MAX_NUM];
 static struct rte_flow_parser_sample_slot test_sample[RAW_SAMPLE_CONFS_MAX_NUM];
 
+/* Forward declarations for cmdline integration fields in config. */
+static void test_dispatch_cb(const struct rte_flow_parser_output *in __rte_unused);
+static cmdline_parse_inst_t test_flow_inst;
+
 static void
 test_register_config(void)
 {
@@ -77,6 +81,8 @@ test_register_config(void)
 		.ipv6_ext_push = { test_ipv6_push, IPV6_EXT_PUSH_CONFS_MAX_NUM },
 		.ipv6_ext_remove = { test_ipv6_remove, IPV6_EXT_PUSH_CONFS_MAX_NUM },
 		.sample = { test_sample, RAW_SAMPLE_CONFS_MAX_NUM },
+		.cmd_flow = &test_flow_inst,
+		.dispatch = test_dispatch_cb,
 	};
 	rte_flow_parser_config_register(&cfg);
 }
@@ -1003,32 +1009,19 @@ static cmdline_parse_inst_t test_flow_inst = {
 	.tokens = { NULL },
 };
 
-static cmdline_parse_inst_t test_set_raw_inst = {
-	.f = rte_flow_parser_cmd_set_raw_cb,
-	.data = NULL,
-	.help_str = NULL,
-	.tokens = { NULL },
-};
-
 static int
 test_flow_parser_cmdline_register(void)
 {
 	cmdline_parse_token_hdr_t *tok = NULL;
 
-	/* Register should not crash */
-	rte_flow_parser_cmdline_register(&test_flow_inst, &test_set_raw_inst,
-					 test_dispatch_cb);
-
+	/*
+	 * Cmdline integration is now registered through
+	 * rte_flow_parser_config_register() (via test_register_config()
+	 * in the test case setup). Verify that the dynamic token
+	 * mechanism works after config registration.
+	 */
 	rte_flow_parser_cmd_flow_cb(&tok, NULL, &test_flow_inst.tokens[0]);
 	TEST_ASSERT_NOT_NULL(tok, "first dynamic token should not be NULL");
-
-	/* Similarly for set_raw */
-	tok = NULL;
-	rte_flow_parser_cmd_set_raw_cb(&tok, NULL, &test_set_raw_inst.tokens[0]);
-	TEST_ASSERT_NOT_NULL(tok, "first set_raw dynamic token should not be NULL");
-
-	/* Unregister by passing NULLs */
-	rte_flow_parser_cmdline_register(NULL, NULL, NULL);
 
 	return TEST_SUCCESS;
 }

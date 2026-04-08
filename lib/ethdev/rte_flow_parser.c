@@ -40,15 +40,6 @@
 #include <eal_export.h>
 #include "rte_flow_parser_cmdline.h"
 
-/* Internal aliases for the public config types */
-#define raw_encap_conf rte_flow_parser_raw_encap_data
-#define raw_decap_conf rte_flow_parser_raw_decap_data
-#define ipv6_ext_push_conf rte_flow_parser_ipv6_ext_push_data
-#define ipv6_ext_remove_conf rte_flow_parser_ipv6_ext_remove_data
-#define action_vxlan_encap_data rte_flow_parser_action_vxlan_encap_data
-#define action_nvgre_encap_data rte_flow_parser_action_nvgre_encap_data
-#define action_rss_data rte_flow_parser_action_rss_data
-
 /**
  * Internal grammar token indices used during parsing.
  *
@@ -63,7 +54,6 @@ enum parser_token {
 	/* Special tokens. */
 	PT_ZERO = 0,
 	PT_END,
-	PT_START_SET,
 	PT_END_SET,
 
 	/* Common tokens. */
@@ -94,18 +84,6 @@ enum parser_token {
 
 	/* TOP-level command. */
 	PT_ADD,
-
-	/* Top-level command. */
-	PT_SET,
-	/* Sub-level commands. */
-	PT_SET_RAW_ENCAP,
-	PT_SET_RAW_DECAP,
-	PT_SET_RAW_INDEX,
-	PT_SET_SAMPLE_ACTIONS,
-	PT_SET_SAMPLE_INDEX,
-	PT_SET_IPV6_EXT_REMOVE,
-	PT_SET_IPV6_EXT_PUSH,
-	PT_SET_IPV6_EXT_INDEX,
 
 	/* Top-level command. */
 	PT_FLOW,
@@ -867,14 +845,6 @@ struct action_ipv6_ext_remove_data {
 	uint16_t idx;
 };
 
-/* Internal struct types are aliased to public types via #define above.
- * struct raw_encap_conf -> struct rte_flow_parser_raw_encap_data
- * struct raw_decap_conf -> struct rte_flow_parser_raw_decap_data
- * struct ipv6_ext_push_conf -> struct rte_flow_parser_ipv6_ext_push_data
- * struct ipv6_ext_remove_conf -> struct rte_flow_parser_ipv6_ext_remove_data
- * struct action_rss_data -> struct rte_flow_parser_action_rss_data
- */
-
 static struct rte_flow_parser_config registry;
 
 static void
@@ -1493,8 +1463,8 @@ parser_ctx_set_ipv6_ext_remove(uint16_t idx,
 	return 0;
 }
 
-static int parse_setup_vxlan_encap_data(struct action_vxlan_encap_data *);
-static int parse_setup_nvgre_encap_data(struct action_nvgre_encap_data *);
+static int parse_setup_vxlan_encap_data(struct rte_flow_parser_action_vxlan_encap_data *);
+static int parse_setup_nvgre_encap_data(struct rte_flow_parser_action_nvgre_encap_data *);
 
 static int
 parser_ctx_set_sample_actions(uint16_t idx,
@@ -2716,12 +2686,6 @@ static const enum parser_token item_pfcp[] = {
 	PT_ZERO,
 };
 
-static const enum parser_token next_set_raw[] = {
-	PT_SET_RAW_INDEX,
-	PT_ITEM_ETH,
-	PT_ZERO,
-};
-
 static const enum parser_token next_action_sample[] = {
 	PT_ACTION_QUEUE,
 	PT_ACTION_RSS,
@@ -3392,18 +3356,6 @@ static const enum parser_token action_jump_to_table_index[] = {
 	PT_ZERO,
 };
 
-static int parse_set_raw_encap_decap(struct context *, const struct token *,
-				     const char *, unsigned int,
-				     void *, unsigned int);
-static int parse_set_sample_action(struct context *, const struct token *,
-				   const char *, unsigned int,
-				   void *, unsigned int);
-static int parse_set_ipv6_ext_action(struct context *, const struct token *,
-				     const char *, unsigned int,
-				     void *, unsigned int);
-static int parse_set_init(struct context *, const struct token *,
-			  const char *, unsigned int,
-			  void *, unsigned int);
 static int
 parse_flex_handle(struct context *, const struct token *,
 		  const char *, unsigned int, void *, unsigned int);
@@ -3766,11 +3718,6 @@ static const struct token token_list[] = {
 		.name = "",
 		.type = "RETURN",
 		.help = "command may end here",
-	},
-	[PT_START_SET] = {
-		.name = "PT_START_SET",
-		.help = "null entry, abused as the entry point for set",
-		.next = NEXT(NEXT_ENTRY(PT_SET)),
 	},
 	[PT_END_SET] = {
 		.name = "end_set",
@@ -7369,7 +7316,7 @@ static const struct token token_list[] = {
 	[PT_ACTION_RSS] = {
 		.name = "rss",
 		.help = "spread packets among several queues",
-		.priv = PRIV_ACTION(RSS, sizeof(struct action_rss_data)),
+		.priv = PRIV_ACTION(RSS, sizeof(struct rte_flow_parser_action_rss_data)),
 		.next = NEXT(action_rss),
 		.call = parse_vc_action_rss,
 	},
@@ -7407,7 +7354,7 @@ static const struct token token_list[] = {
 		.help = "encapsulation level for \"types\"",
 		.next = NEXT(action_rss, NEXT_ENTRY(PT_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY_ARB
-			     (offsetof(struct action_rss_data, conf) +
+			     (offsetof(struct rte_flow_parser_action_rss_data, conf) +
 			      offsetof(struct rte_flow_action_rss, level),
 			      sizeof(((struct rte_flow_action_rss *)0)->
 				     level))),
@@ -7428,22 +7375,22 @@ static const struct token token_list[] = {
 		.help = "RSS hash key",
 		.next = NEXT(action_rss, NEXT_ENTRY(PT_COMMON_HEX)),
 		.args = ARGS(ARGS_ENTRY_ARB
-			     (offsetof(struct action_rss_data, conf) +
+			     (offsetof(struct rte_flow_parser_action_rss_data, conf) +
 			      offsetof(struct rte_flow_action_rss, key),
 			      sizeof(((struct rte_flow_action_rss *)0)->key)),
 			     ARGS_ENTRY_ARB
-			     (offsetof(struct action_rss_data, conf) +
+			     (offsetof(struct rte_flow_parser_action_rss_data, conf) +
 			      offsetof(struct rte_flow_action_rss, key_len),
 			      sizeof(((struct rte_flow_action_rss *)0)->
 				     key_len)),
-			     ARGS_ENTRY(struct action_rss_data, key)),
+			     ARGS_ENTRY(struct rte_flow_parser_action_rss_data, key)),
 	},
 	[PT_ACTION_RSS_KEY_LEN] = {
 		.name = "key_len",
 		.help = "RSS hash key length in bytes",
 		.next = NEXT(action_rss, NEXT_ENTRY(PT_COMMON_UNSIGNED)),
 		.args = ARGS(ARGS_ENTRY_ARB_BOUNDED
-			     (offsetof(struct action_rss_data, conf) +
+			     (offsetof(struct rte_flow_parser_action_rss_data, conf) +
 			      offsetof(struct rte_flow_action_rss, key_len),
 			      sizeof(((struct rte_flow_action_rss *)0)->
 				     key_len),
@@ -7737,7 +7684,7 @@ static const struct token token_list[] = {
 		.help = "VXLAN encapsulation, uses configuration set by \"set"
 			" vxlan\"",
 		.priv = PRIV_ACTION(VXLAN_ENCAP,
-				    sizeof(struct action_vxlan_encap_data)),
+				    sizeof(struct rte_flow_parser_action_vxlan_encap_data)),
 		.next = NEXT(NEXT_ENTRY(PT_ACTION_NEXT)),
 		.call = parse_vc_action_vxlan_encap,
 	},
@@ -7755,7 +7702,7 @@ static const struct token token_list[] = {
 		.help = "NVGRE encapsulation, uses configuration set by \"set"
 			" nvgre\"",
 		.priv = PRIV_ACTION(NVGRE_ENCAP,
-				    sizeof(struct action_nvgre_encap_data)),
+				    sizeof(struct rte_flow_parser_action_nvgre_encap_data)),
 		.next = NEXT(NEXT_ENTRY(PT_ACTION_NEXT)),
 		.call = parse_vc_action_nvgre_encap,
 	},
@@ -8364,91 +8311,6 @@ static const struct token token_list[] = {
 		.call = parse_vc_conf,
 	},
 
-	/* Top level command. */
-	[PT_SET] = {
-		.name = "set",
-		.help = "set raw encap/decap/sample/ipv6_ext data",
-		.type = "set raw_encap|raw_decap|sample_actions|ipv6_ext_push|ipv6_ext_remove <index> <pattern>",
-		.next = NEXT(NEXT_ENTRY
-			     (PT_SET_RAW_ENCAP,
-			      PT_SET_RAW_DECAP,
-			      PT_SET_SAMPLE_ACTIONS,
-			      PT_SET_IPV6_EXT_REMOVE,
-			      PT_SET_IPV6_EXT_PUSH)),
-		.call = parse_set_init,
-	},
-	/* Sub-level commands. */
-	[PT_SET_RAW_ENCAP] = {
-		.name = "raw_encap",
-		.help = "set raw encap data",
-		.next = NEXT(next_set_raw),
-		.args = ARGS(ARGS_ENTRY_ARB_BOUNDED
-				(offsetof(struct rte_flow_parser_output, port),
-				 sizeof(((struct rte_flow_parser_output *)0)->port),
-				 0, RAW_ENCAP_CONFS_MAX_NUM - 1)),
-		.call = parse_set_raw_encap_decap,
-	},
-	[PT_SET_RAW_DECAP] = {
-		.name = "raw_decap",
-		.help = "set raw decap data",
-		.next = NEXT(next_set_raw),
-		.args = ARGS(ARGS_ENTRY_ARB_BOUNDED
-				(offsetof(struct rte_flow_parser_output, port),
-				 sizeof(((struct rte_flow_parser_output *)0)->port),
-				 0, RAW_ENCAP_CONFS_MAX_NUM - 1)),
-		.call = parse_set_raw_encap_decap,
-	},
-	[PT_SET_RAW_INDEX] = {
-		.name = "{index}",
-		.type = "PT_COMMON_UNSIGNED",
-		.help = "index of raw_encap/raw_decap data",
-		.next = NEXT(next_item),
-		.call = parse_port,
-	},
-	[PT_SET_SAMPLE_INDEX] = {
-		.name = "{index}",
-		.type = "UNSIGNED",
-		.help = "index of sample actions",
-		.next = NEXT(next_action_sample),
-		.call = parse_port,
-	},
-	[PT_SET_SAMPLE_ACTIONS] = {
-		.name = "sample_actions",
-		.help = "set sample actions list",
-		.next = NEXT(NEXT_ENTRY(PT_SET_SAMPLE_INDEX)),
-		.args = ARGS(ARGS_ENTRY_ARB_BOUNDED
-			(offsetof(struct rte_flow_parser_output, port),
-			 sizeof(((struct rte_flow_parser_output *)0)->port),
-			 0, RAW_SAMPLE_CONFS_MAX_NUM - 1)),
-		.call = parse_set_sample_action,
-	},
-	[PT_SET_IPV6_EXT_PUSH] = {
-		.name = "ipv6_ext_push",
-		.help = "set IPv6 extension push header",
-		.next = NEXT(NEXT_ENTRY(PT_SET_IPV6_EXT_INDEX)),
-		.args = ARGS(ARGS_ENTRY_ARB_BOUNDED
-			(offsetof(struct rte_flow_parser_output, port),
-			 sizeof(((struct rte_flow_parser_output *)0)->port),
-			 0, IPV6_EXT_PUSH_CONFS_MAX_NUM - 1)),
-		.call = parse_set_ipv6_ext_action,
-	},
-	[PT_SET_IPV6_EXT_REMOVE] = {
-		.name = "ipv6_ext_remove",
-		.help = "set IPv6 extension remove header",
-		.next = NEXT(NEXT_ENTRY(PT_SET_IPV6_EXT_INDEX)),
-		.args = ARGS(ARGS_ENTRY_ARB_BOUNDED
-			(offsetof(struct rte_flow_parser_output, port),
-			 sizeof(((struct rte_flow_parser_output *)0)->port),
-			 0, IPV6_EXT_PUSH_CONFS_MAX_NUM - 1)),
-		.call = parse_set_ipv6_ext_action,
-	},
-	[PT_SET_IPV6_EXT_INDEX] = {
-		.name = "{index}",
-		.type = "UNSIGNED",
-		.help = "index of IPv6 extension push/remove data",
-		.next = NEXT(item_ipv6_push_ext),
-		.call = parse_port,
-	},
 	[PT_ITEM_IPV6_PUSH_REMOVE_EXT] = {
 		.name = "ipv6_ext",
 		.help = "set IPv6 extension header",
@@ -9214,14 +9076,6 @@ parser_token_to_command(enum parser_token token)
 	case PT_FLEX_ITEM_DESTROY:
 		return RTE_FLOW_PARSER_CMD_FLEX_ITEM_DESTROY;
 	case PT_ACTION_POL_G: return RTE_FLOW_PARSER_CMD_ACTION_POL_G;
-	case PT_SET_RAW_ENCAP: return RTE_FLOW_PARSER_CMD_SET_RAW_ENCAP;
-	case PT_SET_RAW_DECAP: return RTE_FLOW_PARSER_CMD_SET_RAW_DECAP;
-	case PT_SET_SAMPLE_ACTIONS:
-		return RTE_FLOW_PARSER_CMD_SET_SAMPLE_ACTIONS;
-	case PT_SET_IPV6_EXT_PUSH:
-		return RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_PUSH;
-	case PT_SET_IPV6_EXT_REMOVE:
-		return RTE_FLOW_PARSER_CMD_SET_IPV6_EXT_REMOVE;
 	case PT_INDIRECT_ACTION_FLOW_CONF_CREATE:
 		return RTE_FLOW_PARSER_CMD_INDIRECT_ACTION_FLOW_CONF_CREATE;
 	default:
@@ -10016,7 +9870,7 @@ parse_vc_action_rss(struct context *ctx, const struct token *token,
 {
 	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_action *action;
-	struct action_rss_data *action_rss_data;
+	struct rte_flow_parser_action_rss_data *action_rss_data;
 	unsigned int i;
 	uint16_t rss_queue_n;
 	int ret;
@@ -10038,7 +9892,7 @@ parse_vc_action_rss(struct context *ctx, const struct token *token,
 	rss_queue_n = parser_rss_queue_count(ctx->port);
 	if (rss_queue_n == 0)
 		rss_queue_n = ACTION_RSS_QUEUE_NUM;
-	*action_rss_data = (struct action_rss_data){
+	*action_rss_data = (struct rte_flow_parser_action_rss_data){
 		.conf = (struct rte_flow_action_rss){
 			.func = RTE_ETH_HASH_FUNCTION_DEFAULT,
 			.level = 0,
@@ -10067,7 +9921,7 @@ parse_vc_action_rss_func(struct context *ctx, const struct token *token,
 			 const char *str, unsigned int len,
 			 void *buf, unsigned int size)
 {
-	struct action_rss_data *action_rss_data;
+	struct rte_flow_parser_action_rss_data *action_rss_data;
 	enum rte_eth_hash_function func;
 
 	(void)buf;
@@ -10108,7 +9962,7 @@ parse_vc_action_rss_type(struct context *ctx, const struct token *token,
 			  const char *str, unsigned int len,
 			  void *buf, unsigned int size)
 {
-	struct action_rss_data *action_rss_data;
+	struct rte_flow_parser_action_rss_data *action_rss_data;
 	const struct rte_eth_rss_type_info *tbl;
 	unsigned int i;
 
@@ -10153,7 +10007,7 @@ parse_vc_action_rss_queue(struct context *ctx, const struct token *token,
 			  const char *str, unsigned int len,
 			  void *buf, unsigned int size)
 {
-	struct action_rss_data *action_rss_data;
+	struct rte_flow_parser_action_rss_data *action_rss_data;
 	const struct arg *arg;
 	int ret;
 	int i;
@@ -10170,7 +10024,7 @@ parse_vc_action_rss_queue(struct context *ctx, const struct token *token,
 	}
 	if (i >= ACTION_RSS_QUEUE_NUM)
 		return -1;
-	arg = ARGS_ENTRY_ARB(offsetof(struct action_rss_data, queue) +
+	arg = ARGS_ENTRY_ARB(offsetof(struct rte_flow_parser_action_rss_data, queue) +
 			     i * sizeof(action_rss_data->queue[i]),
 			     sizeof(action_rss_data->queue[i]));
 	if (push_args(ctx, arg) != 0)
@@ -10197,7 +10051,7 @@ end:
 
 /** Setup VXLAN encap configuration. */
 static int
-parse_setup_vxlan_encap_data(struct action_vxlan_encap_data *action_vxlan_encap_data)
+parse_setup_vxlan_encap_data(struct rte_flow_parser_action_vxlan_encap_data *action_vxlan_encap_data)
 {
 	const struct rte_flow_parser_vxlan_encap_conf *conf =
 		registry.vxlan_encap;
@@ -10205,7 +10059,7 @@ parse_setup_vxlan_encap_data(struct action_vxlan_encap_data *action_vxlan_encap_
 		return -1;
 
 	/* Set up default configuration. */
-	*action_vxlan_encap_data = (struct action_vxlan_encap_data){
+	*action_vxlan_encap_data = (struct rte_flow_parser_action_vxlan_encap_data){
 		.conf = (struct rte_flow_action_vxlan_encap){
 			.definition = action_vxlan_encap_data->items,
 		},
@@ -10319,7 +10173,7 @@ parse_vc_action_vxlan_encap(struct context *ctx, const struct token *token,
 {
 	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_action *action;
-	struct action_vxlan_encap_data *action_vxlan_encap_data;
+	struct rte_flow_parser_action_vxlan_encap_data *action_vxlan_encap_data;
 	int ret;
 
 	ret = parse_vc(ctx, token, str, len, buf, size);
@@ -10342,7 +10196,7 @@ parse_vc_action_vxlan_encap(struct context *ctx, const struct token *token,
 
 /** Setup NVGRE encap configuration. */
 static int
-parse_setup_nvgre_encap_data(struct action_nvgre_encap_data *action_nvgre_encap_data)
+parse_setup_nvgre_encap_data(struct rte_flow_parser_action_nvgre_encap_data *action_nvgre_encap_data)
 {
 	const struct rte_flow_parser_nvgre_encap_conf *conf =
 		registry.nvgre_encap;
@@ -10350,7 +10204,7 @@ parse_setup_nvgre_encap_data(struct action_nvgre_encap_data *action_nvgre_encap_
 		return -1;
 
 	/* Set up default configuration. */
-	*action_nvgre_encap_data = (struct action_nvgre_encap_data){
+	*action_nvgre_encap_data = (struct rte_flow_parser_action_nvgre_encap_data){
 		.conf = (struct rte_flow_action_nvgre_encap){
 			.definition = action_nvgre_encap_data->items,
 		},
@@ -10425,7 +10279,7 @@ parse_vc_action_nvgre_encap(struct context *ctx, const struct token *token,
 {
 	struct rte_flow_parser_output *out = buf;
 	struct rte_flow_action *action;
-	struct action_nvgre_encap_data *action_nvgre_encap_data;
+	struct rte_flow_parser_action_nvgre_encap_data *action_nvgre_encap_data;
 	int ret;
 
 	ret = parse_vc(ctx, token, str, len, buf, size);
@@ -13119,122 +12973,6 @@ parse_meter_policy_id2ptr(struct context *ctx, const struct token *token,
 	return ret;
 }
 
-/** Parse set command, initialize output buffer for subsequent tokens. */
-static int
-parse_set_raw_encap_decap(struct context *ctx, const struct token *token,
-			  const char *str, unsigned int len,
-			  void *buf, unsigned int size)
-{
-	struct rte_flow_parser_output *out = buf;
-
-	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
-		return -1;
-	/* Nothing else to do if there is no buffer. */
-	if (out == NULL)
-		return len;
-	/* Make sure buffer is large enough. */
-	if (size < sizeof(*out))
-		return -1;
-	ctx->objdata = 0;
-	ctx->objmask = NULL;
-	ctx->object = out;
-	if (ctx->command_token == PT_ZERO)
-		return -1;
-	ctx->command_token = ctx->curr;
-	/* For encap/decap we need is pattern */
-	out->args.vc.pattern = (void *)RTE_ALIGN_CEIL((uintptr_t)(out + 1),
-						       sizeof(double));
-	return len;
-}
-
-static int
-parse_set_sample_action(struct context *ctx, const struct token *token,
-			const char *str, unsigned int len,
-			void *buf, unsigned int size)
-{
-	struct rte_flow_parser_output *out = buf;
-
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
-		return -1;
-	if (out == NULL)
-		return len;
-	if (size < sizeof(*out))
-		return -1;
-	ctx->objdata = 0;
-	ctx->objmask = NULL;
-	ctx->object = out;
-	if (ctx->command_token == PT_ZERO)
-		return -1;
-	ctx->command_token = ctx->curr;
-	out->args.vc.actions = (void *)RTE_ALIGN_CEIL((uintptr_t)(out + 1),
-						       sizeof(double));
-	return len;
-}
-
-static int
-parse_set_ipv6_ext_action(struct context *ctx, const struct token *token,
-			  const char *str, unsigned int len,
-			  void *buf, unsigned int size)
-{
-	struct rte_flow_parser_output *out = buf;
-
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
-		return -1;
-	if (out == NULL)
-		return len;
-	if (size < sizeof(*out))
-		return -1;
-	ctx->objdata = 0;
-	ctx->objmask = NULL;
-	ctx->object = out;
-	if (ctx->command_token == PT_ZERO)
-		return -1;
-	ctx->command_token = ctx->curr;
-	out->args.vc.pattern = (void *)RTE_ALIGN_CEIL((uintptr_t)(out + 1),
-						       sizeof(double));
-	return len;
-}
-
-/**
- * Parse set raw_encap/raw_decap command,
- * initialize output buffer for subsequent tokens.
- */
-static int
-parse_set_init(struct context *ctx, const struct token *token,
-	       const char *str, unsigned int len,
-	       void *buf, unsigned int size)
-{
-	struct rte_flow_parser_output *out = buf;
-
-	/* Token name must match. */
-	if (parse_default(ctx, token, str, len, NULL, 0) < 0)
-		return -1;
-	/* Nothing else to do if there is no buffer. */
-	if (out == NULL)
-		return len;
-	/* Make sure buffer is large enough. */
-	if (size < sizeof(*out))
-		return -1;
-	/* Initialize buffer. */
-	memset(out, 0x00, sizeof(*out));
-	memset((uint8_t *)out + sizeof(*out), 0x22, size - sizeof(*out));
-	ctx->objdata = 0;
-	ctx->object = out;
-	ctx->objmask = NULL;
-	if (ctx->command_token == PT_ZERO) {
-		if (ctx->curr != PT_SET)
-			return -1;
-		if (sizeof(*out) > size)
-			return -1;
-		ctx->command_token = ctx->curr;
-		out->args.vc.data = (uint8_t *)out + size;
-		ctx->object  = (void *)RTE_ALIGN_CEIL((uintptr_t)(out + 1),
-						       sizeof(double));
-	}
-	return len;
-}
-
 /*
  * Replace testpmd handles in a flex flow item with real values.
  */
@@ -14097,10 +13835,6 @@ indirect_action_list_conf_get(uint32_t conf_id)
 }
 
 /* Cmdline instances are owned by applications; keep weak references for help. */
-static cmdline_parse_inst_t *cmd_flow_inst;
-static cmdline_parse_inst_t *cmd_set_raw_inst;
-static rte_flow_parser_dispatch_t flow_dispatch_cb;
-
 /** Return number of completion entries (cmdline API). */
 static int
 cmd_flow_complete_get_nb(cmdline_parse_token_hdr_t *hdr)
@@ -14187,11 +13921,11 @@ cmd_flow_get_help(cmdline_parse_token_hdr_t *hdr, char *dst, unsigned int size)
 		return -1;
 	/* Set token type and update global help with details. */
 	strlcpy(dst, (token->type ? token->type : "TOKEN"), size);
-	if (cmd_flow_inst != NULL) {
+	if (registry.cmd_flow != NULL) {
 		if (token->help != NULL)
-			cmd_flow_inst->help_str = token->help;
+			registry.cmd_flow->help_str = token->help;
 		else
-			cmd_flow_inst->help_str = token->name;
+			registry.cmd_flow->help_str = token->name;
 	}
 	return 0;
 }
@@ -14215,7 +13949,7 @@ cmd_flow_tok(cmdline_parse_token_hdr_t **hdr,
 	struct context *ctx = parser_cmd_context();
 	cmdline_parse_token_hdr_t **tokens;
 
-	tokens = cmd_flow_inst ? cmd_flow_inst->tokens : NULL;
+	tokens = registry.cmd_flow ? registry.cmd_flow->tokens : NULL;
 	if (tokens == NULL) {
 		*hdr = NULL;
 		return;
@@ -14243,62 +13977,47 @@ cmd_flow_tok(cmdline_parse_token_hdr_t **hdr,
 	*hdr = &cmd_flow_token_hdr;
 }
 
-static int
-cmd_set_raw_get_help(cmdline_parse_token_hdr_t *hdr, char *dst,
-		     unsigned int size)
+void
+rte_flow_parser_set_ctx_init(enum rte_flow_parser_set_item_kind kind,
+			     void *object, unsigned int size)
 {
 	struct context *ctx = parser_cmd_context();
-	const struct token *token = &token_list[ctx->prev];
 
-	RTE_SET_USED(hdr);
-	if (size == 0)
-		return -1;
-	/* Set token type and update global help with details. */
-	snprintf(dst, size, "%s", (token->type ? token->type : "TOKEN"));
-	if (cmd_set_raw_inst != NULL) {
-		if (token->help != NULL)
-			cmd_set_raw_inst->help_str = token->help;
-		else
-			cmd_set_raw_inst->help_str = token->name;
+	(void)size;
+	cmd_flow_context_init(ctx);
+	/* Mark command as already initialized so parse_vc() skips its
+	 * first-time init block (which rejects non-flow commands).
+	 */
+	ctx->command_token = PT_END;
+
+	/* Set the object pointer for item parsing callbacks. */
+	if (object != NULL)
+		ctx->object = object;
+
+	switch (kind) {
+	case RTE_FLOW_PARSER_SET_ITEMS_PATTERN:
+		ctx->next[ctx->next_num++] = next_item;
+		break;
+	case RTE_FLOW_PARSER_SET_ITEMS_ACTION:
+		ctx->next[ctx->next_num++] = next_action_sample;
+		break;
+	case RTE_FLOW_PARSER_SET_ITEMS_IPV6_EXT:
+		ctx->next[ctx->next_num++] = item_ipv6_push_ext;
+		break;
 	}
-	return 0;
 }
 
-/** Token definition template for set command (cmdline API). */
-static struct cmdline_token_hdr cmd_set_raw_token_hdr = {
-	.ops = &(struct cmdline_token_ops){
-		.parse = cmd_flow_parse,
-		.complete_get_nb = cmd_flow_complete_get_nb,
-		.complete_get_elt = cmd_flow_complete_get_elt,
-		.get_help = cmd_set_raw_get_help,
-	},
-	.offset = 0,
-};
-
-/** Populate the next dynamic token for set command. */
-static void
-cmd_set_raw_tok(cmdline_parse_token_hdr_t **hdr,
-		cmdline_parse_token_hdr_t **hdr_inst)
+void
+rte_flow_parser_set_item_tok(cmdline_parse_token_hdr_t **hdr)
 {
 	struct context *ctx = parser_cmd_context();
-	cmdline_parse_token_hdr_t **tokens;
 
-	tokens = cmd_set_raw_inst ? cmd_set_raw_inst->tokens : NULL;
-	if (tokens == NULL) {
+	/* No more tokens expected */
+	if (ctx->next_num == 0) {
 		*hdr = NULL;
 		return;
 	}
-	/* Always reinitialize context before requesting the first token. */
-	if ((hdr_inst - tokens) == 0) {
-		cmd_flow_context_init(ctx);
-		ctx->curr = PT_START_SET;
-	}
-	/* Return NULL when no more tokens are expected. */
-	if (ctx->next_num == 0 && (ctx->curr != PT_START_SET)) {
-		*hdr = NULL;
-		return;
-	}
-	/* Determine if command should end here. */
+	/* Check for end_set sentinel */
 	if (ctx->eol != 0 && ctx->last != 0 && ctx->next_num != 0) {
 		const enum parser_token *list = ctx->next[ctx->next_num - 1];
 		int i;
@@ -14310,17 +14029,7 @@ cmd_set_raw_tok(cmdline_parse_token_hdr_t **hdr,
 			return;
 		}
 	}
-	*hdr = &cmd_set_raw_token_hdr;
-}
-
-void
-rte_flow_parser_cmdline_register(cmdline_parse_inst_t *flow,
-				 cmdline_parse_inst_t *set_raw,
-				 rte_flow_parser_dispatch_t dispatch)
-{
-	cmd_flow_inst = flow;
-	cmd_set_raw_inst = set_raw;
-	flow_dispatch_cb = dispatch;
+	*hdr = &cmd_flow_token_hdr;
 }
 
 void
@@ -14336,24 +14045,8 @@ rte_flow_parser_cmd_flow_cb(void *arg0, struct cmdline *cl, void *arg2)
 	out = arg0;
 	out->command = parser_token_to_command(
 			(enum parser_token)out->command);
-	if (flow_dispatch_cb != NULL)
-		flow_dispatch_cb(out);
-}
-
-void
-rte_flow_parser_cmd_set_raw_cb(void *arg0, struct cmdline *cl, void *arg2)
-{
-	struct rte_flow_parser_output *out;
-
-	if (cl == NULL) {
-		cmd_set_raw_tok(arg0, arg2);
-		return;
-	}
-	out = arg0;
-	out->command = parser_token_to_command(
-			(enum parser_token)out->command);
-	if (flow_dispatch_cb != NULL)
-		flow_dispatch_cb(out);
+	if (registry.dispatch != NULL)
+		registry.dispatch(out);
 }
 
 int
@@ -14569,6 +14262,6 @@ RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_raw_decap_conf_set, 26.07);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ipv6_ext_push_set, 26.07);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_ipv6_ext_remove_set, 26.07);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_sample_actions_set, 26.07);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmdline_register, 26.07);
 RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_flow_cb, 26.07);
-RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_cmd_set_raw_cb, 26.07);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_set_ctx_init, 26.07);
+RTE_EXPORT_EXPERIMENTAL_SYMBOL(rte_flow_parser_set_item_tok, 26.07);
