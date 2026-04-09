@@ -848,7 +848,7 @@ struct action_ipv6_ext_remove_data {
 static struct rte_flow_parser_config registry;
 
 static void
-parser_ctx_update_fields(uint8_t *buf, struct rte_flow_item *item,
+parser_ctx_update_fields(uint8_t *buf, const struct rte_flow_item *item,
 			   uint16_t next_proto)
 {
 	struct rte_ipv4_hdr *ipv4;
@@ -1058,7 +1058,7 @@ parser_ctx_set_raw_common(bool encap, uint16_t idx,
 {
 	uint32_t n = pattern_n;
 	int i = 0;
-	struct rte_flow_item *item = NULL;
+	const struct rte_flow_item *item = NULL;
 	size_t size = 0;
 	uint8_t *data = NULL;
 	uint8_t *data_tail = NULL;
@@ -1067,7 +1067,6 @@ parser_ctx_set_raw_common(bool encap, uint16_t idx,
 	uint16_t proto = 0;
 	int gtp_psc = -1;
 	const void *src_spec;
-	struct rte_flow_item *items = (struct rte_flow_item *)(uintptr_t)pattern;
 
 	if (encap != 0) {
 		if (idx >= registry.raw_encap.count ||
@@ -1088,12 +1087,11 @@ parser_ctx_set_raw_common(bool encap, uint16_t idx,
 	for (i = n - 1; i >= 0; --i) {
 		const struct rte_flow_item_gtp *gtp;
 		const struct rte_flow_item_geneve_opt *geneve_opt;
-		struct rte_flow_item_ipv6_routing_ext *ext;
 
-		item = items + i;
-		if (item->spec == NULL)
-			item->spec = parser_ctx_item_default_mask(item);
+		item = &pattern[i];
 		src_spec = item->spec;
+		if (src_spec == NULL)
+			src_spec = parser_ctx_item_default_mask(item);
 		switch (item->type) {
 		case RTE_FLOW_ITEM_TYPE_ETH:
 			size = sizeof(struct rte_ether_hdr);
@@ -1111,20 +1109,41 @@ parser_ctx_set_raw_common(bool encap, uint16_t idx,
 			proto = RTE_ETHER_TYPE_IPV6;
 			break;
 		case RTE_FLOW_ITEM_TYPE_IPV6_ROUTING_EXT:
-			ext = (struct rte_flow_item_ipv6_routing_ext *)(uintptr_t)item->spec;
-			if (ext->hdr.hdr_len == 0) {
+		{
+			const struct rte_flow_item_ipv6_routing_ext *ext_spec =
+				(const struct rte_flow_item_ipv6_routing_ext *)src_spec;
+			struct rte_ipv6_routing_ext hdr;
+
+			memcpy(&hdr, &ext_spec->hdr, sizeof(hdr));
+			if (hdr.hdr_len == 0) {
 				size = sizeof(struct rte_ipv6_routing_ext) +
-					(ext->hdr.segments_left << 4);
-				ext->hdr.hdr_len = ext->hdr.segments_left << 1;
-				if (ext->hdr.type == RTE_IPV6_SRCRT_TYPE_4)
-					ext->hdr.last_entry =
-						ext->hdr.segments_left - 1;
+					(hdr.segments_left << 4);
+				hdr.hdr_len = hdr.segments_left << 1;
+				if (hdr.type == RTE_IPV6_SRCRT_TYPE_4)
+					hdr.last_entry =
+						hdr.segments_left - 1;
 			} else {
 				size = sizeof(struct rte_ipv6_routing_ext) +
-					(ext->hdr.hdr_len << 3);
+					(hdr.hdr_len << 3);
 			}
+			/*
+			 * Use the original spec for the bulk copy, then
+			 * overlay the (possibly modified) header below.
+			 */
 			proto = IPPROTO_ROUTING;
+			if (size != 0) {
+				if (parser_ctx_raw_append(data_tail, total_size,
+							  src_spec, size) != 0)
+					goto error;
+				/* Overlay the local header copy with computed fields. */
+				memcpy(data_tail - *total_size, &hdr, sizeof(hdr));
+				parser_ctx_update_fields((data_tail - (*total_size)),
+							 item, upper_layer);
+				upper_layer = proto;
+				size = 0; /* already handled */
+			}
 			break;
+		}
 		case RTE_FLOW_ITEM_TYPE_UDP:
 			size = sizeof(struct rte_udp_hdr);
 			proto = 0x11;
@@ -1159,7 +1178,7 @@ parser_ctx_set_raw_common(bool encap, uint16_t idx,
 			size = sizeof(struct rte_geneve_hdr);
 			break;
 		case RTE_FLOW_ITEM_TYPE_GENEVE_OPT:
-			geneve_opt = (const struct rte_flow_item_geneve_opt *)item->spec;
+			geneve_opt = (const struct rte_flow_item_geneve_opt *)src_spec;
 			size = offsetof(struct rte_flow_item_geneve_opt, option_len) +
 				sizeof(uint8_t);
 			if (geneve_opt->option_len != 0 &&
@@ -1192,7 +1211,7 @@ parser_ctx_set_raw_common(bool encap, uint16_t idx,
 			}
 			if (gtp_psc != i + 1)
 				goto error;
-			gtp = item->spec;
+			gtp = src_spec;
 			if (gtp->hdr.s == 1 || gtp->hdr.pn == 1)
 				goto error;
 			else {
@@ -1358,6 +1377,8 @@ rte_flow_parser_raw_encap_conf_set(uint16_t index,
 {
 	uint32_t n = pattern_n;
 
+	if (pattern == NULL && n > 0)
+		return -EINVAL;
 	/* Strip trailing END items. */
 	while (n > 0 && pattern[n - 1].type == RTE_FLOW_ITEM_TYPE_END)
 		n--;
@@ -1371,6 +1392,8 @@ rte_flow_parser_raw_decap_conf_set(uint16_t index,
 {
 	uint32_t n = pattern_n;
 
+	if (pattern == NULL && n > 0)
+		return -EINVAL;
 	/* Strip trailing END items. */
 	while (n > 0 && pattern[n - 1].type == RTE_FLOW_ITEM_TYPE_END)
 		n--;
@@ -1385,6 +1408,7 @@ parser_ctx_set_ipv6_ext_push(uint16_t idx,
 	uint32_t i = 0;
 	const struct rte_flow_item *item;
 	size_t size = 0;
+	uint8_t *data_base;
 	uint8_t *data;
 	uint8_t *type;
 	size_t *total_size;
@@ -1392,11 +1416,12 @@ parser_ctx_set_ipv6_ext_push(uint16_t idx,
 	if (idx >= registry.ipv6_ext_push.count ||
 	    registry.ipv6_ext_push.slots == NULL)
 		return -EINVAL;
-	data = (uint8_t *)&registry.ipv6_ext_push.slots[idx].data;
+	data_base = (uint8_t *)&registry.ipv6_ext_push.slots[idx].data;
+	data = data_base;
 	type = (uint8_t *)&registry.ipv6_ext_push.slots[idx].type;
 	total_size = &registry.ipv6_ext_push.slots[idx].size;
 	*total_size = 0;
-	memset(data, 0x00, ACTION_IPV6_EXT_PUSH_MAX_DATA);
+	memset(data_base, 0x00, ACTION_IPV6_EXT_PUSH_MAX_DATA);
 	for (i = pattern_n; i > 0; --i) {
 		item = &pattern[i - 1];
 		switch (item->type) {
@@ -1430,6 +1455,7 @@ parser_ctx_set_ipv6_ext_push(uint16_t idx,
 				goto error;
 			memcpy(data, spec, size);
 			memcpy(data, &hdr, sizeof(hdr));
+			data += size;
 			*total_size += size;
 			break;
 		}
@@ -1441,7 +1467,7 @@ parser_ctx_set_ipv6_ext_push(uint16_t idx,
 	return 0;
 error:
 	*total_size = 0;
-	memset(data, 0x00, ACTION_IPV6_EXT_PUSH_MAX_DATA);
+	memset(data_base, 0x00, ACTION_IPV6_EXT_PUSH_MAX_DATA);
 	return -EINVAL;
 }
 
@@ -1487,19 +1513,28 @@ parser_ctx_set_sample_actions(uint16_t idx,
 		sample_actions[act_num] = actions[i];
 		switch (actions[i].type) {
 		case RTE_FLOW_ACTION_TYPE_VXLAN_ENCAP:
-			parse_setup_vxlan_encap_data(&registry.sample.slots[idx].vxlan_encap);
+			if (parse_setup_vxlan_encap_data(&registry.sample.slots[idx].vxlan_encap) < 0)
+				return -EINVAL;
 			sample_actions[act_num].conf =
 				&registry.sample.slots[idx].vxlan_encap.conf;
 			break;
 		case RTE_FLOW_ACTION_TYPE_NVGRE_ENCAP:
-			parse_setup_nvgre_encap_data(&registry.sample.slots[idx].nvgre_encap);
+			if (parse_setup_nvgre_encap_data(&registry.sample.slots[idx].nvgre_encap) < 0)
+				return -EINVAL;
 			sample_actions[act_num].conf =
 				&registry.sample.slots[idx].nvgre_encap.conf;
 			break;
 		case RTE_FLOW_ACTION_TYPE_RAW_ENCAP:
-			sample_actions[act_num].conf =
+		{
+			const struct rte_flow_action_raw_encap *encap =
 				rte_flow_parser_raw_encap_conf(idx);
+			if (encap == NULL)
+				return -EINVAL;
+			registry.sample.slots[idx].raw_encap = *encap;
+			sample_actions[act_num].conf =
+				&registry.sample.slots[idx].raw_encap;
 			break;
+		}
 		case RTE_FLOW_ACTION_TYPE_RSS:
 		{
 			const struct rte_flow_action_rss *rss =
@@ -1537,6 +1572,8 @@ rte_flow_parser_ipv6_ext_push_set(uint16_t index,
 				  const struct rte_flow_item *pattern,
 				  uint32_t pattern_n)
 {
+	if (pattern == NULL && pattern_n > 0)
+		return -EINVAL;
 	if (pattern_n > 0 &&
 	    pattern[pattern_n - 1].type == RTE_FLOW_ITEM_TYPE_END)
 		pattern_n--;
@@ -1548,6 +1585,8 @@ rte_flow_parser_ipv6_ext_remove_set(uint16_t index,
 				    const struct rte_flow_item *pattern,
 				    uint32_t pattern_n)
 {
+	if (pattern == NULL && pattern_n > 0)
+		return -EINVAL;
 	if (pattern_n > 0 &&
 	    pattern[pattern_n - 1].type == RTE_FLOW_ITEM_TYPE_END)
 		pattern_n--;
@@ -1559,6 +1598,8 @@ rte_flow_parser_sample_actions_set(uint16_t index,
 				   const struct rte_flow_action *actions,
 				   uint32_t actions_n)
 {
+	if (actions == NULL && actions_n > 0)
+		return -EINVAL;
 	return parser_ctx_set_sample_actions(index, actions, actions_n);
 }
 
@@ -10189,7 +10230,8 @@ parse_vc_action_vxlan_encap(struct context *ctx, const struct token *token,
 	ctx->object = out->args.vc.data;
 	ctx->objmask = NULL;
 	action_vxlan_encap_data = ctx->object;
-	parse_setup_vxlan_encap_data(action_vxlan_encap_data);
+	if (parse_setup_vxlan_encap_data(action_vxlan_encap_data) < 0)
+		return -1;
 	action->conf = &action_vxlan_encap_data->conf;
 	return ret;
 }
@@ -10295,7 +10337,8 @@ parse_vc_action_nvgre_encap(struct context *ctx, const struct token *token,
 	ctx->object = out->args.vc.data;
 	ctx->objmask = NULL;
 	action_nvgre_encap_data = ctx->object;
-	parse_setup_nvgre_encap_data(action_nvgre_encap_data);
+	if (parse_setup_nvgre_encap_data(action_nvgre_encap_data) < 0)
+		return -1;
 	action->conf = &action_nvgre_encap_data->conf;
 	return ret;
 }
@@ -10378,17 +10421,19 @@ parse_vc_action_l2_decap(struct context *ctx, const struct token *token,
 	struct action_raw_decap_data *action_decap_data;
 	const struct rte_flow_parser_l2_decap_conf *conf =
 		registry.l2_decap;
-	const struct rte_flow_parser_mplsoudp_encap_conf *mpls_conf =
-		registry.mplsoudp_encap;
 	struct rte_flow_item_eth eth = { .hdr.ether_type = 0, };
 	struct rte_flow_item_vlan vlan;
 	uint8_t *header;
 	int ret;
 
-	if (conf == NULL || mpls_conf == NULL)
+	if (conf == NULL)
 		return -1;
+	/*
+	 * VLAN TCI is not meaningful for L2 decap — the decap
+	 * action strips the L2 header regardless of the TCI value.
+	 */
 	vlan = (struct rte_flow_item_vlan){
-		.hdr.vlan_tci = mpls_conf->vlan_tci,
+		.hdr.vlan_tci = 0,
 		.hdr.eth_proto = 0,
 	};
 	ret = parse_vc(ctx, token, str, len, buf, size);

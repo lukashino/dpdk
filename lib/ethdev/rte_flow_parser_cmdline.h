@@ -223,6 +223,7 @@ struct rte_flow_parser_sample_slot {
 	struct rte_flow_parser_action_vxlan_encap_data vxlan_encap;
 	struct rte_flow_parser_action_nvgre_encap_data nvgre_encap;
 	struct rte_flow_parser_action_rss_data rss_data;
+	struct rte_flow_action_raw_encap raw_encap;
 };
 
 /* Forward declarations needed for rte_flow_parser_config. */
