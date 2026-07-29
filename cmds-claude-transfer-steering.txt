@@ -1,0 +1,13 @@
+flow flush 0
+
+# Steer traffic with dst MAC to VF0 (representor port 1)
+flow create 0 transfer pattern eth dst is AA:BB:CC:DD:00:01 / end actions port_id id 1 / end
+
+# Steer traffic with dst MAC to VF1 (representor port 2)
+flow create 0 transfer pattern eth dst is AA:BB:CC:DD:00:02 / end actions port_id id 2 / end
+
+# Steer specific IPv4 subnet to VF0 with count
+flow create 0 transfer pattern eth / ipv4 dst is 10.0.1.0 dst spec 10.0.1.0 dst mask 255.255.255.0 / end actions count / port_id id 1 / end
+
+flow list 0
+flow flush 0

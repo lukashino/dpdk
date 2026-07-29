@@ -1,0 +1,13 @@
+flow flush 0
+
+# Match VLAN 100 IPv4 traffic - steer to queue 1
+flow create 0 ingress pattern eth / vlan vid is 100 / ipv4 / end actions queue index 1 / end
+
+# Match VLAN 200 IPv4 traffic - drop
+flow create 0 ingress pattern eth / vlan vid is 200 / ipv4 / end actions drop / end
+
+# Match VLAN 300 with specific IPv4 dst
+flow create 0 ingress pattern eth / vlan vid is 300 / ipv4 dst is 10.10.10.1 / end actions count / queue index 0 / end
+
+flow list 0
+flow flush 0

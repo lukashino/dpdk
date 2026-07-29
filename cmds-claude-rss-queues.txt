@@ -1,0 +1,13 @@
+flow flush 0
+
+# RSS across all 4 queues with IPv4+TCP hash
+flow create 0 ingress pattern eth / ipv4 / tcp / end actions rss types ipv4-tcp end queues 0 1 2 3 end / end
+
+# RSS across 2 queues with IPv4+UDP hash
+flow create 0 ingress pattern eth / ipv4 / udp / end actions rss types ipv4-udp end queues 0 1 end / end
+
+# RSS with plain IPv4 hash on all traffic
+flow create 0 ingress pattern eth / ipv4 / end actions rss types ipv4 end queues 0 1 2 3 end / end
+
+flow list 0
+flow flush 0

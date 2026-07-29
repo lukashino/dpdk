@@ -1,0 +1,29 @@
+flow flush 0
+
+# --- VXLAN encap/decap with IPv4 outer ---
+set vxlan ip-version ipv4 vni 42 udp-src 4789 udp-dst 4789 ip-src 10.0.0.1 ip-dst 10.0.0.2 eth-src 11:11:11:11:11:11 eth-dst 22:22:22:22:22:22
+
+# Encap: any packet from PF to VF0 gets VXLAN-wrapped
+flow create 0 transfer pattern eth / end actions vxlan_encap / port_id id 1 / end
+
+# Decap: matching VXLAN VNI 42 gets decapped and forwarded
+flow create 0 transfer pattern eth / ipv4 / udp dst is 4789 / vxlan vni is 42 / end actions vxlan_decap / port_id id 1 / end
+
+flow list 0
+
+# --- VXLAN encap with IPv6 outer ---
+set vxlan ip-version ipv6 vni 99 udp-src 4789 udp-dst 4789 ip-src fd00::1 ip-dst fd00::2 eth-src AA:BB:CC:00:00:01 eth-dst AA:BB:CC:00:00:02
+
+# Encap: IPv4 traffic gets VXLAN-over-IPv6 encap
+flow create 0 transfer pattern eth / ipv4 src is 192.168.1.0 src spec 192.168.1.0 src mask 255.255.255.0 / end actions vxlan_encap / port_id id 2 / end
+
+# --- VXLAN inner header matching ---
+
+# Match on inner IPv4 dst inside VXLAN tunnel
+flow create 0 ingress pattern eth / ipv4 / udp dst is 4789 / vxlan vni is 200 / eth / ipv4 dst is 10.10.0.1 / end actions queue index 0 / end
+
+# Match on inner TCP port inside VXLAN tunnel
+flow create 0 ingress pattern eth / ipv4 / udp dst is 4789 / vxlan vni is 200 / eth / ipv4 / tcp dst is 80 / end actions queue index 1 / end
+
+flow list 0
+flow flush 0

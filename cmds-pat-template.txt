@@ -1,0 +1,4 @@
+
+port stop 0
+flow configure 0 queues_number 2 queues_size 64
+port start 0

@@ -1,0 +1,18 @@
+flow flush 0
+
+# Low priority: catch-all IPv4 to queue 0 with count
+flow create 0 ingress priority 3 pattern eth / ipv4 / end actions count / queue index 0 / end
+
+# Higher priority: HTTP to queue 1 with mark + count
+flow create 0 ingress priority 1 pattern eth / ipv4 / tcp dst is 80 / end actions mark id 100 / count / queue index 1 / end
+
+# Highest priority: drop from specific source
+flow create 0 ingress priority 0 pattern eth / ipv4 src is 10.0.0.99 / end actions count / drop / end
+
+# Query all counters
+flow query 0 0 count
+flow query 0 1 count
+flow query 0 2 count
+
+flow list 0
+flow flush 0

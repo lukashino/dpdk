@@ -1,0 +1,13 @@
+flow flush 0
+
+# Match IPv6 destination and drop
+flow create 0 ingress pattern eth / ipv6 dst is fd00::1 / end actions drop / end
+
+# Match IPv6 TCP traffic to specific queue
+flow create 0 ingress pattern eth / ipv6 / tcp dst is 443 / end actions queue index 1 / end
+
+# Match IPv6 UDP traffic and count
+flow create 0 ingress pattern eth / ipv6 / udp dst is 5353 / end actions count / queue index 0 / end
+
+flow list 0
+flow flush 0

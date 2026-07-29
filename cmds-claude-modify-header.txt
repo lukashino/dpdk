@@ -1,0 +1,16 @@
+flow flush 0
+
+# Modify destination MAC and forward to VF0
+flow create 0 transfer pattern eth / ipv4 src is 10.0.0.1 / end actions set_mac_dst mac_addr 11:22:33:44:55:66 / port_id id 1 / end
+
+# Modify source MAC and forward to VF1
+flow create 0 transfer pattern eth / ipv4 src is 10.0.0.2 / end actions set_mac_src mac_addr AA:BB:CC:DD:EE:FF / port_id id 2 / end
+
+# Rewrite destination IPv4 and forward
+flow create 0 transfer pattern eth / ipv4 dst is 192.168.0.1 / end actions set_ipv4_dst ipv4_addr 10.10.0.1 / port_id id 1 / end
+
+# Rewrite TCP destination port and forward
+flow create 0 transfer pattern eth / ipv4 / tcp dst is 8080 / end actions set_tp_dst port 80 / port_id id 1 / end
+
+flow list 0
+flow flush 0

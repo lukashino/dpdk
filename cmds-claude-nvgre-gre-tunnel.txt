@@ -1,0 +1,29 @@
+flow flush 0
+
+# --- NVGRE encap/decap ---
+set nvgre ip-version ipv4 tni 7 ip-src 10.1.0.1 ip-dst 10.1.0.2 eth-src AA:BB:CC:00:00:01 eth-dst AA:BB:CC:00:00:02
+
+# NVGRE encap: wrap traffic toward VF0
+flow create 0 transfer pattern eth / end actions nvgre_encap / port_id id 1 / end
+
+# NVGRE decap: unwrap GRE-encapsulated traffic
+flow create 0 transfer pattern eth / ipv4 / gre / end actions nvgre_decap / port_id id 1 / end
+
+flow list 0
+
+# --- GRE tunnel pattern matching ---
+
+# Match plain GRE traffic and drop
+flow create 0 ingress pattern eth / ipv4 / gre / end actions drop / end
+
+# Match GRE-over-IPv6 and count
+flow create 0 ingress pattern eth / ipv6 / gre / end actions count / queue index 0 / end
+
+# --- NVGRE with IPv6 outer ---
+set nvgre ip-version ipv6 tni 88 ip-src fd01::1 ip-dst fd01::2 eth-src DD:DD:DD:00:00:01 eth-dst DD:DD:DD:00:00:02
+
+# NVGRE encap with IPv6 outer to VF1
+flow create 0 transfer pattern eth / ipv4 dst is 172.16.0.0 dst spec 172.16.0.0 dst mask 255.255.0.0 / end actions nvgre_encap / port_id id 2 / end
+
+flow list 0
+flow flush 0

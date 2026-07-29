@@ -1,0 +1,16 @@
+flow flush 0
+
+# Group 0: jump TCP traffic to group 1
+flow create 0 ingress pattern eth / ipv4 / tcp / end actions jump group 1 / end
+
+# Group 0: jump UDP traffic to group 2
+flow create 0 ingress pattern eth / ipv4 / udp / end actions jump group 2 / end
+
+# Group 1: steer TCP to queue 1
+flow create 0 ingress group 1 pattern eth / ipv4 / tcp / end actions queue index 1 / end
+
+# Group 2: drop all UDP
+flow create 0 ingress group 2 pattern eth / ipv4 / udp / end actions drop / end
+
+flow list 0
+flow flush 0

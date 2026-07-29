@@ -1,0 +1,16 @@
+flow flush 0
+
+# Match SSH (TCP port 22) - steer to queue 2
+flow create 0 ingress pattern eth / ipv4 / tcp dst is 22 / end actions queue index 2 / end
+
+# Match HTTPS (TCP port 443) - steer to queue 3
+flow create 0 ingress pattern eth / ipv4 / tcp dst is 443 / end actions queue index 3 / end
+
+# Match DNS (UDP port 53) - drop
+flow create 0 ingress pattern eth / ipv4 / udp dst is 53 / end actions drop / end
+
+# Match HTTP (TCP port 80) with specific source IP
+flow create 0 ingress pattern eth / ipv4 src is 192.168.1.0 src spec 192.168.1.0 src mask 255.255.255.0 / tcp dst is 80 / end actions queue index 1 / end
+
+flow list 0
+flow flush 0

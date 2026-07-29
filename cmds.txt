@@ -1,0 +1,3 @@
+flow create 0 ingress pattern eth / ipv4 / end actions drop / end
+flow dump 0 all
+flow list 0

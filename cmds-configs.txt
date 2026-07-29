@@ -1,0 +1,13 @@
+flow flush 0
+set verbose 1
+
+# Configure VXLAN encap parameters
+set vxlan ip-version ipv4 vni 4 udp-src 4789 udp-dst 4789 ip-src 1.1.1.1 ip-dst 2.2.2.2 eth-src 11:11:11:11:11:11 eth-dst 22:22:22:22:22:22
+
+# Encap: send any packet to port 1 with VXLAN encap
+flow create 0 transfer pattern eth / end actions vxlan_encap / port_id id 1 / end
+
+# Decap: match VXLAN on port 0 and send decapped to port 1
+flow create 0 transfer pattern eth / ipv4 / udp dst is 4789 / vxlan vni is 4 / end actions vxlan_decap / port_id id 1 / end
+
+flow list 0

@@ -1,0 +1,20 @@
+flow flush 0
+
+# --- Raw VXLAN encap: add tunnel headers ---
+set raw_encap 0 eth / ipv4 / udp / vxlan / end_set
+
+# Encap traffic destined to 192.168.1.x into VXLAN tunnel
+flow create 0 transfer pattern eth / ipv4 dst is 192.168.1.1 / end actions raw_encap index 0 / port_id id 1 / end
+
+# Encap + count
+flow create 0 transfer pattern eth / ipv4 dst is 192.168.2.1 / end actions count / raw_encap index 0 / port_id id 1 / end
+
+# --- Multiple raw encap slots ---
+set raw_encap 1 eth / ipv4 / udp / vxlan / end_set
+
+flow create 0 transfer pattern eth / ipv4 dst is 10.0.0.1 / end actions raw_encap index 1 / port_id id 1 / end
+
+flow list 0
+flow destroy 0 rule 0
+flow destroy 0 rule 1
+flow flush 0

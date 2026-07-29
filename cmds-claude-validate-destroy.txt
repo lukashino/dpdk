@@ -1,0 +1,22 @@
+flow flush 0
+
+# Validate rules without installing
+flow validate 0 ingress pattern eth / ipv4 / end actions drop / end
+flow validate 0 ingress pattern eth / ipv4 / tcp dst is 80 / end actions queue index 0 / end
+flow validate 0 ingress pattern eth / ipv6 / udp dst is 4789 / end actions drop / end
+
+# Create some rules then selectively destroy
+flow create 0 ingress pattern eth / ipv4 src is 1.1.1.1 / end actions drop / end
+flow create 0 ingress pattern eth / ipv4 src is 2.2.2.2 / end actions drop / end
+flow create 0 ingress pattern eth / ipv4 src is 3.3.3.3 / end actions drop / end
+
+flow list 0
+
+# Destroy middle rule
+flow destroy 0 rule 1
+
+flow list 0
+
+# Destroy remaining rules
+flow flush 0
+flow list 0

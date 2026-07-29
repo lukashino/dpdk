@@ -1,0 +1,18 @@
+flow flush 0
+
+# Mark HTTP traffic with id 1 and count hits
+flow create 0 ingress pattern eth / ipv4 / tcp dst is 80 / end actions mark id 1 / count / queue index 0 / end
+
+# Mark DNS traffic with id 2 and count
+flow create 0 ingress pattern eth / ipv4 / udp dst is 53 / end actions mark id 2 / count / queue index 0 / end
+
+# Flag ICMP traffic and count
+flow create 0 ingress pattern eth / ipv4 / icmp / end actions flag / count / queue index 0 / end
+
+# Query counters
+flow query 0 0 count
+flow query 0 1 count
+flow query 0 2 count
+
+flow list 0
+flow flush 0

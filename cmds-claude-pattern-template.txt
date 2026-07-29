@@ -1,0 +1,49 @@
+# TESTPMD: pci_opts=dv_flow_en=2 no_repr rxq=2 txq=2
+port stop 0
+flow configure 0 queues_number 2 queues_size 64
+port start 0
+
+
+flow pattern_template 0 create ingress relaxed no pattern_template_id 1 template eth / ipv4 src mask 255.255.255.255 dst mask 255.255.255.255 / udp src mask 0xffff dst mask 0xffff / end
+ 
+flow pattern_template 0 create ingress relaxed no pattern_template_id 2 template eth / ipv4 src mask 255.255.255.255 dst mask 255.255.255.255 / tcp src mask 0xffff dst mask 0xffff / end
+
+
+flow actions_template 0 create ingress actions_template_id 1     template modify_field op set                          dst_type tag dst_level 0 dst_offset 0                          src_type value src_value 00000000                          width 32 /             jump group 4 /             end    mask     modify_field op set                          dst_type tag dst_level 0xffffffff                                       dst_offset 0xffffffff                          src_type value src_value 00000000                          width 0xffffffff /             jump group 0xffffffff /             end
+
+flow template_table 0 create group 1 priority 0 ingress    table_id 1 rules_number 1000000    pattern_template 1 pattern_template 2    actions_template 1
+
+
+flow queue 0 create 0 template_table 1 pattern_template 0 actions_template 0 postpone no    pattern eth /            ipv4 src spec 10.0.0.1 dst spec 10.0.0.2 /            udp src spec 10001 dst spec 10002 /            end    actions modify_field op set dst_type tag src_type value src_value aaaa0000 width 32 /            jump /            end
+flow pull 0 queue 0
+ 
+flow queue 0 create 0 template_table 1 pattern_template 1 actions_template 0 postpone no    pattern eth /            ipv4 src spec 10.0.0.1 dst spec 10.0.0.2 /            tcp src spec 20001 dst spec 20002 /            end    actions modify_field op set dst_type tag src_type value src_value bbbb0000 width 32 /            jump /            end
+flow pull 0 queue 0
+
+flow pattern_template 0 create ingress relaxed no pattern_template_id 4    template tag data mask 0xffffffff index is 0 / end
+
+flow actions_template 0 create ingress actions_template_id 4    template queue / end    mask     queue / end
+
+
+flow template_table 0 create group 4 priority 0 ingress    table_id 4 rules_number 1000000    pattern_template 4    actions_template 4
+
+
+# It is assumed that RX_QUEUE_ID_A == 0
+flow queue 0 create 0 template_table 4 pattern_template 0 actions_template 0 postpone no    pattern tag data is 0x0000aaaa index is 0 / end    actions queue index 0 / end
+flow pull 0 queue 0
+ 
+# It is assumed that RX_QUEUE_ID_A == 1
+flow queue 0 create 0 template_table 4 pattern_template 0 actions_template 0 postpone no    pattern tag data is 0x0000bbbb index is 0 / end    actions queue index 1 / end
+flow pull 0 queue 0
+
+
+
+# After enqueuing a flow, testpmd prints out a flow ID in "flow rule #ID" format
+flow queue 0 create 0 template_table 4 pattern_template 0 actions_template 0 postpone no            pattern tag data is 0x0000aaaa index is 0 / end            actions queue index 0 / end
+flow pull 0 queue 0
+ 
+# To destroy this flow, provide the flow's ID to flow queue <port> destroy <queue> rule <rule-id> command
+flow queue 0 destroy 0 postpone false rule 0
+flow pull 0 queue 0
+
+flow list 0
